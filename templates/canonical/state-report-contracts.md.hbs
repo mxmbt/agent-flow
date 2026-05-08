@@ -1,0 +1,16 @@
+# Canonical State And Report Contracts
+
+## State Fields By Phase
+
+{{ state.phaseFields }}
+
+## Agent Report Fields
+
+{{ state.reportFields }}
+
+## Report Rules
+
+- State files contain facts and decisions, not placeholders.
+- Agent reports stay compact in orchestrator context.
+- Long reasoning and reproduction detail belongs in handoff files.
+- `lessons` are task-local; `memoryLessons` are durable only when the installed project enables that workflow.

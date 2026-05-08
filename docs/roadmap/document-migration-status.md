@@ -3,7 +3,7 @@
 **Created:** 2026-05-08
 **Roadmap:** `docs/roadmap/project-agnostic-core-roadmap.md`
 **Protocol:** `docs/roadmap/document-migration-protocol.md`
-**Status:** Empty package baseline; FinAI reference inventory populated; classification not complete
+**Status:** Empty package baseline; FinAI reference inventory populated; representative dry-run classification started
 
 ---
 
@@ -19,11 +19,11 @@ The separate `migration-ledger.md` file was removed to avoid splitting status ac
 
 | Area | Status | Current Count | Target | Notes |
 |------|--------|---------------|--------|-------|
-| Migration protocol | Drafted | 1 doc | Approved protocol | Defines per-file migration rules and checklist. |
+| Migration protocol | Drafted | 1 doc | Approved protocol | Defines per-file migration rules and checklist; status vocabulary reconciled with this register. |
 | Unified migration register | Raw populated | 537 rows | One row per FinAI reference candidate source file | Rows start as `UNCLASSIFIED / RAW_SCANNED` until a migration task reads the full file. |
-| FinAI reference candidates | Raw populated | 537 rows | Narrowed and classified | Broad scan includes `.claude`, `.codex`, scripts, templates, nested skill assets, and some likely out-of-scope files. |
+| FinAI reference candidates | Dry-run classification started | 537 rows | Narrowed and classified | Broad scan includes `.claude`, `.codex`, scripts, templates, nested skill assets, and some likely out-of-scope files. |
 | File-by-file migration tasks | Not started | 0 tasks | One task per source file or approved micro-batch | Must be created after representative dry-run classifications. |
-| Classified rows | Not started | 0 rows | 537 rows | Classification applies only to selected FinAI reference candidates. |
+| Classified rows | Dry-run started | 4 rows | 537 rows | Classification applies only after full-file review; first sample covers root target, agent, lifecycle skill, and artifact template. |
 | Migrated rows | Not started | 0 rows | TBD | Target count depends on how many rows become `OUT_OF_SCOPE`, `OBSOLETE`, or `GENERATED`. |
 | Core agnostic scan | Not started | 0 runs | Passing in CI | Blocks project-specific literals and absolute local paths. |
 | Claude/Codex parity validation | Not started | 0 runs | Passing in CI | Requires canonical/target renderer first. |
@@ -63,7 +63,7 @@ The separate `migration-ledger.md` file was removed to avoid splitting status ac
 
 | Source | Scope | Raw Count | Register Rows | Coverage | Status |
 |--------|-------|-----------|---------------|----------|--------|
-| FinAI reference repo | `AGENTS.md`, `CLAUDE.md`, `.claude/**`, `.codex/**`, `scripts/**`, `docs/templates/**` | 537 | 537 | 100% raw registered | Raw scanned, unclassified |
+| FinAI reference repo | `AGENTS.md`, `CLAUDE.md`, `.claude/**`, `.codex/**`, `scripts/**`, `docs/templates/**` | 537 | 537 | 100% raw registered | Raw scanned; 4 representative rows classified |
 
 Notes:
 
@@ -77,12 +77,12 @@ Notes:
 
 | Workstream | Scope | Status | Next Action |
 |------------|-------|--------|-------------|
-| Root entrypoints | `AGENTS.md`, `CLAUDE.md`, `.claude/CLAUDE.md`, `.codex/orchestration-policy.md`, `.codex/claude-interop.md` | Raw registered | Classify after canonical template boundary is designed. |
-| Agents | `.claude/agents/**`, `.codex/agents/**` | Raw registered | Migrate one agent per task. |
-| Lifecycle skills | planning, implementation, simplify, review, fix, quality, QA, delivery | Raw registered | Split core lifecycle from packs. |
+| Root entrypoints | `AGENTS.md`, `CLAUDE.md`, `.claude/CLAUDE.md`, `.codex/orchestration-policy.md`, `.codex/claude-interop.md` | 1 dry-run classified | Build canonical lifecycle boundary before migrating root targets. |
+| Agents | `.claude/agents/**`, `.codex/agents/**` | 1 dry-run classified | Migrate one agent per task; split project/runtime assumptions into config and packs. |
+| Lifecycle skills | planning, implementation, simplify, review, fix, quality, QA, delivery | 1 dry-run classified | Split core lifecycle from configurable docs, profiles, and packs. |
 | Auxiliary skills/guides | debugging, TDD, frontend, e2e, commit, architecture, design | Raw registered | Classify vendor/core/pack/obsolete before migration. |
 | Scripts | sync, validation, delivery, worktree, roadmap checks | Raw registered | Split core scripts from optional packs and out-of-scope project scripts. |
-| Templates | state, design document, report, QA, walkthrough | Raw registered | Convert project values into config placeholders. |
+| Templates | state, design document, report, QA, walkthrough | 1 dry-run classified | Convert artifact paths and project values into config placeholders. |
 | MCP config | settings and MCP files | Raw registered | Classify as installer output; scan for absolute paths. |
 | Packs | finance, cloudflare-worker, telegram, webapp, planning-docs | Planned | Define pack manifests before moving pack-heavy files. |
 | Profiles | generic, webapp, finai.example | Planned | Create after core and pack boundaries stabilize. |
@@ -92,12 +92,12 @@ Notes:
 ## Immediate Next Steps
 
 1. Scaffold the package from an empty baseline. Done 2026-05-08: package metadata, TypeScript source tree, public README, CLI skeleton, and help smoke tests landed in Agent Flow.
-2. Reconcile M0 roadmap statuses with evidence from the existing inventory/protocol docs before marking additional M0 tasks done.
-3. Review and classify three representative FinAI rows:
+2. Reconcile M0 roadmap statuses with evidence from the existing inventory/protocol docs before marking additional M0 tasks done. Done 2026-05-08: AF-M0-T3 has protocol/register evidence; AF-M0-T2 remains in progress because full classification is incomplete.
+3. Review and classify three representative FinAI rows. Done 2026-05-08:
    - one root entrypoint
    - one agent
    - one lifecycle skill
-4. Confirm the classification process is usable and does not require bulk migration.
+4. Classify one script or artifact template row to satisfy the roadmap dry-run variant and test non-prompt extraction. Done 2026-05-08: `FINAI-0503`.
 5. Start per-file migration tasks from the register below only for files selected for porting.
 6. Update each row in place after classification, migration, and validation.
 
@@ -127,6 +127,7 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | FinAI rows are raw-scanned but unclassified | Blocks porting those specific files, but does not block empty package scaffold | Classify FinAI files only as they enter a migration slice. |
 | Pack manifest schema not defined | Cannot decide final target for domain/runtime content | Complete AF-M2-T3 before migrating pack-heavy files. |
 | Canonical/target renderer not defined | Root entrypoint parity cannot be validated yet | Complete AF-M3-T1 and AF-M3-T2. |
+| Project-specific assumptions appear inside useful source files | Core migration would leak FinAI runtime/domain facts if copied directly | Split each selected file into canonical core, config placeholders, optional packs, generated target output, or profile data. |
 
 ---
 
@@ -140,7 +141,7 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | FINAI-0004 | FinAI:.claude/agents/code-simplifier.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0005 | FinAI:.claude/agents/deep-reviewer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0006 | FinAI:.claude/agents/delivery-agent.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0007 | FinAI:.claude/agents/feature-developer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
+| FINAI-0007 | FinAI:.claude/agents/feature-developer.md | CORE | core + finance/cloudflare-worker packs | port-as-core | CLASSIFIED | `templates/canonical/agents/feature-developer.md.hbs` | Full file read 2026-05-08 with Codex mirror. Universal implementation/TDD/report contract belongs in core; `cf/`, financial correctness/no-look-ahead, Wrangler/runtime checks, and generated `npm run agents:sync` notice must move to config, packs, or generated target metadata. |
 | FINAI-0008 | FinAI:.claude/agents/findings-arbiter.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0009 | FinAI:.claude/agents/math-genius.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0010 | FinAI:.claude/agents/paranoid-architect.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
@@ -172,7 +173,7 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | FINAI-0036 | FinAI:.claude/skills/architecture-designer/references/system-design.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
 | FINAI-0037 | FinAI:.claude/skills/architecture-patterns/SKILL.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
 | FINAI-0038 | FinAI:.claude/skills/architecture-patterns/references/violation-checklist.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
-| FINAI-0039 | FinAI:.claude/skills/architecture-phase/SKILL.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
+| FINAI-0039 | FinAI:.claude/skills/architecture-phase/SKILL.md | CORE | core + optional project docs/profile inputs | port-as-core | CLASSIFIED | `templates/canonical/skills/architecture-phase/SKILL.md.hbs` | Full file read 2026-05-08 with Codex mirror. RED-task architecture gate, architect prompt contract, ADR/ADD output, and state update contract are core; concrete docs such as `ARCHITECTURE_MULTI_USER.md`, `docs/ARCHITECTURE.md`, RAG/deep-cleanup skill choices, and `docs/ADRs/` path must be config/profile inputs or pack contributions. |
 | FINAI-0040 | FinAI:.claude/skills/banner-design-uupm/SKILL.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
 | FINAI-0041 | FinAI:.claude/skills/banner-design-uupm/references/banner-sizes-and-styles.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
 | FINAI-0042 | FinAI:.claude/skills/brainstorming/SKILL.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
@@ -634,9 +635,9 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | FINAI-0498 | FinAI:.codex/skills/writing-plans/plan-document-reviewer-prompt.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Codex mirror candidate; likely GENERATED or ADAPTER_TARGET after review. |
 | FINAI-0499 | FinAI:.codex/sync-manifest.json | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Codex target/manual policy candidate; check for tool-specific differences. |
 | FINAI-0500 | FinAI:.codex/templates/agent-report-template.codex.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Codex target/manual policy candidate; check for tool-specific differences. |
-| FINAI-0501 | FinAI:AGENTS.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Codex root target candidate; render from canonical parity templates. |
+| FINAI-0501 | FinAI:AGENTS.md | ADAPTER_TARGET | codex + finai.example profile | replace-with-generated | CLASSIFIED | `templates/targets/codex/AGENTS.md.hbs` | Full file read 2026-05-08 with `.claude/CLAUDE.md` and root `CLAUDE.md` context. This is a Codex root entrypoint containing target-specific syntax plus mirrored lifecycle semantics; FinAI task IDs, protected branches, Cloudflare/Telegram/runtime paths, financial/domain experts, roadmap docs, and `cf` checks must render from canonical core, config, packs, or the `finai.example` profile. |
 | FINAI-0502 | FinAI:CLAUDE.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Claude root target candidate; render from canonical parity templates. |
-| FINAI-0503 | FinAI:docs/templates/agent-report-template.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Artifact template candidate; replace project values with config placeholders. |
+| FINAI-0503 | FinAI:docs/templates/agent-report-template.md | CORE | core artifact template | port-as-core | CLASSIFIED | `templates/shared/docs/templates/agent-report-template.md.hbs` | Full file read 2026-05-08 with Codex compatibility shim. Compact `AGENT_REPORT` schema is generic and portable; handoff path should render from configured artifact roots instead of hardcoding `docs/phases/phase-<token>/handoffs/...`. |
 | FINAI-0504 | FinAI:docs/templates/design-document-template.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Artifact template candidate; replace project values with config placeholders. |
 | FINAI-0505 | FinAI:docs/templates/qa-report-template.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Artifact template candidate; replace project values with config placeholders. |
 | FINAI-0506 | FinAI:docs/templates/state-template.json | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Artifact template candidate; replace project values with config placeholders. |
