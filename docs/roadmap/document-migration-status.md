@@ -91,14 +91,15 @@ Notes:
 
 ## Immediate Next Steps
 
-1. Scaffold the package from an empty baseline.
-2. Review and classify three representative FinAI rows:
+1. Scaffold the package from an empty baseline. Done 2026-05-08: package metadata, TypeScript source tree, public README, CLI skeleton, and help smoke tests landed in Agent Flow.
+2. Reconcile M0 roadmap statuses with evidence from the existing inventory/protocol docs before marking additional M0 tasks done.
+3. Review and classify three representative FinAI rows:
    - one root entrypoint
    - one agent
    - one lifecycle skill
-3. Confirm the classification process is usable.
-4. Start per-file migration tasks from the register below only for files selected for porting.
-5. Update each row in place after classification, migration, and validation.
+4. Confirm the classification process is usable and does not require bulk migration.
+5. Start per-file migration tasks from the register below only for files selected for porting.
+6. Update each row in place after classification, migration, and validation.
 
 ---
 

@@ -428,11 +428,11 @@ The CLI may also read `.agent-flow/config.yml` for users who prefer YAML, but th
 
 | ID | Title | Complexity | Dependencies | Status |
 |----|-------|------------|--------------|--------|
-| [AF-M0-T1](#af-m0-t1) | Preserve FinAI as read-only reference | Green | none | TODO |
+| [AF-M0-T1](#af-m0-t1) | Preserve FinAI as read-only reference | Green | none | DONE |
 | [AF-M0-T2](#af-m0-t2) | Inventory FinAI reference assets | Yellow | AF-M0-T1 | TODO |
 | [AF-M0-T3](#af-m0-t3) | Create migration protocol and unified status register | Yellow | AF-M0-T2 | TODO |
-| [AF-M1-T1](#af-m1-t1) | Create package scaffold on empty baseline | Yellow | AF-M0-T3 | TODO |
-| [AF-M1-T2](#af-m1-t2) | Add CLI command skeleton | Yellow | AF-M1-T1 | TODO |
+| [AF-M1-T1](#af-m1-t1) | Create package scaffold on empty baseline | Yellow | AF-M0-T3 | DONE |
+| [AF-M1-T2](#af-m1-t2) | Add CLI command skeleton | Yellow | AF-M1-T1 | DONE |
 | [AF-M2-T1](#af-m2-t1) | Implement project config schema and detection | Red | AF-M1-T2 | TODO |
 | [AF-M2-T2](#af-m2-t2) | Implement template renderer and managed-file policy | Red | AF-M2-T1 | TODO |
 | [AF-M2-T3](#af-m2-t3) | Define pack model and pack composition rules | Red | AF-M2-T1 | TODO |
@@ -456,7 +456,7 @@ The CLI may also read `.agent-flow/config.yml` for users who prefer YAML, but th
 ### AF-M0-T1
 
 **Title:** Preserve FinAI as read-only reference
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Green
 **Dependencies:** none
 
@@ -530,7 +530,7 @@ When moving many prompt and orchestration files, I want a file-level migration p
 ### AF-M1-T1
 
 **Title:** Create package scaffold on empty baseline
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Yellow
 **Dependencies:** AF-M0-T2
 
@@ -548,12 +548,17 @@ When users open the public repo, I want it to look like an installable package, 
 
 - `npm test` or package-equivalent smoke command passes.
 
+#### Verification Evidence
+
+- 2026-05-08: `npm test` passed.
+- 2026-05-08: `npm run type-check` passed.
+
 ---
 
 ### AF-M1-T2
 
 **Title:** Add CLI command skeleton
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Yellow
 **Dependencies:** AF-M1-T1
 
@@ -570,6 +575,10 @@ When users install Agent Flow, I want a real command surface, so that onboarding
 #### Verification Focus
 
 - CLI smoke tests for each command's help output.
+
+#### Verification Evidence
+
+- 2026-05-08: `npm test` covered global help and command help for `init`, `update`, `upgrade`, `sync`, `doctor`, `render`, `validate`, and `pack`.
 
 ---
 
