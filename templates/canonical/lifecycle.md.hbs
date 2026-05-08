@@ -1,0 +1,29 @@
+# Canonical Agent Flow Lifecycle
+
+## Lifecycle
+
+{{ lifecycle.sequence }}
+
+## Phase Contracts
+
+Each phase must finish with a concrete state update before the next phase starts.
+
+- PLAN creates or updates the design document and decides task complexity.
+- ARCHITECTURE runs only for RED work or when a configured rule requires it.
+- IMPLEMENTATION changes code inside the approved scope and records verification.
+- SIMPLIFY is behavior-preserving and happens before REVIEW.
+- REVIEW triages findings before FIX work starts.
+- FIX addresses accepted findings and records targeted verification.
+- QUALITY_GATE runs configured experts plus pack-contributed validators.
+- QA validates the user-facing or runtime surface touched by the task.
+- DELIVERY records final evidence, documentation changes, and delivery state.
+
+Before a phase transition, validate the current phase report and state fields.
+
+## Default Checks
+
+{{ checks.default }}
+
+## Changed-Scope Checks
+
+{{ checks.changed }}

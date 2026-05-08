@@ -429,15 +429,15 @@ The CLI may also read `.agent-flow/config.yml` for users who prefer YAML, but th
 | ID | Title | Complexity | Dependencies | Status |
 |----|-------|------------|--------------|--------|
 | [AF-M0-T1](#af-m0-t1) | Preserve FinAI as read-only reference | Green | none | DONE |
-| [AF-M0-T2](#af-m0-t2) | Inventory FinAI reference assets | Yellow | AF-M0-T1 | TODO |
-| [AF-M0-T3](#af-m0-t3) | Create migration protocol and unified status register | Yellow | AF-M0-T2 | TODO |
+| [AF-M0-T2](#af-m0-t2) | Inventory FinAI reference assets | Yellow | AF-M0-T1 | IN_PROGRESS |
+| [AF-M0-T3](#af-m0-t3) | Create migration protocol and unified status register | Yellow | AF-M0-T2 | DONE |
 | [AF-M1-T1](#af-m1-t1) | Create package scaffold on empty baseline | Yellow | AF-M0-T3 | DONE |
 | [AF-M1-T2](#af-m1-t2) | Add CLI command skeleton | Yellow | AF-M1-T1 | DONE |
-| [AF-M2-T1](#af-m2-t1) | Implement project config schema and detection | Red | AF-M1-T2 | TODO |
-| [AF-M2-T2](#af-m2-t2) | Implement template renderer and managed-file policy | Red | AF-M2-T1 | TODO |
-| [AF-M2-T3](#af-m2-t3) | Define pack model and pack composition rules | Red | AF-M2-T1 | TODO |
-| [AF-M3-T1](#af-m3-t1) | Build canonical lifecycle templates | Red | AF-M2-T2, AF-M2-T3 | TODO |
-| [AF-M3-T2](#af-m3-t2) | Build Claude and Codex target renderers | Red | AF-M3-T1 | TODO |
+| [AF-M2-T1](#af-m2-t1) | Implement project config schema and detection | Red | AF-M1-T2 | DONE |
+| [AF-M2-T2](#af-m2-t2) | Implement template renderer and managed-file policy | Red | AF-M2-T1 | DONE |
+| [AF-M2-T3](#af-m2-t3) | Define pack model and pack composition rules | Red | AF-M2-T1 | DONE |
+| [AF-M3-T1](#af-m3-t1) | Build canonical lifecycle templates | Red | AF-M2-T2, AF-M2-T3 | DONE |
+| [AF-M3-T2](#af-m3-t2) | Build Claude and Codex target renderers | Red | AF-M3-T1 | DONE |
 | [AF-M3-T3](#af-m3-t3) | Port agents, skills, guides, and artifact templates | Red | AF-M3-T2 | TODO |
 | [AF-M4-T1](#af-m4-t1) | Add full mirror parity validation | Red | AF-M3-T3 | TODO |
 | [AF-M4-T2](#af-m4-t2) | Generalize git and delivery utilities | Red | AF-M4-T1 | TODO |
@@ -479,7 +479,7 @@ When rebuilding Agent Flow, I want FinAI untouched, so that extraction cannot re
 ### AF-M0-T2
 
 **Title:** Inventory FinAI reference assets
-**Status:** TODO
+**Status:** IN_PROGRESS
 **Complexity:** Yellow
 **Dependencies:** AF-M0-T1
 
@@ -496,12 +496,18 @@ When extracting orchestration assets from FinAI, I want every selected candidate
 
 - Forbidden literal scan runs against all proposed core files.
 
+#### Verification Evidence
+
+- 2026-05-08: `docs/roadmap/document-migration-status.md` contains 537 raw FinAI reference rows covering `.claude/**`, `.codex/**`, root entrypoints, `scripts/**`, and `docs/templates/**`.
+- 2026-05-08: 4 representative rows were classified after full-file review: root Codex entrypoint, `feature-developer` agent, `architecture-phase` lifecycle skill, and `agent-report-template`.
+- Remaining work: classify the rest of the register before treating AF-M0-T2 as complete.
+
 ---
 
 ### AF-M0-T3
 
 **Title:** Create migration protocol and unified status register
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Yellow
 **Dependencies:** AF-M0-T2
 
@@ -524,6 +530,13 @@ When moving many prompt and orchestration files, I want a file-level migration p
   - one lifecycle skill
   - one script or template
 - Confirm none require bulk migration.
+
+#### Verification Evidence
+
+- 2026-05-08: `docs/roadmap/document-migration-protocol.md` defines per-file migration rules, classification vocabulary, batch limits, project-specific scans, extraction rules, and validation checklist.
+- 2026-05-08: `docs/roadmap/document-migration-status.md` is the unified status register with dashboard, workstreams, blockers, update protocol, and 537 FinAI reference rows.
+- 2026-05-08: dry-run classifications completed for `FINAI-0007`, `FINAI-0039`, and `FINAI-0503`; `FINAI-0501` was also classified to exercise the root entrypoint boundary.
+- Dry-run result: none of the reviewed files should be bulk-copied; each requires boundary extraction into core, config/profile, pack, or generated target output.
 
 ---
 
@@ -585,7 +598,7 @@ When users install Agent Flow, I want a real command surface, so that onboarding
 ### AF-M2-T1
 
 **Title:** Implement project config schema and detection
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M1-T2
 
@@ -605,12 +618,19 @@ When Agent Flow enters a repo, I want project-specific facts captured in one con
 
 - Unit tests for valid config, missing config, invalid branches, invalid commands, and detected npm scripts.
 
+#### Verification Evidence
+
+- 2026-05-08: Added `src/config/schema.ts` with structural config validation, issue paths, branch-name checks, command checks, relative path checks, feature/MCP enum checks, and readable validation errors.
+- 2026-05-08: `loadProjectConfig` now validates `.agent-flow/config.json` and reports invalid JSON/config through `ConfigValidationError`.
+- 2026-05-08: Added `src/config/detect.ts` to detect `package.json`, npm/pnpm/yarn lockfiles, default checks, optional checks, schema checks, dev server command, and unresolved `needsReview` fields.
+- 2026-05-08: `npm test` covered missing config defaults, valid config, invalid branch names, invalid commands, and detected npm scripts.
+
 ---
 
 ### AF-M2-T2
 
 **Title:** Implement template renderer and managed-file policy
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M2-T1
 
@@ -630,12 +650,20 @@ When rendering into an existing repo, I want safe file writes, so that Agent Flo
 - Snapshot tests for rendered core files.
 - Conflict tests for existing unmanaged `AGENTS.md` and `CLAUDE.md`.
 
+#### Verification Evidence
+
+- 2026-05-08: Added `src/renderer/render-template.ts` with dotted placeholder resolution, canonical partial expansion, array rendering, and explicit missing-value errors.
+- 2026-05-08: Added `src/renderer/managed-blocks.ts` with parseable Agent Flow managed metadata headers.
+- 2026-05-08: Added `src/renderer/conflict-policy.ts` with dry-run planning for create/update/noop/conflict and write behavior requiring `force` or `backup` for unmanaged overwrites.
+- 2026-05-08: `npm test` covered rendered output, missing placeholders, metadata parsing, create/noop/update/conflict planning, and backup-before-overwrite behavior.
+- Note: concrete Claude/Codex lifecycle templates are intentionally deferred to AF-M3-T1 and AF-M3-T2.
+
 ---
 
 ### AF-M2-T3
 
 **Title:** Define pack model and pack composition rules
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M2-T1
 
@@ -658,12 +686,18 @@ When a project needs reusable domain or runtime behavior, I want it added throug
 - Unit test composing `finance + cloudflare-worker + telegram`.
 - Conflict test where two packs define the same domain expert or validation hook.
 
+#### Verification Evidence
+
+- 2026-05-08: Added `src/packs/manifest.ts` with pack manifests, deterministic selected-pack composition, merged agents/skill fragments/checks/MCP/deployment surfaces/invariants, and composition errors.
+- 2026-05-08: Added `src/packs/builtin.ts` with initial `finance`, `cloudflare-worker`, `telegram`, and `webapp` pack manifests.
+- 2026-05-08: `npm test` covered empty core composition, `finance + cloudflare-worker + telegram`, unknown/duplicate pack names, duplicate validation hooks, and competing domain experts.
+
 ---
 
 ### AF-M3-T1
 
 **Title:** Build canonical lifecycle templates
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M2-T2
 
@@ -681,12 +715,20 @@ When rendering Claude and Codex files, I want one canonical lifecycle source, so
 
 - Mirror parity validator confirms canonical sections render equivalently.
 
+#### Verification Evidence
+
+- 2026-05-08: Added canonical templates under `templates/canonical/` for lifecycle, artifact contracts, quality gates, QA/delivery, state/report contracts, and the canonical contract index.
+- 2026-05-08: Added `src/renderer/canonical-context.ts` to render canonical templates from project config plus composed pack contributions.
+- 2026-05-08: `npm test` rendered the canonical contract with `finance + cloudflare-worker + telegram`, verified lifecycle/phase/artifact/quality/QA/delivery/state sections, and checked the rendered contract for blocked project-specific literals.
+- 2026-05-08: `npm test` also verified the canonical quality gate renders correctly with zero packs.
+- Note: target-specific Claude/Codex templates and parity validation remain in AF-M3-T2 and AF-M4-T1.
+
 ---
 
 ### AF-M3-T2
 
 **Title:** Build Claude and Codex target renderers
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M3-T1
 
@@ -705,6 +747,14 @@ When installing into a repo, I want Claude Code and Codex to receive their nativ
 #### Verification Focus
 
 - Test proves root `AGENTS.md` and root/Claude lifecycle docs share the same canonical sections.
+
+#### Verification Evidence
+
+- 2026-05-08: Added Claude target templates for root `CLAUDE.md` and `.claude/CLAUDE.md`.
+- 2026-05-08: Added Codex target templates for root `AGENTS.md`, `.codex/orchestration-policy.md`, and `.codex/claude-interop.md`.
+- 2026-05-08: Added `src/renderer/target-renderer.ts` to render enabled Claude/Codex native target files from the same canonical partials with managed metadata.
+- 2026-05-08: `npm test` proved root `CLAUDE.md` and `AGENTS.md` contain identical canonical lifecycle sections while preserving target-specific headers, and verified feature flags can disable Claude or Codex output.
+- Note: agent, skill, guide, and artifact-template target content remains in AF-M3-T3.
 
 ---
 

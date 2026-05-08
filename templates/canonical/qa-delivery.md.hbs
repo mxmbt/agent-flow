@@ -1,0 +1,21 @@
+# Canonical QA And Delivery
+
+## QA
+
+- QA is required for code, runtime, user-facing, or integration changes.
+- The QA plan should match the changed surface and configured dev runtime.
+- Start command: `{{ dev.startCommand }}`
+- Runtime URL: `{{ dev.startUrl }}`
+- QA may be skipped only with an explicit state reason.
+
+## Deployment Impact
+
+{{ packs.deploymentImpactSurfaces }}
+
+## Delivery
+
+- Delivery must report whether the work reached the configured integration branch: `{{ git.integrationBranch }}`.
+- Release branch: `{{ git.releaseBranch }}`.
+- Delivery must record commit or PR identifiers when available.
+- Delivery must update configured docs when the shipped behavior changes repo truth.
+- Final reporting separates implementation, release, and local workspace cleanup facts.

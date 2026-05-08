@@ -91,11 +91,14 @@ Allowed decisions:
 
 Status values:
 
-- `TODO`
-- `IN_PROGRESS`
+- `RAW_SCANNED`
+- `CLASSIFIED`
+- `TASKED`
 - `MIGRATED`
 - `VALIDATED`
 - `SKIPPED`
+
+Legacy task-planning values may appear inside future task descriptions, but the migration register itself uses the status vocabulary above.
 
 ---
 
