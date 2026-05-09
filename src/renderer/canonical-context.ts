@@ -18,16 +18,25 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
       productFile: config.artifacts.productFile,
       phaseRoot: config.artifacts.phaseRoot,
       walkthroughRoot: config.artifacts.walkthroughRoot,
+      taskContextPathPattern: `${config.artifacts.phaseRoot}/phase-<phase-token>/context/<taskId>-context.md`,
       table: renderArtifactTable(config)
     },
     checks: {
       default: renderList([...config.checks.default, ...packs.checks.default]),
-      changed: renderChangedChecks(mergeChangedChecks(config.checks.changed, packs.checks.changed))
+      defaultShellBlock: renderShellBlock([...config.checks.default, ...packs.checks.default]),
+      changed: renderChangedChecks(mergeChangedChecks(config.checks.changed, packs.checks.changed)),
+      changedSchemaInline: renderInlineCommands(
+        mergeChangedChecks(config.checks.changed, packs.checks.changed).schema ?? []
+      ),
+      changedSchemaIndented: renderIndentedList(
+        mergeChangedChecks(config.checks.changed, packs.checks.changed).schema ?? []
+      )
     },
     quality: {
       experts: renderList(config.quality.experts),
       domainExpert: config.quality.domainExpert ?? packs.quality.domainExpert ?? "none configured",
-      invariants: renderList([...config.quality.invariants, ...packs.quality.invariants])
+      invariants: renderList([...config.quality.invariants, ...packs.quality.invariants]),
+      invariantSummary: renderInvariantSummary([...config.quality.invariants, ...packs.quality.invariants])
     },
     packs: {
       installed: renderList(packs.packs),
@@ -36,6 +45,12 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
         ...config.runtime.deploymentImpactSurfaces,
         ...packs.deploymentImpactSurfaces
       ])
+    },
+    runtime: {
+      appRoot: config.runtime.appRoot,
+      migrationsGlob: `${config.runtime.appRoot}/migrations/**`,
+      bindingConfigFile: `${config.runtime.appRoot}/configured-runtime.toml`,
+      routeEntrypoint: `${config.runtime.appRoot}/src/index.ts`
     },
     state: {
       phaseFields: renderPhaseFields(),
@@ -52,7 +67,21 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
     },
     git: {
       integrationBranch: config.git.integrationBranch,
-      releaseBranch: config.git.releaseBranch ?? "none configured"
+      releaseBranch: config.git.releaseBranch ?? "none configured",
+      integrationRef: `${config.git.remoteName}/${config.git.integrationBranch}`,
+      releaseRef: config.git.releaseBranch ? `${config.git.remoteName}/${config.git.releaseBranch}` : "none configured",
+      defaultDeliveryDiffCommand: `git diff --name-only ${config.git.remoteName}/${config.git.integrationBranch}...HEAD`,
+      releaseSyncDiffCommand: config.git.releaseBranch
+        ? `git diff --name-only ${config.git.remoteName}/${config.git.releaseBranch}...${config.git.remoteName}/${config.git.integrationBranch}`
+        : "none configured",
+      releaseFlow: config.git.releaseBranch
+        ? `${config.git.integrationBranch} -> ${config.git.releaseBranch}`
+        : "none configured",
+      prBaseFlag: `--base ${config.git.integrationBranch}`,
+      remoteBranchDeleteCommand: config.git.repository
+        ? `gh api repos/${config.git.repository}/git/refs/heads/<branch> -X DELETE`
+        : "delete the remote branch using the configured repository host",
+      deliveryStateRef: `<merged-commit-or-${config.git.remoteName}/${config.git.integrationBranch}>`
     },
     dev: {
       startCommand: config.dev.start.command ?? "none configured",
@@ -103,6 +132,30 @@ function renderChangedChecks(changed: AgentFlowConfig["checks"]["changed"]): str
     .join("\n");
 }
 
+function renderShellBlock(commands: string[]): string {
+  if (commands.length === 0) {
+    return "# none configured";
+  }
+
+  return commands.join("\n");
+}
+
+function renderIndentedList(values: string[]): string {
+  if (values.length === 0) {
+    return "  - none configured";
+  }
+
+  return values.map((value) => `  - \`${value}\``).join("\n");
+}
+
+function renderInlineCommands(values: string[]): string {
+  if (values.length === 0) {
+    return "none configured";
+  }
+
+  return values.map((value) => `\`${value}\``).join(" and ");
+}
+
 function mergeChangedChecks(
   configChecks: AgentFlowConfig["checks"]["changed"],
   packChecks: AgentFlowConfig["checks"]["changed"]
@@ -131,4 +184,16 @@ function renderList(values: string[]): string {
   }
 
   return values.map((value) => `- ${value}`).join("\n");
+}
+
+function renderInvariantSummary(values: string[]): string {
+  if (values.length === 0) {
+    return "configured correctness";
+  }
+
+  if (values.length === 1) {
+    return values[0] ?? "configured correctness";
+  }
+
+  return `${values.slice(0, -1).join(", ")}, and ${values.at(-1)}`;
 }

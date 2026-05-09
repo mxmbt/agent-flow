@@ -15,7 +15,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node --test dist/tests/*.test.js",
-    "type-check": "tsc -p tsconfig.json --noEmit"
+    "type-check": "tsc -p tsconfig.json --noEmit",
+    "check:migration-similarity": "npm run build && node scripts/check-migration-similarity.mjs",
+    "check:universality": "npm run build && node scripts/check-universality.mjs"
   },
   "engines": {
     "node": ">=20"

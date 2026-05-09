@@ -22,11 +22,19 @@ agent-flow init --help
 agent-flow update --help
 agent-flow upgrade --help
 agent-flow sync --help
+agent-flow sync --diff
 agent-flow doctor --help
+agent-flow config --help
+agent-flow config list
+agent-flow config explain checks.defaultShellBlock
 agent-flow render --help
 agent-flow validate --help
 agent-flow pack --help
 ```
+
+`agent-flow config explain <key>` is the transparency tool for template placeholders. It shows the current rendered value, where it comes from in `.agent-flow/config.json` or enabled packs, and which agent templates use it.
+
+`agent-flow sync --diff` previews generated `.claude/**` and `.codex/**` changes before writing, so users can inspect how config and packs affect the final agent files.
 
 ## Development
 
@@ -41,7 +49,7 @@ Agent Flow is split into:
 
 - `core`: lifecycle mechanics, agent contracts, canonical templates, validators
 - `packs`: optional domain/runtime modules
-- `profiles`: starter configurations composed from core and packs
-- `installer`: CLI commands for init, update, upgrade, sync, doctor, render, validate, and pack management
+- `config`: project-local values such as checks, branches, runtime roots, and repository refs
+- `installer`: CLI commands for init, update, upgrade, sync, doctor, config inspection, render, validate, and pack management
 
 See [docs/roadmap/project-agnostic-core-roadmap.md](docs/roadmap/project-agnostic-core-roadmap.md) for the detailed implementation roadmap.

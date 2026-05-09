@@ -12,6 +12,8 @@ export interface AgentFlowConfig {
     walkthroughRoot: string;
   };
   git: {
+    remoteName: string;
+    repository: string | null;
     integrationBranch: string;
     releaseBranch: string | null;
     branchPrefixes: string[];
@@ -65,6 +67,8 @@ export function createDefaultConfig(projectName = "Example Project"): AgentFlowC
       walkthroughRoot: "docs/walkthroughs/agents"
     },
     git: {
+      remoteName: "origin",
+      repository: null,
       integrationBranch: "main",
       releaseBranch: null,
       branchPrefixes: ["feature", "bugfix", "hotfix", "infra"],

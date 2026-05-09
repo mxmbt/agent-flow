@@ -105,9 +105,9 @@ Initial pack candidates:
 - `cloudflare-worker`: Wrangler, Worker runtime limits, D1/R2/KV deployment surfaces
 - `telegram`: Telegram QA and user-facing copy constraints
 - `webapp`: browser QA, accessibility, common frontend checks
+- `design`: design/UI/brand review surfaces and quality checks
 - `github-delivery`: PR, branch cleanup, delivery-state helpers
 - `code-review-graph`: graph-first discovery MCP and hooks
-- `planning-docs`: optional status/roadmap/tasks consistency checks for projects that use that planning model
 
 CLI target:
 
@@ -352,7 +352,7 @@ agent-flow/
       cloudflare-worker/
       telegram/
       webapp/
-      planning-docs/
+      design/
   tests/
     fixtures/
     e2e/
@@ -438,7 +438,7 @@ The CLI may also read `.agent-flow/config.yml` for users who prefer YAML, but th
 | [AF-M2-T3](#af-m2-t3) | Define pack model and pack composition rules | Red | AF-M2-T1 | DONE |
 | [AF-M3-T1](#af-m3-t1) | Build canonical lifecycle templates | Red | AF-M2-T2, AF-M2-T3 | DONE |
 | [AF-M3-T2](#af-m3-t2) | Build Claude and Codex target renderers | Red | AF-M3-T1 | DONE |
-| [AF-M3-T3](#af-m3-t3) | Port agents, skills, guides, and artifact templates | Red | AF-M3-T2 | TODO |
+| [AF-M3-T3](#af-m3-t3) | Port agents, skills, guides, and artifact templates | Red | AF-M3-T2 | IN_PROGRESS |
 | [AF-M4-T1](#af-m4-t1) | Add full mirror parity validation | Red | AF-M3-T3 | TODO |
 | [AF-M4-T2](#af-m4-t2) | Generalize git and delivery utilities | Red | AF-M4-T1 | TODO |
 | [AF-M5-T1](#af-m5-t1) | Add MCP configuration rendering and health checks | Red | AF-M2-T1 | TODO |
@@ -536,7 +536,7 @@ When moving many prompt and orchestration files, I want a file-level migration p
 - 2026-05-08: `docs/roadmap/document-migration-protocol.md` defines per-file migration rules, classification vocabulary, batch limits, project-specific scans, extraction rules, and validation checklist.
 - 2026-05-08: `docs/roadmap/document-migration-status.md` is the unified status register with dashboard, workstreams, blockers, update protocol, and 537 FinAI reference rows.
 - 2026-05-08: dry-run classifications completed for `FINAI-0007`, `FINAI-0039`, and `FINAI-0503`; `FINAI-0501` was also classified to exercise the root entrypoint boundary.
-- Dry-run result: none of the reviewed files should be bulk-copied; each requires boundary extraction into core, config/profile, pack, or generated target output.
+- Dry-run result: none of the reviewed files should be bulk-copied; each requires boundary extraction into core, config, pack, neutralized source-specific wording, or generated target output.
 
 ---
 
@@ -761,7 +761,7 @@ When installing into a repo, I want Claude Code and Codex to receive their nativ
 ### AF-M3-T3
 
 **Title:** Port agents, skills, guides, and artifact templates
-**Status:** TODO
+**Status:** IN_PROGRESS
 **Complexity:** Red
 **Dependencies:** AF-M3-T2
 
@@ -780,6 +780,17 @@ When users install Agent Flow, I want the strong FinAI-aligned process without F
 #### Verification Focus
 
 - Agnostic scan blocks `FinAI`, `FINAI`, `ZNAI`, `cf &&`, `wrangler`, `Telegram`, `D1`, `docs/sprints`, `Prisma`, `tRPC`, `organizationId`, and hardcoded branches in core.
+
+#### Verification Evidence
+
+- 2026-05-08: AF-MIG-0001 migrated `FINAI-0007` feature-developer agent into `templates/canonical/agents/feature-developer.md.hbs` with Claude/Codex target wrappers under `templates/targets/*/agents/`.
+- 2026-05-08: AF-MIG-0002 migrated `FINAI-0006` delivery-agent and `FINAI-0019` qa-expert into canonical agent templates with Claude/Codex target wrappers.
+- 2026-05-08: `src/renderer/target-renderer.ts` now renders `.claude/agents/{feature-developer,delivery-agent,qa-expert}.md` and `.codex/agents/{feature-developer,delivery-agent,qa-expert}.md` from canonical bodies with target-specific guide and skill roots.
+- 2026-05-09: `npm test` passed with 46 tests, including rendered agent metadata, target-specific paths, pack-contributed invariants, configured checks, config explanation, sync diff preview, template comment handling, similarity logic, universality scanner logic, and rendered universalized migrated agents.
+- 2026-05-08: Added `npm run check:migration-similarity` with a 99% baseline target. `FINAI-0006`, `FINAI-0007`, and `FINAI-0019` pass after accepted universalization substitutions; `FINAI-0007` is 99.00% line / 99.85% token similarity and the other two are 100.00% line / 100.00% token similarity.
+- 2026-05-08: Added `npm run check:universality` as an advisory scanner for project/runtime/stack/domain/command assumptions. Internal Agent Flow skill/guide links are accepted package links by MRD-0001, and planning/design artifacts are core by MRD-0006. The three migrated agent templates now pass the universality scan after applying accepted config/pack/source-wording decisions.
+- 2026-05-09: Added `agent-flow config explain <key>` as an onboarding/transparency command for rendered placeholders. It shows the current value, source config/pack inputs, and templates that use the value.
+- 2026-05-09: Implemented `agent-flow sync --diff` to preview generated target-file create/update/conflict plans and compact diffs without writing files.
 
 ---
 

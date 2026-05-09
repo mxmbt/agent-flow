@@ -23,9 +23,15 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.deepEqual([...byPath.keys()], [
     "CLAUDE.md",
     path.join(".claude", "CLAUDE.md"),
+    path.join(".claude", "agents", "feature-developer.md"),
+    path.join(".claude", "agents", "delivery-agent.md"),
+    path.join(".claude", "agents", "qa-expert.md"),
     "AGENTS.md",
     path.join(".codex", "orchestration-policy.md"),
-    path.join(".codex", "claude-interop.md")
+    path.join(".codex", "claude-interop.md"),
+    path.join(".codex", "agents", "feature-developer.md"),
+    path.join(".codex", "agents", "delivery-agent.md"),
+    path.join(".codex", "agents", "qa-expert.md")
   ]);
 
   const claude = byPath.get("CLAUDE.md");
@@ -53,6 +59,63 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.match(codex, /# Canonical QA And Delivery/);
   assert.match(codex, /# Canonical State And Report Contracts/);
   assert.doesNotMatch(codex, /FinAI|FINAI|ZNAI|cf &&|organizationId/);
+
+  const claudeAgent = byPath.get(path.join(".claude", "agents", "feature-developer.md"));
+  const codexAgent = byPath.get(path.join(".codex", "agents", "feature-developer.md"));
+  assert.ok(claudeAgent);
+  assert.ok(codexAgent);
+  assert.deepEqual(parseManagedMetadata(claudeAgent), {
+    id: "claude-agent-feature-developer",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "feature-developer.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexAgent), {
+    id: "codex-agent-feature-developer",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "feature-developer.md.hbs")
+  });
+  assert.match(claudeAgent, /`\.claude\/guides\/test-driven-development\.md`/);
+  assert.match(codexAgent, /`\.codex\/guides\/test-driven-development\.md`/);
+  assert.match(claudeAgent, /`\.claude\/skills\/frontend-design\/SKILL\.md`/);
+  assert.match(codexAgent, /`\.codex\/skills\/frontend-design\/SKILL\.md`/);
+  assert.match(codexAgent, /fixed-point money, no look-ahead, and explicit timezone handling/);
+  assert.match(codexAgent, /Preferred path:/);
+  assert.doesNotMatch(codexAgent, /Preferred path in FinAI:/);
+  assert.match(codexAgent, /Default required checks for code changes:\n\n```bash\nnpm test\n```/s);
+
+  const claudeDeliveryAgent = byPath.get(path.join(".claude", "agents", "delivery-agent.md"));
+  const codexDeliveryAgent = byPath.get(path.join(".codex", "agents", "delivery-agent.md"));
+  assert.ok(claudeDeliveryAgent);
+  assert.ok(codexDeliveryAgent);
+  assert.deepEqual(parseManagedMetadata(claudeDeliveryAgent), {
+    id: "claude-agent-delivery-agent",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "delivery-agent.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexDeliveryAgent), {
+    id: "codex-agent-delivery-agent",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "delivery-agent.md.hbs")
+  });
+  assert.match(claudeDeliveryAgent, /Commit staged files per `\.claude\/skills\/commit\/SKILL\.md`/);
+  assert.match(codexDeliveryAgent, /Commit staged files per `\.codex\/skills\/commit\/SKILL\.md`/);
+
+  const claudeQaAgent = byPath.get(path.join(".claude", "agents", "qa-expert.md"));
+  const codexQaAgent = byPath.get(path.join(".codex", "agents", "qa-expert.md"));
+  assert.ok(claudeQaAgent);
+  assert.ok(codexQaAgent);
+  assert.deepEqual(parseManagedMetadata(claudeQaAgent), {
+    id: "claude-agent-qa-expert",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "qa-expert.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexQaAgent), {
+    id: "codex-agent-qa-expert",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "qa-expert.md.hbs")
+  });
+  assert.match(claudeQaAgent, /`\.claude\/guides\/verification-before-completion\.md`/);
+  assert.match(codexQaAgent, /`\.codex\/guides\/verification-before-completion\.md`/);
 });
 
 test("renderTargetFiles honors disabled Claude or Codex feature flags", async () => {
@@ -65,7 +128,10 @@ test("renderTargetFiles honors disabled Claude or Codex feature flags", async ()
   assert.deepEqual(files.map((file) => file.path), [
     "AGENTS.md",
     path.join(".codex", "orchestration-policy.md"),
-    path.join(".codex", "claude-interop.md")
+    path.join(".codex", "claude-interop.md"),
+    path.join(".codex", "agents", "feature-developer.md"),
+    path.join(".codex", "agents", "delivery-agent.md"),
+    path.join(".codex", "agents", "qa-expert.md")
   ]);
 });
 

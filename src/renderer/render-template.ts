@@ -10,7 +10,8 @@ export class TemplateRenderError extends Error {
 }
 
 export function renderTemplate(template: string, context: RenderContext, partials: TemplatePartials = {}): string {
-  const withPartials = template.replace(/\{\{\s*>\s*([A-Za-z0-9_.-]+)\s*\}\}/g, (_match, partialName: string) => {
+  const withoutComments = template.replace(/^\s*\{\{![\s\S]*?\}\}\s*\n?/gm, "");
+  const withPartials = withoutComments.replace(/\{\{\s*>\s*([A-Za-z0-9_./-]+)\s*\}\}/g, (_match, partialName: string) => {
     const partial = partials[partialName];
     if (partial === undefined) {
       throw new TemplateRenderError(`Missing template partial: ${partialName}`);
