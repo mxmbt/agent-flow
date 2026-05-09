@@ -137,6 +137,34 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0023",
+      "source": ".claude/guides/systematic-debugging.md",
+      "target": "templates/canonical/guides/systematic-debugging.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0024",
+      "source": ".claude/guides/test-driven-development.md",
+      "target": "templates/canonical/guides/test-driven-development.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0026",
+      "source": ".claude/guides/verification-before-completion.md",
+      "target": "templates/canonical/guides/verification-before-completion.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0027",
+      "source": ".claude/guides/worktree-workflow.md",
+      "target": "templates/canonical/guides/worktree-workflow.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0006",
       "source": ".claude/agents/delivery-agent.md",
       "target": "templates/canonical/agents/delivery-agent.md.hbs",
@@ -147,6 +175,552 @@
       "id": "FINAI-0019",
       "source": ".claude/agents/qa-expert.md",
       "target": "templates/canonical/agents/qa-expert.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0025",
+      "source": ".claude/guides/ui-ux-pro-max-reference.md",
+      "target": "templates/canonical/guides/ui-ux-pro-max-reference.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0074",
+      "source": ".claude/skills/design-system-uupm/SKILL.md",
+      "target": "templates/static/skills/design-system-uupm/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0075",
+      "source": ".claude/skills/design-system-uupm/data/slide-backgrounds.csv",
+      "target": "templates/static/skills/design-system-uupm/data/slide-backgrounds.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0076",
+      "source": ".claude/skills/design-system-uupm/data/slide-charts.csv",
+      "target": "templates/static/skills/design-system-uupm/data/slide-charts.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0077",
+      "source": ".claude/skills/design-system-uupm/data/slide-color-logic.csv",
+      "target": "templates/static/skills/design-system-uupm/data/slide-color-logic.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0078",
+      "source": ".claude/skills/design-system-uupm/data/slide-copy.csv",
+      "target": "templates/static/skills/design-system-uupm/data/slide-copy.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0079",
+      "source": ".claude/skills/design-system-uupm/data/slide-layout-logic.csv",
+      "target": "templates/static/skills/design-system-uupm/data/slide-layout-logic.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0080",
+      "source": ".claude/skills/design-system-uupm/data/slide-layouts.csv",
+      "target": "templates/static/skills/design-system-uupm/data/slide-layouts.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0081",
+      "source": ".claude/skills/design-system-uupm/data/slide-strategies.csv",
+      "target": "templates/static/skills/design-system-uupm/data/slide-strategies.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0082",
+      "source": ".claude/skills/design-system-uupm/data/slide-typography.csv",
+      "target": "templates/static/skills/design-system-uupm/data/slide-typography.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0083",
+      "source": ".claude/skills/design-system-uupm/references/component-specs.md",
+      "target": "templates/static/skills/design-system-uupm/references/component-specs.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0084",
+      "source": ".claude/skills/design-system-uupm/references/component-tokens.md",
+      "target": "templates/static/skills/design-system-uupm/references/component-tokens.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0085",
+      "source": ".claude/skills/design-system-uupm/references/primitive-tokens.md",
+      "target": "templates/static/skills/design-system-uupm/references/primitive-tokens.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0086",
+      "source": ".claude/skills/design-system-uupm/references/semantic-tokens.md",
+      "target": "templates/static/skills/design-system-uupm/references/semantic-tokens.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0087",
+      "source": ".claude/skills/design-system-uupm/references/states-and-variants.md",
+      "target": "templates/static/skills/design-system-uupm/references/states-and-variants.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0088",
+      "source": ".claude/skills/design-system-uupm/references/tailwind-integration.md",
+      "target": "templates/static/skills/design-system-uupm/references/tailwind-integration.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0089",
+      "source": ".claude/skills/design-system-uupm/references/token-architecture.md",
+      "target": "templates/static/skills/design-system-uupm/references/token-architecture.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0090",
+      "source": ".claude/skills/design-system-uupm/scripts/embed-tokens.cjs",
+      "target": "templates/static/skills/design-system-uupm/scripts/embed-tokens.cjs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0091",
+      "source": ".claude/skills/design-system-uupm/scripts/fetch-background.py",
+      "target": "templates/static/skills/design-system-uupm/scripts/fetch-background.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0092",
+      "source": ".claude/skills/design-system-uupm/scripts/generate-slide.py",
+      "target": "templates/static/skills/design-system-uupm/scripts/generate-slide.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0093",
+      "source": ".claude/skills/design-system-uupm/scripts/generate-tokens.cjs",
+      "target": "templates/static/skills/design-system-uupm/scripts/generate-tokens.cjs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0094",
+      "source": ".claude/skills/design-system-uupm/scripts/html-token-validator.py",
+      "target": "templates/static/skills/design-system-uupm/scripts/html-token-validator.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0095",
+      "source": ".claude/skills/design-system-uupm/scripts/search-slides.py",
+      "target": "templates/static/skills/design-system-uupm/scripts/search-slides.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0096",
+      "source": ".claude/skills/design-system-uupm/scripts/slide-token-validator.py",
+      "target": "templates/static/skills/design-system-uupm/scripts/slide-token-validator.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0097",
+      "source": ".claude/skills/design-system-uupm/scripts/slide_search_core.py",
+      "target": "templates/static/skills/design-system-uupm/scripts/slide_search_core.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0098",
+      "source": ".claude/skills/design-system-uupm/scripts/validate-tokens.cjs",
+      "target": "templates/static/skills/design-system-uupm/scripts/validate-tokens.cjs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0099",
+      "source": ".claude/skills/design-system-uupm/templates/design-tokens-starter.json",
+      "target": "templates/static/skills/design-system-uupm/templates/design-tokens-starter.json",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0189",
+      "source": ".claude/skills/ui-styling-uupm/LICENSE.txt",
+      "target": "templates/static/skills/ui-styling-uupm/LICENSE.txt",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0190",
+      "source": ".claude/skills/ui-styling-uupm/SKILL.md",
+      "target": "templates/static/skills/ui-styling-uupm/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0191",
+      "source": ".claude/skills/ui-styling-uupm/references/canvas-design-system.md",
+      "target": "templates/static/skills/ui-styling-uupm/references/canvas-design-system.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0192",
+      "source": ".claude/skills/ui-styling-uupm/references/shadcn-accessibility.md",
+      "target": "templates/static/skills/ui-styling-uupm/references/shadcn-accessibility.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0193",
+      "source": ".claude/skills/ui-styling-uupm/references/shadcn-components.md",
+      "target": "templates/static/skills/ui-styling-uupm/references/shadcn-components.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0194",
+      "source": ".claude/skills/ui-styling-uupm/references/shadcn-theming.md",
+      "target": "templates/static/skills/ui-styling-uupm/references/shadcn-theming.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0195",
+      "source": ".claude/skills/ui-styling-uupm/references/tailwind-customization.md",
+      "target": "templates/static/skills/ui-styling-uupm/references/tailwind-customization.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0196",
+      "source": ".claude/skills/ui-styling-uupm/references/tailwind-responsive.md",
+      "target": "templates/static/skills/ui-styling-uupm/references/tailwind-responsive.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0197",
+      "source": ".claude/skills/ui-styling-uupm/references/tailwind-utilities.md",
+      "target": "templates/static/skills/ui-styling-uupm/references/tailwind-utilities.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0199",
+      "source": ".claude/skills/ui-styling-uupm/scripts/requirements.txt",
+      "target": "templates/static/skills/ui-styling-uupm/scripts/requirements.txt",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0200",
+      "source": ".claude/skills/ui-styling-uupm/scripts/shadcn_add.py",
+      "target": "templates/static/skills/ui-styling-uupm/scripts/shadcn_add.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0201",
+      "source": ".claude/skills/ui-styling-uupm/scripts/tailwind_config_gen.py",
+      "target": "templates/static/skills/ui-styling-uupm/scripts/tailwind_config_gen.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0202",
+      "source": ".claude/skills/ui-styling-uupm/scripts/tests/coverage-ui.json",
+      "target": "templates/static/skills/ui-styling-uupm/scripts/tests/coverage-ui.json",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0203",
+      "source": ".claude/skills/ui-styling-uupm/scripts/tests/requirements.txt",
+      "target": "templates/static/skills/ui-styling-uupm/scripts/tests/requirements.txt",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0204",
+      "source": ".claude/skills/ui-styling-uupm/scripts/tests/test_shadcn_add.py",
+      "target": "templates/static/skills/ui-styling-uupm/scripts/tests/test_shadcn_add.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0205",
+      "source": ".claude/skills/ui-styling-uupm/scripts/tests/test_tailwind_config_gen.py",
+      "target": "templates/static/skills/ui-styling-uupm/scripts/tests/test_tailwind_config_gen.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0206",
+      "source": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "target": "templates/static/skills/ui-ux-pro-max/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0207",
+      "source": ".claude/skills/ui-ux-pro-max/data/_sync_all.py",
+      "target": "templates/static/skills/ui-ux-pro-max/data/_sync_all.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0208",
+      "source": ".claude/skills/ui-ux-pro-max/data/app-interface.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/app-interface.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0209",
+      "source": ".claude/skills/ui-ux-pro-max/data/charts.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/charts.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0210",
+      "source": ".claude/skills/ui-ux-pro-max/data/colors.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/colors.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0211",
+      "source": ".claude/skills/ui-ux-pro-max/data/design.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/design.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0212",
+      "source": ".claude/skills/ui-ux-pro-max/data/draft.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/draft.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0213",
+      "source": ".claude/skills/ui-ux-pro-max/data/google-fonts.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/google-fonts.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0214",
+      "source": ".claude/skills/ui-ux-pro-max/data/icons.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/icons.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0215",
+      "source": ".claude/skills/ui-ux-pro-max/data/landing.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/landing.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0216",
+      "source": ".claude/skills/ui-ux-pro-max/data/products.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/products.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0217",
+      "source": ".claude/skills/ui-ux-pro-max/data/react-performance.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/react-performance.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0218",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/angular.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/angular.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0219",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/astro.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/astro.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0220",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0221",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0222",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0223",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/laravel.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/laravel.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0224",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0225",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0226",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0227",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0228",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/react.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/react.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0229",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0230",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0231",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0232",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/threejs.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/threejs.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0233",
+      "source": ".claude/skills/ui-ux-pro-max/data/stacks/vue.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/stacks/vue.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0234",
+      "source": ".claude/skills/ui-ux-pro-max/data/styles.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/styles.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0235",
+      "source": ".claude/skills/ui-ux-pro-max/data/typography.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/typography.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0236",
+      "source": ".claude/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0237",
+      "source": ".claude/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+      "target": "templates/static/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0238",
+      "source": ".claude/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "templates/static/skills/ui-ux-pro-max/scripts/core.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0239",
+      "source": ".claude/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "templates/static/skills/ui-ux-pro-max/scripts/design_system.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0240",
+      "source": ".claude/skills/ui-ux-pro-max/scripts/search.py",
+      "target": "templates/static/skills/ui-ux-pro-max/scripts/search.py",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     }

@@ -17,6 +17,7 @@ test("config list shows explainable rendered placeholders", async () => {
 
   assert.match(stdout, /agent-flow config/);
   assert.match(stdout, /checks\.defaultShellBlock/);
+  assert.match(stdout, /checks\.focusedTestCommand/);
   assert.match(stdout, /artifacts\.architectureFile/);
   assert.match(stdout, /artifacts\.userIsolationArchitectureFile/);
   assert.match(stdout, /artifacts\.schedulingArchitectureFile/);
@@ -24,6 +25,8 @@ test("config list shows explainable rendered placeholders", async () => {
   assert.match(stdout, /artifacts\.uiUxSpecificationFile/);
   assert.match(stdout, /artifacts\.designSystemFile/);
   assert.match(stdout, /artifacts\.uxWritingGuideFile/);
+  assert.match(stdout, /artifacts\.qaSharedAccountFile/);
+  assert.match(stdout, /dev\.startUrl/);
   assert.match(stdout, /discovery\.codeGraphProvider/);
   assert.match(stdout, /discovery\.planningProviderSummary/);
   assert.match(stdout, /git\.remoteBranchDeleteCommand/);
@@ -37,6 +40,7 @@ test("config explain shows current rendered value, sources, and template usage",
   config.git.integrationBranch = "main";
   config.git.releaseBranch = "stable";
   config.checks.default = ["pnpm test", "pnpm typecheck"];
+  config.checks.focusedTestCommand = "pnpm test -- <test-file>";
   config.runtime.appRoot = "apps/site";
   config.artifacts.architectureFile = "docs/architecture/system.md";
   config.artifacts.userIsolationArchitectureFile = "docs/architecture/data-isolation.md";
@@ -45,6 +49,8 @@ test("config explain shows current rendered value, sources, and template usage",
   config.artifacts.uiUxSpecificationFile = "docs/design/ux-spec.md";
   config.artifacts.designSystemFile = "docs/design/system.md";
   config.artifacts.uxWritingGuideFile = "docs/design/writing.md";
+  config.artifacts.qaSharedAccountFile = "docs/testing/shared-account.md";
+  config.dev.start.url = "http://localhost:4173";
   config.discovery.codeGraphProvider = "custom";
   config.discovery.customProvider = "internal-graph-mcp";
   config.packs = ["cloudflare-worker"];
@@ -56,6 +62,14 @@ test("config explain shows current rendered value, sources, and template usage",
   assert.match(checks.stdout, /pnpm test\npnpm typecheck/);
   assert.match(checks.stdout, /\.agent-flow\/config\.json -> checks\.default/);
   assert.match(checks.stdout, /templates\/canonical\/agents\/feature-developer\.md\.hbs/);
+
+  const focusedTest = await execFileAsync(process.execPath, [cliPath, "config", "explain", "checks.focusedTestCommand"], {
+    cwd
+  });
+  assert.match(focusedTest.stdout, /checks\.focusedTestCommand/);
+  assert.match(focusedTest.stdout, /pnpm test -- <test-file>/);
+  assert.match(focusedTest.stdout, /\.agent-flow\/config\.json -> checks\.focusedTestCommand/);
+  assert.match(focusedTest.stdout, /templates\/canonical\/guides\/test-driven-development\.md\.hbs/);
 
   const git = await execFileAsync(process.execPath, [cliPath, "config", "explain", "git.remoteBranchDeleteCommand"], { cwd });
   assert.match(git.stdout, /gh api repos\/acme\/example\/git\/refs\/heads\/<branch> -X DELETE/);
@@ -87,6 +101,20 @@ test("config explain shows current rendered value, sources, and template usage",
   assert.match(uxWriting.stdout, /docs\/design\/writing\.md/);
   assert.match(uxWriting.stdout, /\.agent-flow\/config\.json -> artifacts\.uxWritingGuideFile/);
   assert.match(uxWriting.stdout, /templates\/canonical\/agents\/ux-expert\.md\.hbs/);
+
+  const qaSharedAccount = await execFileAsync(
+    process.execPath,
+    [cliPath, "config", "explain", "artifacts.qaSharedAccountFile"],
+    { cwd }
+  );
+  assert.match(qaSharedAccount.stdout, /docs\/testing\/shared-account\.md/);
+  assert.match(qaSharedAccount.stdout, /\.agent-flow\/config\.json -> artifacts\.qaSharedAccountFile/);
+  assert.match(qaSharedAccount.stdout, /templates\/canonical\/agents\/qa-expert\.md\.hbs/);
+
+  const startUrl = await execFileAsync(process.execPath, [cliPath, "config", "explain", "dev.startUrl"], { cwd });
+  assert.match(startUrl.stdout, /http:\/\/localhost:4173/);
+  assert.match(startUrl.stdout, /\.agent-flow\/config\.json -> dev\.start\.url/);
+  assert.match(startUrl.stdout, /templates\/canonical\/agents\/qa-expert\.md\.hbs/);
 
   const discovery = await execFileAsync(
     process.execPath,

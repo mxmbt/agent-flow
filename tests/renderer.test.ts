@@ -9,7 +9,7 @@ import {
   planManagedFiles,
   writeManagedFiles
 } from "../src/renderer/conflict-policy.js";
-import { parseManagedMetadata, renderManagedFile } from "../src/renderer/managed-blocks.js";
+import { parseManagedMetadata, renderManagedAssetFile, renderManagedFile } from "../src/renderer/managed-blocks.js";
 import { renderTemplate, TemplateRenderError } from "../src/renderer/render-template.js";
 
 test("renderTemplate resolves dotted values and canonical partials", () => {
@@ -63,6 +63,36 @@ test("renderManagedFile writes parseable metadata", () => {
     source: "templates/targets/codex/AGENTS.md.hbs"
   });
   assert.match(content, /^<!-- @agent-flow managed /);
+});
+
+test("renderManagedAssetFile writes file-type compatible metadata", () => {
+  const python = renderManagedAssetFile(
+    { id: "python-asset", version: 2, source: "templates/static/skills/example/script.py" },
+    "#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\nprint('ok')\n",
+    ".claude/skills/example/script.py"
+  );
+  assert.match(python, /^#!\/usr\/bin\/env python3\n# -\*- coding: utf-8 -\*-\n# @agent-flow managed /);
+  assert.deepEqual(parseManagedMetadata(python), {
+    id: "python-asset",
+    version: 2,
+    source: "templates/static/skills/example/script.py"
+  });
+
+  const csv = renderManagedAssetFile({ id: "csv-asset", version: 1 }, "Name,Value\nA,1\n", ".claude/skills/example/data.csv");
+  assert.match(csv, /^# @agent-flow managed /);
+  assert.deepEqual(parseManagedMetadata(csv), { id: "csv-asset", version: 1, source: undefined });
+
+  const skill = renderManagedAssetFile(
+    { id: "skill-asset", version: 1 },
+    "---\nname: example\n---\n# Example\n",
+    ".claude/skills/example/SKILL.md"
+  );
+  assert.match(skill, /^---\nname: example\n---\n<!-- @agent-flow managed /);
+  assert.deepEqual(parseManagedMetadata(skill), { id: "skill-asset", version: 1, source: undefined });
+
+  const json = renderManagedAssetFile({ id: "json-asset", version: 1 }, "{\"ok\":true}\n", ".claude/skills/example/data.json");
+  assert.equal(json, "{\"ok\":true}\n");
+  assert.equal(parseManagedMetadata(json), null);
 });
 
 test("planManagedFiles detects create, noop, managed update, and unmanaged conflict", async () => {

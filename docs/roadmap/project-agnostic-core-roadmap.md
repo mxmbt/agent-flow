@@ -60,7 +60,7 @@ installer
 
 Core must not mention a concrete product or stack. Project-specific behavior is supplied by `.agent-flow/config.json` or an equivalent config file loaded by the CLI.
 
-Planning has one important abstraction: coding projects need a discovery provider for codebase maps, impact analysis, and affected-flow discovery. Core owns that provider contract. The default onboarding provider is the `code-review-graph` pack when `init` detects a code project and no existing Agent Flow config; projects with another graph/indexing tool configure `discovery.codeGraphProvider: "custom"` and describe it in `discovery.customProvider`.
+Planning has one important abstraction: coding projects need a discovery provider for codebase maps, impact analysis, and affected-flow discovery. Core owns that provider contract. The default onboarding provider is the `code-review-graph` pack when `init` detects a code project and no existing Agent Flow config; projects with another graph/indexing tool configure `discovery.codeGraphProvider: "custom"` and describe it in `discovery.customProvider`. Core agents refer to the configured provider instead of hardcoding CRG links or MCP tools.
 
 ### 3. No Mass Replacement
 
@@ -99,7 +99,7 @@ Profiles and packs are different things.
 | Concept | Purpose | Example |
 |---------|---------|---------|
 | Profile | A starting configuration for a project shape | `generic`, `webapp`, `finai.example` |
-| Pack | A reusable capability module | `finance`, `cloudflare-worker`, `telegram`, `webapp`, `code-review-toolkit` |
+| Pack | A reusable capability module | `finance`, `cloudflare-worker`, `telegram`, `webapp`, `code-review-toolkit`, `design` |
 
 Initial pack candidates:
 
@@ -253,6 +253,7 @@ checks:
   default:
     - "npm test"
     - "npm run type-check"
+  focusedTestCommand: "npm test -- <test-file>"
   changed:
     schema:
       - "npm run db:generate"
@@ -267,6 +268,9 @@ dev:
   start:
     command: "npm run dev"
     url: "http://localhost:3000"
+
+artifacts:
+  qaSharedAccountFile: "docs/testing/QA-SHARED-ACCOUNT.md"
 
 runtime:
   appRoot: "."
@@ -695,8 +699,8 @@ When a project needs reusable domain or runtime behavior, I want it added throug
 
 #### Verification Evidence
 
-- 2026-05-08: Added `src/packs/manifest.ts` with pack manifests, deterministic selected-pack composition, merged agents/skill fragments/checks/MCP/deployment surfaces/invariants, and composition errors.
-- 2026-05-08: Added `src/packs/builtin.ts` with initial `finance`, `cloudflare-worker`, `telegram`, and `webapp` pack manifests.
+- 2026-05-08: Added `src/packs/manifest.ts` with pack manifests, deterministic selected-pack composition, merged agents/skills/skill fragments/checks/MCP/deployment surfaces/invariants, and composition errors.
+- 2026-05-08: Added `src/packs/builtin.ts` with initial `finance`, `cloudflare-worker`, `telegram`, `webapp`, `code-review-toolkit`, `code-review-graph`, and `design` pack manifests.
 - 2026-05-08: `npm test` covered empty core composition, `finance + cloudflare-worker + telegram`, unknown/duplicate pack names, duplicate validation hooks, and competing domain experts.
 
 ---
@@ -802,13 +806,18 @@ When users install Agent Flow, I want the strong FinAI-aligned process without F
 - 2026-05-09: AF-MIG-0010 migrated `FINAI-0017` prt-silent-failure-hunter and `FINAI-0018` prt-type-design-analyzer as `code-review-toolkit` pack agents with PR-only wording, concrete logging/Sentry examples, production-code phrasing, and narrow type-design terminology generalized in canonical bodies.
 - 2026-05-09: AF-MIG-0011 migrated `FINAI-0020` ux-expert into a canonical agent template with UX/design reference paths routed through artifact config and starter/reuse behavior added to init.
 - 2026-05-09: AF-MIG-0012 migrated `FINAI-0021` code-review-graph-usage as a `code-review-graph` pack guide and `FINAI-0022` gan-protocol as a core guide.
-- 2026-05-09: `src/renderer/target-renderer.ts` now renders `.claude/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,paranoid-architect,performance-expert,product-manager,ux-expert,delivery-agent,qa-expert}.md` and `.codex/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,paranoid-architect,performance-expert,product-manager,ux-expert,delivery-agent,qa-expert}.md` from canonical bodies with target-specific guide and skill roots. Pack-contributed agents such as `math-genius` and the `prt-*` code-review-toolkit agents render only when the selected packs contribute them. Core guides such as `gan-protocol` render in zero-pack installs; pack guides such as `code-review-graph-usage` render only when the owning pack contributes them.
-- 2026-05-09: `npm test` passed with 50 tests, including rendered agent metadata, target-specific paths, pack-contributed invariants, configured checks, config explanation, sync diff preview, starter artifact reuse, template comment handling, similarity logic, universality scanner logic, and rendered universalized migrated agents.
+- 2026-05-09: AF-MIG-0013 migrated `FINAI-0023` systematic-debugging and `FINAI-0024` test-driven-development as core guides, with focused single-test commands routed through `checks.focusedTestCommand`.
+- 2026-05-09: AF-MIG-0014 classified `FINAI-0025` ui-ux-pro-max-reference as vendor/design-pack content and migrated `FINAI-0026` verification-before-completion plus `FINAI-0027` worktree-workflow as core guides, with checks and Git/worktree delivery commands routed through config/rendered placeholders.
+- 2026-05-09: AF-MIG-0015 migrated `FINAI-0025` ui-ux-pro-max-reference plus `ui-ux-pro-max`, `ui-styling-uupm`, and `design-system-uupm` static skill bundles as the optional `design` pack.
+- 2026-05-09: `src/renderer/target-renderer.ts` now renders `.claude/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,paranoid-architect,performance-expert,product-manager,ux-expert,delivery-agent,qa-expert}.md` and `.codex/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,paranoid-architect,performance-expert,product-manager,ux-expert,delivery-agent,qa-expert}.md` from canonical bodies with target-specific guide and skill roots. Pack-contributed agents such as `math-genius` and the `prt-*` code-review-toolkit agents render only when the selected packs contribute them. Core guides such as `{gan-protocol,systematic-debugging,test-driven-development,verification-before-completion,worktree-workflow}` render in zero-pack installs; pack guides such as `{code-review-graph-usage,ui-ux-pro-max-reference}` render only when the owning pack contributes them. Pack skill assets render into target-specific `.claude/skills/**` and `.codex/skills/**` trees.
+- 2026-05-09: `npm test` passed with 60 tests, including rendered agent/guide metadata, target-specific paths, pack-contributed invariants, configured checks, config explanation, sync diff preview, starter artifact reuse, template comment handling, file-type-compatible managed headers, static pack skill assets, similarity logic, universality scanner logic, and rendered universalized migrated agents/guides.
 - 2026-05-08: Added `npm run check:migration-similarity` with a 99% baseline target. `FINAI-0006`, `FINAI-0007`, and `FINAI-0019` pass after accepted universalization substitutions; `FINAI-0007` is 99.00% line / 99.85% token similarity and the other two are 100.00% line / 100.00% token similarity.
 - 2026-05-08: Added `npm run check:universality` as an advisory scanner for project/runtime/stack/domain/command assumptions. Internal Agent Flow skill/guide links are accepted package links by MRD-0001, and planning/design artifacts are core by MRD-0006. The three migrated agent templates now pass the universality scan after applying accepted config/pack/source-wording decisions.
 - 2026-05-09: Added `agent-flow config explain <key>` as an onboarding/transparency command for rendered placeholders. It shows the current value, source config/pack inputs, and templates that use the value.
 - 2026-05-09: Implemented `agent-flow sync --diff` to preview generated target-file create/update/conflict plans and compact diffs without writing files.
-- 2026-05-09: Added `discovery.codeGraphProvider` onboarding. `init` enables the `code-review-graph` pack by default for detected coding projects without existing Agent Flow config, while `doctor` and `config explain` surface missing or custom planning discovery providers.
+- 2026-05-09: Added `discovery.codeGraphProvider` onboarding. `init` enables the `code-review-graph` pack by default for detected coding projects without existing Agent Flow config, while `doctor` and `config explain` surface missing or custom planning discovery providers. Core agents now reference the configured discovery provider instead of hardcoded CRG guide links; the CRG guide and MCP recommendation remain pack-owned.
+- 2026-05-09: Detected coding projects also enable the `code-review-toolkit` pack as recommended manual review tooling, without making those agents mandatory in zero-pack installs.
+- 2026-05-09: QA runtime URL and shared test-account docs now render from config via `dev.start.url` and `artifacts.qaSharedAccountFile`; `init` creates a starter QA shared-account doc for bare projects and reuses common existing QA docs.
 
 ---
 

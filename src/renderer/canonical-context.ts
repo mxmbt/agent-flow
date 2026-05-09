@@ -23,6 +23,7 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
       uiUxSpecificationFile: config.artifacts.uiUxSpecificationFile,
       designSystemFile: config.artifacts.designSystemFile,
       uxWritingGuideFile: config.artifacts.uxWritingGuideFile,
+      qaSharedAccountFile: config.artifacts.qaSharedAccountFile ?? "docs/testing/QA-SHARED-ACCOUNT.md",
       phaseRoot: config.artifacts.phaseRoot,
       walkthroughRoot: config.artifacts.walkthroughRoot,
       taskContextPathPattern: `${config.artifacts.phaseRoot}/phase-<phase-token>/context/<taskId>-context.md`,
@@ -31,6 +32,7 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
     checks: {
       default: renderList([...config.checks.default, ...packs.checks.default]),
       defaultShellBlock: renderShellBlock([...config.checks.default, ...packs.checks.default]),
+      focusedTestCommand: config.checks.focusedTestCommand ?? "run the configured focused test command for <test-file>",
       changed: renderChangedChecks(mergeChangedChecks(config.checks.changed, packs.checks.changed)),
       changedSchemaInline: renderInlineCommands(
         mergeChangedChecks(config.checks.changed, packs.checks.changed).schema ?? []
@@ -79,6 +81,7 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
       ])
     },
     git: {
+      remoteName: config.git.remoteName,
       integrationBranch: config.git.integrationBranch,
       releaseBranch: config.git.releaseBranch ?? "none configured",
       integrationRef: `${config.git.remoteName}/${config.git.integrationBranch}`,
@@ -94,7 +97,9 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
       remoteBranchDeleteCommand: config.git.repository
         ? `gh api repos/${config.git.repository}/git/refs/heads/<branch> -X DELETE`
         : "delete the remote branch using the configured repository host",
-      deliveryStateRef: `<merged-commit-or-${config.git.remoteName}/${config.git.integrationBranch}>`
+      deliveryStateRef: `<merged-commit-or-${config.git.remoteName}/${config.git.integrationBranch}>`,
+      worktreeParkCommand: "./scripts/park-worktrees.sh",
+      deliveryStateCommand: "./scripts/report-delivery-state.sh"
     },
     dev: {
       startCommand: config.dev.start.command ?? "none configured",
@@ -117,6 +122,7 @@ function renderArtifactTable(config: AgentFlowConfig): string {
     `| UI/UX specification | \`${config.artifacts.uiUxSpecificationFile}\` |`,
     `| Design system | \`${config.artifacts.designSystemFile}\` |`,
     `| UX writing guide | \`${config.artifacts.uxWritingGuideFile}\` |`,
+    `| QA shared account | \`${config.artifacts.qaSharedAccountFile ?? "docs/testing/QA-SHARED-ACCOUNT.md"}\` |`,
     `| Phase root | \`${config.artifacts.phaseRoot}\` |`,
     `| Walkthrough root | \`${config.artifacts.walkthroughRoot}\` |`,
     `| Design document | \`${config.artifacts.phaseRoot}/phase-<phase-token>/design/<taskId>-design.md\` |`,

@@ -35,8 +35,12 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   if (!config.packs.includes("code-review-graph")) {
     config.packs.push("code-review-graph");
   }
+  if (!config.packs.includes("code-review-toolkit")) {
+    config.packs.push("code-review-toolkit");
+  }
   needsReview.push("discovery.codeGraphProvider");
   evidence.push("Detected a code project and no existing Agent Flow config; enabled the code-review-graph pack as the default planning discovery provider. If this project uses another code graph provider, set discovery.codeGraphProvider to custom and remove or replace the pack.");
+  evidence.push("Enabled the code-review-toolkit pack as recommended manual review tooling for code projects.");
 
   const scripts = getScripts(packageJson);
   const run = packageManager === "yarn" ? "yarn" : `${packageManager ?? "npm"} run`;
@@ -49,6 +53,12 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
 
   if (defaultChecks.length > 0) {
     config.checks.default = defaultChecks;
+    if (scripts.test) {
+      config.checks.focusedTestCommand = packageManager === "yarn"
+        ? "yarn test <test-file>"
+        : `${run} test -- <test-file>`;
+      evidence.push(`Detected focused test command: ${config.checks.focusedTestCommand}.`);
+    }
     evidence.push(`Detected default checks: ${defaultChecks.join(", ")}.`);
   } else {
     needsReview.push("checks.default");

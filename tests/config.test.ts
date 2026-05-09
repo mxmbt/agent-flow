@@ -21,9 +21,11 @@ test("loadProjectConfig returns defaults when config is missing", async () => {
   assert.equal(loaded.config.artifacts.uiUxSpecificationFile, "docs/UI-UX-SPECIFICATION.md");
   assert.equal(loaded.config.artifacts.designSystemFile, "docs/design/DESIGN-SYSTEM.md");
   assert.equal(loaded.config.artifacts.uxWritingGuideFile, "docs/design/UX-WRITING-GUIDE.md");
+  assert.equal(loaded.config.artifacts.qaSharedAccountFile, "docs/testing/QA-SHARED-ACCOUNT.md");
   assert.equal(loaded.config.discovery.codeGraphProvider, "none");
   assert.equal(loaded.config.discovery.fallback, "filesystem-search");
   assert.deepEqual(loaded.config.checks.default, ["npm test"]);
+  assert.equal(loaded.config.checks.focusedTestCommand, null);
 });
 
 test("loadProjectConfig validates a complete config file", async () => {
@@ -39,6 +41,23 @@ test("loadProjectConfig validates a complete config file", async () => {
   assert.equal(loaded.source, path.join(".agent-flow", "config.json"));
   assert.equal(loaded.config.project.name, "Config Fixture");
   assert.deepEqual(loaded.config.checks.default, ["npm test", "npm run type-check"]);
+});
+
+test("loadProjectConfig accepts older config files without newly added optional fields", async () => {
+  const cwd = await tempDir();
+  const config = createDefaultConfig("Legacy Config");
+  delete (config.checks as Partial<AgentFlowConfig["checks"]>).focusedTestCommand;
+  delete (config.artifacts as Partial<AgentFlowConfig["artifacts"]>).qaSharedAccountFile;
+
+  const configDir = path.join(cwd, ".agent-flow");
+  await mkdir(configDir, { recursive: true });
+  await writeJson(path.join(configDir, "config.json"), config);
+
+  const loaded = await loadProjectConfig(cwd);
+
+  assert.equal(loaded.config.project.name, "Legacy Config");
+  assert.equal(loaded.config.checks.focusedTestCommand, undefined);
+  assert.equal(loaded.config.artifacts.qaSharedAccountFile, undefined);
 });
 
 test("loadProjectConfig reports invalid branch names with issue paths", async () => {
@@ -133,8 +152,9 @@ test("detectProjectConfig proposes npm script checks and review markers", async 
   assert.equal(detected.packageManager, "npm");
   assert.equal(detected.config.project.name, "detected-app");
   assert.equal(detected.config.discovery.codeGraphProvider, "code-review-graph");
-  assert.deepEqual(detected.config.packs, ["code-review-graph"]);
+  assert.deepEqual(detected.config.packs, ["code-review-graph", "code-review-toolkit"]);
   assert.deepEqual(detected.config.checks.default, ["npm run test", "npm run type-check"]);
+  assert.equal(detected.config.checks.focusedTestCommand, "npm run test -- <test-file>");
   assert.equal(detected.config.checks.optional.lint, "npm run lint");
   assert.equal(detected.config.checks.optional.build, "npm run build");
   assert.deepEqual(detected.config.checks.changed.schema, ["npm run generate", "npm run migrate:local"]);
@@ -144,7 +164,9 @@ test("detectProjectConfig proposes npm script checks and review markers", async 
   assert.ok(detected.needsReview.includes("git.integrationBranch"));
   assert.ok(detected.needsReview.includes("dev.start.url"));
   assert.ok(detected.needsReview.includes("discovery.codeGraphProvider"));
+  assert.ok(detected.evidence.some((line) => /Detected focused test command: npm run test -- <test-file>/.test(line)));
   assert.ok(detected.evidence.some((line) => /code-review-graph pack as the default planning discovery provider/.test(line)));
+  assert.ok(detected.evidence.some((line) => /code-review-toolkit pack as recommended manual review tooling/.test(line)));
 });
 
 async function tempDir(): Promise<string> {

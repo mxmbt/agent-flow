@@ -9,9 +9,18 @@ test("composePacks supports an empty core install", () => {
   assert.deepEqual(composed.packs, []);
   assert.deepEqual(composed.agents, []);
   assert.deepEqual(composed.guides, []);
+  assert.deepEqual(composed.skills, []);
   assert.deepEqual(composed.validators, []);
   assert.deepEqual(composed.checks.default, []);
   assert.equal(composed.quality.domainExpert, null);
+});
+
+test("composePacks includes design guide and UI/UX skill bundle", () => {
+  const composed = composePacks(builtinPacks, ["design"]);
+
+  assert.deepEqual(composed.guides, ["ui-ux-pro-max-reference"]);
+  assert.deepEqual(composed.skills, ["ui-ux-pro-max", "ui-styling-uupm", "design-system-uupm"]);
+  assert.deepEqual(composed.validators, ["design-review"]);
 });
 
 test("composePacks includes code-review-graph guide and optional MCP server", () => {

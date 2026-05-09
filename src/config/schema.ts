@@ -72,6 +72,10 @@ function validateArtifacts(config: Record<string, unknown>, issues: ConfigIssue[
   ]) {
     expectRelativePath(artifacts[key], `artifacts.${key}`, issues);
   }
+
+  if (artifacts.qaSharedAccountFile !== undefined) {
+    expectRelativePath(artifacts.qaSharedAccountFile, "artifacts.qaSharedAccountFile", issues);
+  }
 }
 
 function validateGit(config: Record<string, unknown>, issues: ConfigIssue[]): void {
@@ -105,6 +109,10 @@ function expectRepositoryRef(value: unknown, path: string, issues: ConfigIssue[]
 function validateChecks(config: Record<string, unknown>, issues: ConfigIssue[]): void {
   const checks = expectRecord(config.checks, "checks", issues);
   expectCommandArray(checks.default, "checks.default", issues);
+
+  if (checks.focusedTestCommand !== null && checks.focusedTestCommand !== undefined) {
+    expectCommand(checks.focusedTestCommand, "checks.focusedTestCommand", issues);
+  }
 
   const optional = expectRecord(checks.optional, "checks.optional", issues);
   for (const [key, command] of Object.entries(optional)) {

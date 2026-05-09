@@ -53,9 +53,11 @@ Rules:
 - do not re-research the same module from scratch unless the pack is stale or clearly insufficient
 - if the file is unexpectedly missing, attempt the canonical path, note the miss, and continue with incremental discovery
 
-## Graph-First Analysis
+## Discovery-First Analysis
 
-When structural impact is unclear, use code-review-graph before broad manual scanning:
+When structural impact is unclear, use the configured planning discovery provider before broad manual scanning:
+
+`{{discovery.planningProviderSummary}}`
 
 - `query_graph` for callers, imports, and local structure
 - `get_impact_radius` for blast radius

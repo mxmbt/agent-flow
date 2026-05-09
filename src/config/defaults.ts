@@ -15,6 +15,7 @@ export interface AgentFlowConfig {
     uiUxSpecificationFile: string;
     designSystemFile: string;
     uxWritingGuideFile: string;
+    qaSharedAccountFile: string;
     phaseRoot: string;
     walkthroughRoot: string;
   };
@@ -28,6 +29,7 @@ export interface AgentFlowConfig {
   };
   checks: {
     default: string[];
+    focusedTestCommand: string | null;
     optional: Record<string, string>;
     changed: Record<string, string[]>;
   };
@@ -82,6 +84,7 @@ export function createDefaultConfig(projectName = "Example Project"): AgentFlowC
       uiUxSpecificationFile: "docs/UI-UX-SPECIFICATION.md",
       designSystemFile: "docs/design/DESIGN-SYSTEM.md",
       uxWritingGuideFile: "docs/design/UX-WRITING-GUIDE.md",
+      qaSharedAccountFile: "docs/testing/QA-SHARED-ACCOUNT.md",
       phaseRoot: "docs/phases",
       walkthroughRoot: "docs/walkthroughs/agents"
     },
@@ -95,6 +98,7 @@ export function createDefaultConfig(projectName = "Example Project"): AgentFlowC
     },
     checks: {
       default: ["npm test"],
+      focusedTestCommand: null,
       optional: {},
       changed: {}
     },
