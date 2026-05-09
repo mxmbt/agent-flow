@@ -21,17 +21,37 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.match(stdout, /docs\/ARCHITECTURE\.md/);
   assert.match(stdout, /docs\/ARCHITECTURE_MULTI_USER\.md/);
   assert.match(stdout, /docs\/ARCHITECTURE_SCHEDULING\.md/);
+  assert.match(stdout, /docs\/tasks\.md/);
+  assert.match(stdout, /docs\/UI-UX-SPECIFICATION\.md/);
+  assert.match(stdout, /docs\/design\/DESIGN-SYSTEM\.md/);
+  assert.match(stdout, /docs\/design\/UX-WRITING-GUIDE\.md/);
   assert.match(stdout, /\.claude\/agents\/architect\.md/);
   assert.match(stdout, /\.codex\/agents\/architect\.md/);
   assert.match(stdout, /\.codex\/agents\/code-simplifier\.md/);
   assert.match(stdout, /\.codex\/agents\/deep-reviewer\.md/);
   assert.match(stdout, /\.codex\/agents\/findings-arbiter\.md/);
+  assert.match(stdout, /\.codex\/agents\/paranoid-architect\.md/);
+  assert.match(stdout, /\.codex\/agents\/performance-expert\.md/);
+  assert.match(stdout, /\.codex\/agents\/product-manager\.md/);
+  assert.match(stdout, /\.codex\/agents\/ux-expert\.md/);
+  assert.match(stdout, /\.codex\/guides\/gan-protocol\.md/);
   assert.doesNotMatch(stdout, /\.codex\/agents\/math-genius\.md/);
+  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-code-reviewer\.md/);
+  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-code-simplifier\.md/);
+  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-comment-analyzer\.md/);
+  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-pr-test-analyzer\.md/);
+  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-silent-failure-hunter\.md/);
+  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-type-design-analyzer\.md/);
+  assert.doesNotMatch(stdout, /\.codex\/guides\/code-review-graph-usage\.md/);
 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.equal(config.artifacts.architectureFile, "docs/ARCHITECTURE.md");
   assert.equal(config.artifacts.userIsolationArchitectureFile, "docs/ARCHITECTURE_MULTI_USER.md");
   assert.equal(config.artifacts.schedulingArchitectureFile, "docs/ARCHITECTURE_SCHEDULING.md");
+  assert.equal(config.artifacts.backlogFile, "docs/tasks.md");
+  assert.equal(config.artifacts.uiUxSpecificationFile, "docs/UI-UX-SPECIFICATION.md");
+  assert.equal(config.artifacts.designSystemFile, "docs/design/DESIGN-SYSTEM.md");
+  assert.equal(config.artifacts.uxWritingGuideFile, "docs/design/UX-WRITING-GUIDE.md");
 
   const architecture = await readFile(path.join(cwd, "docs", "ARCHITECTURE.md"), "utf8");
   assert.match(architecture, /# Architecture/);
@@ -41,6 +61,36 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.match(architectAgent, /`docs\/ARCHITECTURE\.md`/);
   assert.match(architectAgent, /user-isolation work -> `docs\/ARCHITECTURE_MULTI_USER\.md`/);
   assert.match(architectAgent, /scheduling or asynchronous work -> `docs\/ARCHITECTURE_SCHEDULING\.md`/);
+
+  const productManager = await readFile(path.join(cwd, ".codex", "agents", "product-manager.md"), "utf8");
+  assert.match(productManager, /`docs\/tasks\.md`/);
+
+  const uxExpert = await readFile(path.join(cwd, ".codex", "agents", "ux-expert.md"), "utf8");
+  assert.match(uxExpert, /`docs\/UI-UX-SPECIFICATION\.md`/);
+  assert.match(uxExpert, /`docs\/design\/DESIGN-SYSTEM\.md`/);
+  assert.match(uxExpert, /`docs\/design\/UX-WRITING-GUIDE\.md`/);
+});
+
+test("init enables code-review-graph as default discovery provider for detected code projects", async () => {
+  const cwd = await tempDir();
+  await writeFile(path.join(cwd, "package.json"), JSON.stringify({
+    name: "code-project",
+    scripts: {
+      test: "vitest run"
+    }
+  }, null, 2), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [cliPath, "init"], { cwd });
+
+  assert.match(stdout, /Detected a code project and no existing Agent Flow config; enabled the code-review-graph pack/);
+  assert.match(stdout, /\.codex\/guides\/code-review-graph-usage\.md/);
+
+  const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
+  assert.equal(config.discovery.codeGraphProvider, "code-review-graph");
+  assert.deepEqual(config.packs, ["code-review-graph"]);
+
+  const guide = await readFile(path.join(cwd, ".codex", "guides", "code-review-graph-usage.md"), "utf8");
+  assert.match(guide, /Graph-First/);
 });
 
 test("init dry-run does not write files", async () => {
@@ -67,6 +117,7 @@ test("init reports unmanaged conflicts without overwriting user files", async ()
 test("init reuses existing project documents instead of creating duplicate artifact paths", async () => {
   const cwd = await tempDir();
   await mkdir(path.join(cwd, "docs", "architecture"), { recursive: true });
+  await mkdir(path.join(cwd, "docs", "design"), { recursive: true });
   await mkdir(path.join(cwd, "docs", "product"), { recursive: true });
   await writeFile(path.join(cwd, "STATUS.md"), "status\n", "utf8");
   await writeFile(path.join(cwd, "ROADMAP.md"), "roadmap\n", "utf8");
@@ -74,6 +125,11 @@ test("init reuses existing project documents instead of creating duplicate artif
   await writeFile(path.join(cwd, "docs", "architecture", "README.md"), "architecture\n", "utf8");
   await writeFile(path.join(cwd, "docs", "SECURITY.md"), "security\n", "utf8");
   await writeFile(path.join(cwd, "docs", "JOBS.md"), "jobs\n", "utf8");
+  await writeFile(path.join(cwd, "docs", "backlog.md"), "backlog\n", "utf8");
+  await writeFile(path.join(cwd, "docs", "UX.md"), "ux\n", "utf8");
+  await writeFile(path.join(cwd, "docs", "design", "README.md"), "design system\n", "utf8");
+  await mkdir(path.join(cwd, "docs", "content"), { recursive: true });
+  await writeFile(path.join(cwd, "docs", "content", "UX-WRITING-GUIDE.md"), "copy\n", "utf8");
 
   const { stdout } = await execFileAsync(process.execPath, [cliPath, "init"], { cwd });
 
@@ -83,6 +139,10 @@ test("init reuses existing project documents instead of creating duplicate artif
   assert.match(stdout, /Detected existing artifact for artifacts\.architectureFile: docs\/architecture\/README\.md/);
   assert.match(stdout, /Detected existing artifact for artifacts\.userIsolationArchitectureFile: docs\/SECURITY\.md/);
   assert.match(stdout, /Detected existing artifact for artifacts\.schedulingArchitectureFile: docs\/JOBS\.md/);
+  assert.match(stdout, /Detected existing artifact for artifacts\.backlogFile: docs\/backlog\.md/);
+  assert.match(stdout, /Detected existing artifact for artifacts\.uiUxSpecificationFile: docs\/UX\.md/);
+  assert.match(stdout, /Detected existing artifact for artifacts\.designSystemFile: docs\/design\/README\.md/);
+  assert.match(stdout, /Detected existing artifact for artifacts\.uxWritingGuideFile: docs\/content\/UX-WRITING-GUIDE\.md/);
 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.equal(config.artifacts.statusFile, "STATUS.md");
@@ -91,11 +151,20 @@ test("init reuses existing project documents instead of creating duplicate artif
   assert.equal(config.artifacts.architectureFile, "docs/architecture/README.md");
   assert.equal(config.artifacts.userIsolationArchitectureFile, "docs/SECURITY.md");
   assert.equal(config.artifacts.schedulingArchitectureFile, "docs/JOBS.md");
+  assert.equal(config.artifacts.backlogFile, "docs/backlog.md");
+  assert.equal(config.artifacts.uiUxSpecificationFile, "docs/UX.md");
+  assert.equal(config.artifacts.designSystemFile, "docs/design/README.md");
+  assert.equal(config.artifacts.uxWritingGuideFile, "docs/content/UX-WRITING-GUIDE.md");
 
   const architectAgent = await readFile(path.join(cwd, ".codex", "agents", "architect.md"), "utf8");
   assert.match(architectAgent, /`docs\/architecture\/README\.md`/);
   assert.match(architectAgent, /user-isolation work -> `docs\/SECURITY\.md`/);
   assert.match(architectAgent, /scheduling or asynchronous work -> `docs\/JOBS\.md`/);
+
+  const uxExpert = await readFile(path.join(cwd, ".codex", "agents", "ux-expert.md"), "utf8");
+  assert.match(uxExpert, /`docs\/UX\.md`/);
+  assert.match(uxExpert, /`docs\/design\/README\.md`/);
+  assert.match(uxExpert, /`docs\/content\/UX-WRITING-GUIDE\.md`/);
 
   await assert.rejects(() => readFile(path.join(cwd, "docs", "ARCHITECTURE.md"), "utf8"));
   assert.equal(await readFile(path.join(cwd, "STATUS.md"), "utf8"), "status\n");

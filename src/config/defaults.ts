@@ -11,6 +11,10 @@ export interface AgentFlowConfig {
     architectureFile: string;
     userIsolationArchitectureFile: string;
     schedulingArchitectureFile: string;
+    backlogFile: string;
+    uiUxSpecificationFile: string;
+    designSystemFile: string;
+    uxWritingGuideFile: string;
     phaseRoot: string;
     walkthroughRoot: string;
   };
@@ -36,6 +40,11 @@ export interface AgentFlowConfig {
   runtime: {
     appRoot: string;
     deploymentImpactSurfaces: string[];
+  };
+  discovery: {
+    codeGraphProvider: "none" | "code-review-graph" | "custom";
+    customProvider: string | null;
+    fallback: "filesystem-search";
   };
   quality: {
     experts: string[];
@@ -69,6 +78,10 @@ export function createDefaultConfig(projectName = "Example Project"): AgentFlowC
       architectureFile: "docs/ARCHITECTURE.md",
       userIsolationArchitectureFile: "docs/ARCHITECTURE_MULTI_USER.md",
       schedulingArchitectureFile: "docs/ARCHITECTURE_SCHEDULING.md",
+      backlogFile: "docs/tasks.md",
+      uiUxSpecificationFile: "docs/UI-UX-SPECIFICATION.md",
+      designSystemFile: "docs/design/DESIGN-SYSTEM.md",
+      uxWritingGuideFile: "docs/design/UX-WRITING-GUIDE.md",
       phaseRoot: "docs/phases",
       walkthroughRoot: "docs/walkthroughs/agents"
     },
@@ -94,6 +107,11 @@ export function createDefaultConfig(projectName = "Example Project"): AgentFlowC
     runtime: {
       appRoot: ".",
       deploymentImpactSurfaces: []
+    },
+    discovery: {
+      codeGraphProvider: "none",
+      customProvider: null,
+      fallback: "filesystem-search"
     },
     quality: {
       experts: ["paranoid-architect", "performance-expert", "ux-expert"],

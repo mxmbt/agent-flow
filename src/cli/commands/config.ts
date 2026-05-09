@@ -69,6 +69,42 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     ]
   },
   {
+    key: "artifacts.backlogFile",
+    summary: "Project backlog file used for cross-phase follow-ups and deferred work.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.backlogFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/product-manager.md.hbs"
+    ]
+  },
+  {
+    key: "artifacts.uiUxSpecificationFile",
+    summary: "Project UI/UX specification used by UX quality review.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.uiUxSpecificationFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/ux-expert.md.hbs"
+    ]
+  },
+  {
+    key: "artifacts.designSystemFile",
+    summary: "Project design system reference used by UX quality review.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.designSystemFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/ux-expert.md.hbs"
+    ]
+  },
+  {
+    key: "artifacts.uxWritingGuideFile",
+    summary: "Project UX writing guide used by UX-copy review.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.uxWritingGuideFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/ux-expert.md.hbs"
+    ]
+  },
+  {
     key: "runtime.migrationsGlob",
     summary: "Migration-file glob derived from the configured runtime app root.",
     renderedFrom: [".agent-flow/config.json -> runtime.appRoot"],
@@ -88,6 +124,25 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     summary: "Runtime route entrypoint derived from the configured runtime app root.",
     renderedFrom: [".agent-flow/config.json -> runtime.appRoot"],
     usedIn: ["templates/canonical/agents/delivery-agent.md.hbs"]
+  },
+  {
+    key: "discovery.codeGraphProvider",
+    summary: "Planning-time code discovery provider used for codebase maps, impact analysis, and affected-flow discovery.",
+    renderedFrom: [".agent-flow/config.json -> discovery.codeGraphProvider", "enabled packs may provide the concrete guide/tooling"],
+    usedIn: [
+      "templates/canonical/index.md.hbs",
+      "templates/canonical/guides/code-review-graph-usage.md.hbs"
+    ]
+  },
+  {
+    key: "discovery.planningProviderSummary",
+    summary: "Human-readable planning discovery provider summary shown during onboarding and troubleshooting.",
+    renderedFrom: [
+      ".agent-flow/config.json -> discovery.codeGraphProvider",
+      ".agent-flow/config.json -> discovery.customProvider",
+      ".agent-flow/config.json -> discovery.fallback"
+    ],
+    usedIn: ["templates/canonical/index.md.hbs"]
   },
   {
     key: "quality.invariantSummary",

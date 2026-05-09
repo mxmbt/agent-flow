@@ -17,6 +17,12 @@ test("loadProjectConfig returns defaults when config is missing", async () => {
   assert.equal(loaded.config.artifacts.architectureFile, "docs/ARCHITECTURE.md");
   assert.equal(loaded.config.artifacts.userIsolationArchitectureFile, "docs/ARCHITECTURE_MULTI_USER.md");
   assert.equal(loaded.config.artifacts.schedulingArchitectureFile, "docs/ARCHITECTURE_SCHEDULING.md");
+  assert.equal(loaded.config.artifacts.backlogFile, "docs/tasks.md");
+  assert.equal(loaded.config.artifacts.uiUxSpecificationFile, "docs/UI-UX-SPECIFICATION.md");
+  assert.equal(loaded.config.artifacts.designSystemFile, "docs/design/DESIGN-SYSTEM.md");
+  assert.equal(loaded.config.artifacts.uxWritingGuideFile, "docs/design/UX-WRITING-GUIDE.md");
+  assert.equal(loaded.config.discovery.codeGraphProvider, "none");
+  assert.equal(loaded.config.discovery.fallback, "filesystem-search");
   assert.deepEqual(loaded.config.checks.default, ["npm test"]);
 });
 
@@ -89,6 +95,23 @@ test("loadProjectConfig rejects artifact paths outside the project", async () =>
   );
 });
 
+test("loadProjectConfig requires a custom discovery provider description", async () => {
+  const cwd = await tempDir();
+  const config = createDefaultConfig("Invalid Discovery");
+  config.discovery.codeGraphProvider = "custom";
+
+  await writeConfig(cwd, config);
+
+  await assert.rejects(
+    () => loadProjectConfig(cwd),
+    (error: unknown) => {
+      assert.ok(error instanceof ConfigValidationError);
+      assert.match(error.message, /discovery\.customProvider/);
+      return true;
+    }
+  );
+});
+
 test("detectProjectConfig proposes npm script checks and review markers", async () => {
   const cwd = await tempDir();
   await writeJson(path.join(cwd, "package.json"), {
@@ -109,6 +132,8 @@ test("detectProjectConfig proposes npm script checks and review markers", async 
 
   assert.equal(detected.packageManager, "npm");
   assert.equal(detected.config.project.name, "detected-app");
+  assert.equal(detected.config.discovery.codeGraphProvider, "code-review-graph");
+  assert.deepEqual(detected.config.packs, ["code-review-graph"]);
   assert.deepEqual(detected.config.checks.default, ["npm run test", "npm run type-check"]);
   assert.equal(detected.config.checks.optional.lint, "npm run lint");
   assert.equal(detected.config.checks.optional.build, "npm run build");
@@ -118,6 +143,8 @@ test("detectProjectConfig proposes npm script checks and review markers", async 
   assert.ok(detected.needsReview.includes("project.taskPrefix"));
   assert.ok(detected.needsReview.includes("git.integrationBranch"));
   assert.ok(detected.needsReview.includes("dev.start.url"));
+  assert.ok(detected.needsReview.includes("discovery.codeGraphProvider"));
+  assert.ok(detected.evidence.some((line) => /code-review-graph pack as the default planning discovery provider/.test(line)));
 });
 
 async function tempDir(): Promise<string> {

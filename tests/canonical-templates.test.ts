@@ -42,6 +42,7 @@ test("canonical lifecycle contract renders from config and pack composition", as
   assert.match(rendered, /Architecture reference\s+\| `docs\/ARCHITECTURE\.md`/);
   assert.match(rendered, /User-isolation architecture reference\s+\| `docs\/ARCHITECTURE_MULTI_USER\.md`/);
   assert.match(rendered, /Scheduling architecture reference\s+\| `docs\/ARCHITECTURE_SCHEDULING\.md`/);
+  assert.match(rendered, /Backlog\s+\| `docs\/tasks\.md`/);
   assert.match(rendered, /## Canonical Quality Gates|# Canonical Quality Gates/);
   assert.match(rendered, /math-genius/);
   assert.match(rendered, /finance-invariants/);

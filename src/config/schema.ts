@@ -26,6 +26,7 @@ export function validateAgentFlowConfig(value: unknown): AgentFlowConfig {
   validateChecks(config, issues);
   validateDev(config, issues);
   validateRuntime(config, issues);
+  validateDiscovery(config, issues);
   validateQuality(config, issues);
   validatePacks(config, issues);
   validateMcp(config, issues);
@@ -62,6 +63,10 @@ function validateArtifacts(config: Record<string, unknown>, issues: ConfigIssue[
     "architectureFile",
     "userIsolationArchitectureFile",
     "schedulingArchitectureFile",
+    "backlogFile",
+    "uiUxSpecificationFile",
+    "designSystemFile",
+    "uxWritingGuideFile",
     "phaseRoot",
     "walkthroughRoot"
   ]) {
@@ -132,6 +137,23 @@ function validateRuntime(config: Record<string, unknown>, issues: ConfigIssue[])
   const runtime = expectRecord(config.runtime, "runtime", issues);
   expectRelativePath(runtime.appRoot, "runtime.appRoot", issues);
   expectStringArray(runtime.deploymentImpactSurfaces, "runtime.deploymentImpactSurfaces", issues);
+}
+
+function validateDiscovery(config: Record<string, unknown>, issues: ConfigIssue[]): void {
+  const discovery = expectRecord(config.discovery, "discovery", issues);
+  expectOneOf(discovery.codeGraphProvider, "discovery.codeGraphProvider", ["none", "code-review-graph", "custom"], issues);
+  expectOneOf(discovery.fallback, "discovery.fallback", ["filesystem-search"], issues);
+
+  if (discovery.customProvider !== null) {
+    expectNonEmptyString(discovery.customProvider, "discovery.customProvider", issues);
+  }
+
+  if (discovery.codeGraphProvider === "custom" && discovery.customProvider === null) {
+    issues.push({
+      path: "discovery.customProvider",
+      message: "must describe the custom provider when discovery.codeGraphProvider is custom"
+    });
+  }
 }
 
 function validateQuality(config: Record<string, unknown>, issues: ConfigIssue[]): void {
