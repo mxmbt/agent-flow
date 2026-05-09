@@ -25,6 +25,7 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.match(stdout, /docs\/UI-UX-SPECIFICATION\.md/);
   assert.match(stdout, /docs\/design\/DESIGN-SYSTEM\.md/);
   assert.match(stdout, /docs\/design\/UX-WRITING-GUIDE\.md/);
+  assert.match(stdout, /docs\/testing\/QA-SHARED-ACCOUNT\.md/);
   assert.match(stdout, /\.claude\/agents\/architect\.md/);
   assert.match(stdout, /\.codex\/agents\/architect\.md/);
   assert.match(stdout, /\.codex\/agents\/code-simplifier\.md/);
@@ -52,6 +53,7 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.equal(config.artifacts.uiUxSpecificationFile, "docs/UI-UX-SPECIFICATION.md");
   assert.equal(config.artifacts.designSystemFile, "docs/design/DESIGN-SYSTEM.md");
   assert.equal(config.artifacts.uxWritingGuideFile, "docs/design/UX-WRITING-GUIDE.md");
+  assert.equal(config.artifacts.qaSharedAccountFile, "docs/testing/QA-SHARED-ACCOUNT.md");
 
   const architecture = await readFile(path.join(cwd, "docs", "ARCHITECTURE.md"), "utf8");
   assert.match(architecture, /# Architecture/);
@@ -69,6 +71,10 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.match(uxExpert, /`docs\/UI-UX-SPECIFICATION\.md`/);
   assert.match(uxExpert, /`docs\/design\/DESIGN-SYSTEM\.md`/);
   assert.match(uxExpert, /`docs\/design\/UX-WRITING-GUIDE\.md`/);
+
+  const qaExpert = await readFile(path.join(cwd, ".codex", "agents", "qa-expert.md"), "utf8");
+  assert.match(qaExpert, /`docs\/testing\/QA-SHARED-ACCOUNT\.md`/);
+  assert.match(qaExpert, /Use the configured local runtime URL/);
 });
 
 test("init enables code-review-graph as default discovery provider for detected code projects", async () => {
@@ -83,11 +89,13 @@ test("init enables code-review-graph as default discovery provider for detected 
   const { stdout } = await execFileAsync(process.execPath, [cliPath, "init"], { cwd });
 
   assert.match(stdout, /Detected a code project and no existing Agent Flow config; enabled the code-review-graph pack/);
+  assert.match(stdout, /Enabled the code-review-toolkit pack as recommended manual review tooling/);
   assert.match(stdout, /\.codex\/guides\/code-review-graph-usage\.md/);
+  assert.match(stdout, /\.codex\/agents\/prt-code-reviewer\.md/);
 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.equal(config.discovery.codeGraphProvider, "code-review-graph");
-  assert.deepEqual(config.packs, ["code-review-graph"]);
+  assert.deepEqual(config.packs, ["code-review-graph", "code-review-toolkit"]);
 
   const guide = await readFile(path.join(cwd, ".codex", "guides", "code-review-graph-usage.md"), "utf8");
   assert.match(guide, /Graph-First/);
@@ -129,7 +137,9 @@ test("init reuses existing project documents instead of creating duplicate artif
   await writeFile(path.join(cwd, "docs", "UX.md"), "ux\n", "utf8");
   await writeFile(path.join(cwd, "docs", "design", "README.md"), "design system\n", "utf8");
   await mkdir(path.join(cwd, "docs", "content"), { recursive: true });
+  await mkdir(path.join(cwd, "docs", "qa"), { recursive: true });
   await writeFile(path.join(cwd, "docs", "content", "UX-WRITING-GUIDE.md"), "copy\n", "utf8");
+  await writeFile(path.join(cwd, "docs", "qa", "shared-account.md"), "qa account\n", "utf8");
 
   const { stdout } = await execFileAsync(process.execPath, [cliPath, "init"], { cwd });
 
@@ -143,6 +153,7 @@ test("init reuses existing project documents instead of creating duplicate artif
   assert.match(stdout, /Detected existing artifact for artifacts\.uiUxSpecificationFile: docs\/UX\.md/);
   assert.match(stdout, /Detected existing artifact for artifacts\.designSystemFile: docs\/design\/README\.md/);
   assert.match(stdout, /Detected existing artifact for artifacts\.uxWritingGuideFile: docs\/content\/UX-WRITING-GUIDE\.md/);
+  assert.match(stdout, /Detected existing artifact for artifacts\.qaSharedAccountFile: docs\/qa\/shared-account\.md/);
 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.equal(config.artifacts.statusFile, "STATUS.md");
@@ -155,6 +166,7 @@ test("init reuses existing project documents instead of creating duplicate artif
   assert.equal(config.artifacts.uiUxSpecificationFile, "docs/UX.md");
   assert.equal(config.artifacts.designSystemFile, "docs/design/README.md");
   assert.equal(config.artifacts.uxWritingGuideFile, "docs/content/UX-WRITING-GUIDE.md");
+  assert.equal(config.artifacts.qaSharedAccountFile, "docs/qa/shared-account.md");
 
   const architectAgent = await readFile(path.join(cwd, ".codex", "agents", "architect.md"), "utf8");
   assert.match(architectAgent, /`docs\/architecture\/README\.md`/);
@@ -165,6 +177,9 @@ test("init reuses existing project documents instead of creating duplicate artif
   assert.match(uxExpert, /`docs\/UX\.md`/);
   assert.match(uxExpert, /`docs\/design\/README\.md`/);
   assert.match(uxExpert, /`docs\/content\/UX-WRITING-GUIDE\.md`/);
+
+  const qaExpert = await readFile(path.join(cwd, ".codex", "agents", "qa-expert.md"), "utf8");
+  assert.match(qaExpert, /`docs\/qa\/shared-account\.md`/);
 
   await assert.rejects(() => readFile(path.join(cwd, "docs", "ARCHITECTURE.md"), "utf8"));
   assert.equal(await readFile(path.join(cwd, "STATUS.md"), "utf8"), "status\n");

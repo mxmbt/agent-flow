@@ -66,6 +66,16 @@ export const builtinPacks: PackManifest[] = [
     }
   },
   {
+    name: "design",
+    version: 1,
+    description: "UI/UX design intelligence, styling references, and design-system tooling.",
+    contributes: {
+      guides: ["ui-ux-pro-max-reference"],
+      skills: ["ui-ux-pro-max", "ui-styling-uupm", "design-system-uupm"],
+      validators: ["design-review"]
+    }
+  },
+  {
     name: "code-review-toolkit",
     version: 1,
     description: "Auxiliary code review and behavior-preserving simplification agents.",

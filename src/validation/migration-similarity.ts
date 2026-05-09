@@ -33,6 +33,7 @@ interface DiffLine {
 }
 
 const DEFAULT_MAX_DIFF_LINES = 12;
+const MAX_EXACT_LCS_CELLS = 1_000_000;
 
 export function compareMigrationTexts(
   id: string,
@@ -130,7 +131,9 @@ function stripFrontmatter(lines: string[]): string[] {
 function isGeneratedNotice(line: string): boolean {
   const trimmed = line.trim();
   return /^<!--\s*@generated\b/.test(trimmed)
-    || /^<!--\s*@agent-flow managed\b/.test(trimmed);
+    || /^<!--\s*@agent-flow managed\b/.test(trimmed)
+    || /^#\s*@agent-flow managed\b/.test(trimmed)
+    || /^\/\/\s*@agent-flow managed\b/.test(trimmed);
 }
 
 function isTemplateComment(line: string): boolean {
@@ -155,26 +158,66 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("{{artifacts.uiUxSpecificationFile}}", "docs/UI-UX-SPECIFICATION.md")
     .replaceAll("{{artifacts.designSystemFile}}", "docs/design/DESIGN-SYSTEM.md")
     .replaceAll("{{artifacts.uxWritingGuideFile}}", "docs/design/UX-WRITING-GUIDE.md")
+    .replaceAll("{{artifacts.qaSharedAccountFile}}", "docs/testing/QA-SHARED-ACCOUNT.md")
     .replaceAll("{{runtime.appRoot}}", "cf")
     .replaceAll("{{runtime.migrationsGlob}}", "cf/migrations/**")
     .replaceAll("{{runtime.bindingConfigFile}}", "cf/wrangler.toml")
     .replaceAll("{{runtime.routeEntrypoint}}", "cf/src/index.ts")
     .replaceAll("{{quality.invariantSummary}}", "financial correctness, user isolation, UTC handling, and no-look-ahead")
     .replaceAll("{{checks.defaultShellBlock}}", "cd cf && npm test\ncd cf && npm run type-check")
+    .replaceAll("For code changes in the active project:", "For code changes in the active Worker app:")
+    .replaceAll("{{checks.focusedTestCommand}}", "npm test -- path/to/test.test.ts")
+    .replaceAll("- [ ] All configured checks pass", "- [ ] All tests pass: `npm test`")
     .replaceAll("{{checks.changedSchemaInline}}", "`cd cf && npm run generate` and `cd cf && npm run migrate:local`")
     .replaceAll("{{checks.changedSchemaIndented}}", "  - `cd cf && npm run generate`\n  - `cd cf && npm run migrate:local`")
+    .replaceAll('csv.DictReader(line for line in f if not line.startswith("# @agent-flow managed "))', "csv.DictReader(f)")
+    .replaceAll('csv.DictReader(line for line in f if not line.startswith("# -flow managed "))', "csv.DictReader(f)")
     .replaceAll("{{dev.startCommand}}", "cd cf && npm run dev")
+    .replaceAll("{{dev.startUrl}}", "http://localhost:8787")
+    .replaceAll("Use the configured local runtime URL when the task needs a live service:", "Assume the local application should answer at:")
+    .replaceAll("- configured planning discovery provider: `{{discovery.planningProviderSummary}}`", "- `.agent-tool/guides/code-review-graph-usage.md`")
+    .replaceAll("## Discovery-First Analysis", "## Graph-First Analysis")
+    .replaceAll("When structural impact is unclear, use the configured planning discovery provider before broad manual scanning:", "When structural impact is unclear, use code-review-graph before broad manual scanning:")
+    .replaceAll("\n`{{discovery.planningProviderSummary}}`\n", "\n")
+    .replaceAll("`{{discovery.planningProviderSummary}}`", "")
     .replaceAll("{{git.integrationBranch}}", "develop")
     .replaceAll("{{git.releaseBranch}}", "master")
+    .replaceAll("{{git.integrationRef}}", "origin/develop")
+    .replaceAll("{{git.releaseRef}}", "origin/master")
+    .replaceAll("{{git.remoteName}}", "origin")
     .replaceAll("{{git.defaultDeliveryDiffCommand}}", "git diff --name-only origin/develop...HEAD")
     .replaceAll("{{git.releaseSyncDiffCommand}}", "git diff --name-only origin/master...origin/develop")
     .replaceAll("{{git.releaseFlow}}", "develop -> master")
     .replaceAll("{{git.prBaseFlag}}", "--base develop")
     .replaceAll("{{git.remoteBranchDeleteCommand}}", "gh api repos/id-bu/AI_Finance_Manager/git/refs/heads/<branch> -X DELETE")
     .replaceAll("{{git.deliveryStateRef}}", "<merged-commit-or-origin/develop>")
+    .replaceAll("{{git.worktreeParkCommand}}", "./scripts/park-worktrees.sh")
+    .replaceAll("{{git.deliveryStateCommand}}", "./scripts/report-delivery-state.sh")
+    .replaceAll("{{project.taskPrefix}}", "FINAI")
+    .replaceAll("->", "→")
+    .replaceAll("## Feature Delivery: Task → develop", "## Feature Delivery: Task → Develop")
+    .replaceAll("## Release Sync: develop → master", "## Release Sync: Develop → Master")
+    .replaceAll("- `develop:` merged / not merged, PR number, commit", "- `Develop:` merged / not merged, PR number, commit")
+    .replaceAll("- `master:` released / not released, release PR number if any", "- `Master:` released / not released, release PR number if any")
+    .replaceAll("Worktrees паркуются между задачами на своих ветках:", "Три worktree, каждый паркуется между задачами на своей ветке:")
+    .replaceAll("| Main | `<main worktree>` | `develop` |", "| Main | `/Users/mburtikov/ai_finance_manager` | `develop` |")
+    .replaceAll("| additional | `<additional worktree>` | `worktree/<dirname>` |", "| dar-es-salaam | `…/conductor/workspaces/ai_finance_manager/dar-es-salaam` | `worktree/dar-es-salaam` |\n| san-juan | `…/conductor/workspaces/ai_finance_manager/san-juan` | `worktree/san-juan` |")
+    .replaceAll("Дополнительные worktrees", "Conductor worktrees")
+    .replaceAll("remote, обновляет integration branch", "origin, обновляет develop")
+    .replaceAll("feature/FINAI-<taskId>-short-desc", "feature/FINAI-<taskId>-short-desc")
+    .replaceAll("git -C <main worktree>", "git -C /Users/mburtikov/ai_finance_manager")
+    .replaceAll("`<merge-commit-or-origin/develop>`", "`<merge-commit-or-origin/develop>`")
+    .replaceAll("| yes, GitHub мёрджит сам |", "| ✅ GitHub мёрджит сам |")
+    .replaceAll("| rebase обязателен |", "| ⚠️ rebase обязателен |")
+    .replaceAll("| только последовательно |", "| ❌ только последовательно |")
     .replaceAll("`{{artifacts.architectureFile}}`", "`docs/ARCHITECTURE.md`")
     .replaceAll("- user-isolation work -> `{{artifacts.userIsolationArchitectureFile}}`", "- `ARCHITECTURE_MULTI_USER.md` when user isolation or scheduling is involved")
+    .replaceAll("- user-isolation work → `{{artifacts.userIsolationArchitectureFile}}`", "- `ARCHITECTURE_MULTI_USER.md` when user isolation or scheduling is involved")
     .replaceAll("- scheduling or asynchronous work -> `{{artifacts.schedulingArchitectureFile}}`\n", "")
+    .replaceAll("- scheduling or asynchronous work -> `{{artifacts.schedulingArchitectureFile}}`", "")
+    .replaceAll("- scheduling or asynchronous work → `{{artifacts.schedulingArchitectureFile}}`\n", "")
+    .replaceAll("- scheduling or asynchronous work → `{{artifacts.schedulingArchitectureFile}}`", "")
+    .replaceAll("- scheduling or asynchronous work -> `docs/ARCHITECTURE_SCHEDULING.md`\n", "")
     .replaceAll("When the task touches the active runtime, consider configured runtime and pack-contributed attack surfaces:", "When the task touches the active runtime, consider:")
     .replaceAll("When relevant, evaluate the current repository's configured runtime and pack-contributed performance constraints:", "When relevant, evaluate the current repository’s active runtime constraints:")
     .replaceAll("{{packs.deploymentImpactSurfaces}}", "- configured runtime and pack-contributed review surfaces")
@@ -196,6 +239,7 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("Use current project conventions under:", "Use current repo conventions under:")
     .replaceAll("- keep task status and backlog structure compatible with the configured backlog/task contract", "- keep task status and backlog structure compatible with the repo `tasks.md` contract")
     .replaceAll("- `RED` -> boundary, data model, access control, external dependency, or runtime/system architecture changes", "- `RED` -> boundary, schema, auth, provider, or runtime architecture changes")
+    .replaceAll("- `RED` → boundary, data model, access control, external dependency, or runtime/system architecture changes", "- `RED` → boundary, schema, auth, provider, or runtime architecture changes")
     .replaceAll("- revise in product voice if needed — no task IDs, no internal phase slang, no internal implementation identifiers", "- revise in product voice if needed — no task IDs, no internal phase slang, no code identifiers")
     .replaceAll("project guidelines in the root agent instructions", "project guidelines in CLAUDE.md")
     .replaceAll("review the current change set or configured diff", "review unstaged changes from `git diff`")
@@ -292,11 +336,19 @@ function sequenceSimilarity(left: string[], right: string[]): number {
     return 1;
   }
 
+  if (left.length * right.length > MAX_EXACT_LCS_CELLS) {
+    return positionalSimilarity(left, right);
+  }
+
   const lcs = lcsTable(left, right)[left.length]?.[right.length] ?? 0;
   return (2 * lcs) / (left.length + right.length);
 }
 
 function lineDiff(source: string[], target: string[]): DiffLine[] {
+  if (source.length * target.length > MAX_EXACT_LCS_CELLS) {
+    return positionalDiff(source, target);
+  }
+
   const table = lcsTable(source, target);
   const diff: DiffLine[] = [];
   let i = source.length;
@@ -317,6 +369,48 @@ function lineDiff(source: string[], target: string[]): DiffLine[] {
   }
 
   return diff.reverse();
+}
+
+function positionalSimilarity(left: string[], right: string[]): number {
+  const maxLength = Math.max(left.length, right.length);
+  if (maxLength === 0) {
+    return 1;
+  }
+
+  let same = 0;
+  const minLength = Math.min(left.length, right.length);
+  for (let index = 0; index < minLength; index += 1) {
+    if (left[index] === right[index]) {
+      same += 1;
+    }
+  }
+
+  return same / maxLength;
+}
+
+function positionalDiff(source: string[], target: string[]): DiffLine[] {
+  const diff: DiffLine[] = [];
+  const maxLength = Math.max(source.length, target.length);
+
+  for (let index = 0; index < maxLength; index += 1) {
+    const sourceLine = source[index];
+    const targetLine = target[index];
+
+    if (sourceLine === targetLine) {
+      diff.push({ kind: "same", value: sourceLine ?? "" });
+      continue;
+    }
+
+    if (sourceLine !== undefined) {
+      diff.push({ kind: "missing", value: sourceLine });
+    }
+
+    if (targetLine !== undefined) {
+      diff.push({ kind: "added", value: targetLine });
+    }
+  }
+
+  return diff;
 }
 
 function lcsTable(left: string[], right: string[]): number[][] {

@@ -19,7 +19,12 @@
     "templates/canonical/agents/delivery-agent.md.hbs",
     "templates/canonical/agents/qa-expert.md.hbs",
     "templates/canonical/guides/code-review-graph-usage.md.hbs",
-    "templates/canonical/guides/gan-protocol.md.hbs"
+    "templates/canonical/guides/gan-protocol.md.hbs",
+    "templates/canonical/guides/systematic-debugging.md.hbs",
+    "templates/canonical/guides/test-driven-development.md.hbs",
+    "templates/canonical/guides/verification-before-completion.md.hbs",
+    "templates/canonical/guides/worktree-workflow.md.hbs",
+    "templates/canonical/guides/ui-ux-pro-max-reference.md.hbs"
   ],
   "exceptions": []
 }

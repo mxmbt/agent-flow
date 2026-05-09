@@ -1,10 +1,10 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import type { AgentFlowConfig } from "../config/defaults.js";
 import type { ComposedPacks } from "../packs/manifest.js";
 import type { RenderedFile } from "./conflict-policy.js";
 import { buildCanonicalContext } from "./canonical-context.js";
-import { renderManagedFile } from "./managed-blocks.js";
+import { renderManagedAssetFile, renderManagedFile } from "./managed-blocks.js";
 import { renderTemplate, type TemplatePartials } from "./render-template.js";
 
 export interface TargetRenderOptions {
@@ -20,6 +20,31 @@ interface TargetTemplate {
   packAgent?: string;
   packGuide?: string;
 }
+
+interface SkillAssetRoot {
+  skill: string;
+  sourceRoot: string;
+}
+
+interface StaticAsset {
+  sourcePath: string;
+  relativePath: string;
+}
+
+const PACK_SKILL_ASSET_ROOTS: SkillAssetRoot[] = [
+  {
+    skill: "ui-ux-pro-max",
+    sourceRoot: path.join("static", "skills", "ui-ux-pro-max")
+  },
+  {
+    skill: "ui-styling-uupm",
+    sourceRoot: path.join("static", "skills", "ui-styling-uupm")
+  },
+  {
+    skill: "design-system-uupm",
+    sourceRoot: path.join("static", "skills", "design-system-uupm")
+  }
+];
 
 const CLAUDE_TARGETS: TargetTemplate[] = [
   {
@@ -160,6 +185,37 @@ const CLAUDE_TARGETS: TargetTemplate[] = [
     templatePath: path.join("targets", "claude", "guides", "gan-protocol.md.hbs"),
     id: "claude-guide-gan-protocol",
     target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "guides", "systematic-debugging.md"),
+    templatePath: path.join("targets", "claude", "guides", "systematic-debugging.md.hbs"),
+    id: "claude-guide-systematic-debugging",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "guides", "test-driven-development.md"),
+    templatePath: path.join("targets", "claude", "guides", "test-driven-development.md.hbs"),
+    id: "claude-guide-test-driven-development",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "guides", "verification-before-completion.md"),
+    templatePath: path.join("targets", "claude", "guides", "verification-before-completion.md.hbs"),
+    id: "claude-guide-verification-before-completion",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "guides", "worktree-workflow.md"),
+    templatePath: path.join("targets", "claude", "guides", "worktree-workflow.md.hbs"),
+    id: "claude-guide-worktree-workflow",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "guides", "ui-ux-pro-max-reference.md"),
+    templatePath: path.join("targets", "claude", "guides", "ui-ux-pro-max-reference.md.hbs"),
+    id: "claude-guide-ui-ux-pro-max-reference",
+    target: "claude",
+    packGuide: "ui-ux-pro-max-reference"
   },
   {
     outputPath: path.join(".claude", "guides", "code-review-graph-usage.md"),
@@ -317,6 +373,37 @@ const CODEX_TARGETS: TargetTemplate[] = [
     target: "codex"
   },
   {
+    outputPath: path.join(".codex", "guides", "systematic-debugging.md"),
+    templatePath: path.join("targets", "codex", "guides", "systematic-debugging.md.hbs"),
+    id: "codex-guide-systematic-debugging",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "guides", "test-driven-development.md"),
+    templatePath: path.join("targets", "codex", "guides", "test-driven-development.md.hbs"),
+    id: "codex-guide-test-driven-development",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "guides", "verification-before-completion.md"),
+    templatePath: path.join("targets", "codex", "guides", "verification-before-completion.md.hbs"),
+    id: "codex-guide-verification-before-completion",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "guides", "worktree-workflow.md"),
+    templatePath: path.join("targets", "codex", "guides", "worktree-workflow.md.hbs"),
+    id: "codex-guide-worktree-workflow",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "guides", "ui-ux-pro-max-reference.md"),
+    templatePath: path.join("targets", "codex", "guides", "ui-ux-pro-max-reference.md.hbs"),
+    id: "codex-guide-ui-ux-pro-max-reference",
+    target: "codex",
+    packGuide: "ui-ux-pro-max-reference"
+  },
+  {
     outputPath: path.join(".codex", "guides", "code-review-graph-usage.md"),
     templatePath: path.join("targets", "codex", "guides", "code-review-graph-usage.md.hbs"),
     id: "codex-guide-code-review-graph-usage",
@@ -349,7 +436,7 @@ export async function renderTargetFiles(
     return true;
   });
 
-  return Promise.all(targets.map(async (target) => {
+  const renderedTemplates = await Promise.all(targets.map(async (target) => {
     const template = await readFile(path.join(options.templateRoot, target.templatePath), "utf8");
     const rendered = renderTemplate(template, {
       ...context,
@@ -369,6 +456,9 @@ export async function renderTargetFiles(
       )
     };
   }));
+
+  const renderedSkillAssets = await renderPackSkillAssets(config, packs, options);
+  return [...renderedTemplates, ...renderedSkillAssets];
 }
 
 async function loadCanonicalPartials(templateRoot: string): Promise<TemplatePartials> {
@@ -400,6 +490,11 @@ async function loadCanonicalPartials(templateRoot: string): Promise<TemplatePart
     path.join("agents", "delivery-agent"),
     path.join("agents", "qa-expert"),
     path.join("guides", "gan-protocol"),
+    path.join("guides", "systematic-debugging"),
+    path.join("guides", "test-driven-development"),
+    path.join("guides", "verification-before-completion"),
+    path.join("guides", "worktree-workflow"),
+    path.join("guides", "ui-ux-pro-max-reference"),
     path.join("guides", "code-review-graph-usage")
   ];
   const partials: TemplatePartials = {};
@@ -409,6 +504,72 @@ async function loadCanonicalPartials(templateRoot: string): Promise<TemplatePart
   }));
 
   return partials;
+}
+
+async function renderPackSkillAssets(
+  config: AgentFlowConfig,
+  packs: ComposedPacks,
+  options: TargetRenderOptions
+): Promise<RenderedFile[]> {
+  const selectedRoots = PACK_SKILL_ASSET_ROOTS.filter((root) => packs.skills.includes(root.skill));
+  const targetKinds: TargetKind[] = [
+    ...(config.features.claude ? ["claude" as const] : []),
+    ...(config.features.codex ? ["codex" as const] : [])
+  ];
+  const rendered: RenderedFile[] = [];
+
+  for (const root of selectedRoots) {
+    const assets = await listStaticAssets(path.join(options.templateRoot, root.sourceRoot));
+
+    for (const target of targetKinds) {
+      for (const asset of assets) {
+        const outputPath = path.join(targetContext(target).toolRoot, "skills", root.skill, asset.relativePath);
+        const sourcePath = path.join(root.sourceRoot, asset.relativePath);
+        const raw = await readFile(asset.sourcePath, "utf8");
+        const body = applyTargetAdapters(raw, target);
+
+        rendered.push({
+          path: outputPath,
+          content: renderManagedAssetFile(
+            {
+              id: `${target}-skill-${root.skill}-${asset.relativePath.replaceAll(path.sep, "-")}`,
+              version: options.version ?? 1,
+              source: path.join("templates", sourcePath)
+            },
+            body,
+            outputPath
+          )
+        });
+      }
+    }
+  }
+
+  return rendered;
+}
+
+async function listStaticAssets(root: string, current = root): Promise<StaticAsset[]> {
+  const entries = await readdir(current, { withFileTypes: true });
+  const assets: StaticAsset[] = [];
+
+  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+    const entryPath = path.join(current, entry.name);
+
+    if (entry.isDirectory()) {
+      assets.push(...await listStaticAssets(root, entryPath));
+      continue;
+    }
+
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    assets.push({
+      sourcePath: entryPath,
+      relativePath: path.relative(root, entryPath)
+    });
+  }
+
+  return assets;
 }
 
 function targetContext(target: TargetKind): {

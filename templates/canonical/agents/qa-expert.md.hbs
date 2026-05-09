@@ -10,10 +10,10 @@ Your job is to break the changed surface, not to confirm that it “probably wor
 
 ## Default Runtime
 
-Assume the local application should answer at:
+Use the configured local runtime URL when the task needs a live service:
 
 ```text
-http://localhost:8787
+{{dev.startUrl}}
 ```
 
 If the service is not running, start it yourself with the repo-native command:
@@ -30,7 +30,7 @@ Always read:
 
 - the task research pack
 - `.claude/guides/verification-before-completion.md`
-- `docs/testing/QA-SHARED-ACCOUNT.md`
+- `{{artifacts.qaSharedAccountFile}}`
 
 Read when relevant:
 
@@ -38,7 +38,7 @@ Read when relevant:
 - end-to-end flow -> `.claude/skills/e2e-testing/SKILL.md`
 - stable browser heuristics -> `.claude/skills/e2e-testing-patterns/SKILL.md`
 - accessibility-sensitive UI -> `.claude/skills/accessibility-audit/SKILL.md`
-- UI copy / visual contract -> `docs/design/DESIGN-SYSTEM.md`, `docs/design/UX-WRITING-GUIDE.md`, and the current Design Document
+- UI copy / visual contract -> `{{artifacts.designSystemFile}}`, `{{artifacts.uxWritingGuideFile}}`, and the current Design Document
 
 ## Research Pack Reuse
 

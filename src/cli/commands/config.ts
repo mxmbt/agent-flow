@@ -14,25 +14,47 @@ interface ExplainEntry {
 
 const EXPLAIN_ENTRIES: ExplainEntry[] = [
   {
+    key: "project.taskPrefix",
+    summary: "Configured task ID prefix used in example task branch names.",
+    renderedFrom: [".agent-flow/config.json -> project.taskPrefix"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
     key: "checks.defaultShellBlock",
     summary: "Default verification commands rendered into agent code blocks.",
     renderedFrom: [".agent-flow/config.json -> checks.default", "enabled packs -> contributes.checks.default"],
     usedIn: [
       "templates/canonical/agents/feature-developer.md.hbs",
       "templates/canonical/agents/delivery-agent.md.hbs",
-      "templates/canonical/agents/qa-expert.md.hbs"
+      "templates/canonical/agents/qa-expert.md.hbs",
+      "templates/canonical/guides/verification-before-completion.md.hbs"
     ]
   },
   {
     key: "checks.changedSchemaInline",
     summary: "Schema-change verification commands rendered inline in agent guidance.",
     renderedFrom: [".agent-flow/config.json -> checks.changed.schema", "enabled packs -> contributes.checks.changed.schema"],
-    usedIn: ["templates/canonical/agents/feature-developer.md.hbs"]
+    usedIn: [
+      "templates/canonical/agents/feature-developer.md.hbs",
+      "templates/canonical/guides/verification-before-completion.md.hbs"
+    ]
+  },
+  {
+    key: "checks.focusedTestCommand",
+    summary: "Focused single-test command rendered into TDD guidance.",
+    renderedFrom: [".agent-flow/config.json -> checks.focusedTestCommand", "init detection may derive this from package scripts"],
+    usedIn: ["templates/canonical/guides/test-driven-development.md.hbs"]
   },
   {
     key: "dev.startCommand",
     summary: "Command an agent should use to start the local runtime when needed.",
     renderedFrom: [".agent-flow/config.json -> dev.start.command"],
+    usedIn: ["templates/canonical/agents/qa-expert.md.hbs"]
+  },
+  {
+    key: "dev.startUrl",
+    summary: "Configured local runtime URL agents should use for QA smoke checks when applicable.",
+    renderedFrom: [".agent-flow/config.json -> dev.start.url"],
     usedIn: ["templates/canonical/agents/qa-expert.md.hbs"]
   },
   {
@@ -83,6 +105,8 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     renderedFrom: [".agent-flow/config.json -> artifacts.uiUxSpecificationFile"],
     usedIn: [
       "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/feature-developer.md.hbs",
+      "templates/canonical/agents/qa-expert.md.hbs",
       "templates/canonical/agents/ux-expert.md.hbs"
     ]
   },
@@ -92,6 +116,8 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     renderedFrom: [".agent-flow/config.json -> artifacts.designSystemFile"],
     usedIn: [
       "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/feature-developer.md.hbs",
+      "templates/canonical/agents/qa-expert.md.hbs",
       "templates/canonical/agents/ux-expert.md.hbs"
     ]
   },
@@ -102,6 +128,15 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     usedIn: [
       "templates/canonical/artifact-contracts.md.hbs",
       "templates/canonical/agents/ux-expert.md.hbs"
+    ]
+  },
+  {
+    key: "artifacts.qaSharedAccountFile",
+    summary: "Project QA shared-account or test-identity reference used by QA agents.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.qaSharedAccountFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/qa-expert.md.hbs"
     ]
   },
   {
@@ -116,7 +151,8 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     renderedFrom: [".agent-flow/config.json -> runtime.appRoot", "enabled runtime packs may refine this later"],
     usedIn: [
       "templates/canonical/agents/feature-developer.md.hbs",
-      "templates/canonical/agents/delivery-agent.md.hbs"
+      "templates/canonical/agents/delivery-agent.md.hbs",
+      "templates/canonical/guides/verification-before-completion.md.hbs"
     ]
   },
   {
@@ -131,6 +167,11 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     renderedFrom: [".agent-flow/config.json -> discovery.codeGraphProvider", "enabled packs may provide the concrete guide/tooling"],
     usedIn: [
       "templates/canonical/index.md.hbs",
+      "templates/canonical/agents/architect.md.hbs",
+      "templates/canonical/agents/code-simplifier.md.hbs",
+      "templates/canonical/agents/deep-reviewer.md.hbs",
+      "templates/canonical/agents/performance-expert.md.hbs",
+      "templates/canonical/agents/paranoid-architect.md.hbs",
       "templates/canonical/guides/code-review-graph-usage.md.hbs"
     ]
   },
@@ -142,7 +183,14 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
       ".agent-flow/config.json -> discovery.customProvider",
       ".agent-flow/config.json -> discovery.fallback"
     ],
-    usedIn: ["templates/canonical/index.md.hbs"]
+    usedIn: [
+      "templates/canonical/index.md.hbs",
+      "templates/canonical/agents/architect.md.hbs",
+      "templates/canonical/agents/code-simplifier.md.hbs",
+      "templates/canonical/agents/deep-reviewer.md.hbs",
+      "templates/canonical/agents/performance-expert.md.hbs",
+      "templates/canonical/agents/paranoid-architect.md.hbs"
+    ]
   },
   {
     key: "quality.invariantSummary",
@@ -170,19 +218,73 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     key: "git.prBaseFlag",
     summary: "Pull request base-branch flag for delivery.",
     renderedFrom: [".agent-flow/config.json -> git.integrationBranch"],
-    usedIn: ["templates/canonical/agents/delivery-agent.md.hbs"]
+    usedIn: [
+      "templates/canonical/agents/delivery-agent.md.hbs",
+      "templates/canonical/guides/worktree-workflow.md.hbs"
+    ]
   },
   {
     key: "git.remoteBranchDeleteCommand",
     summary: "Remote branch deletion command or generic branch-cleanup instruction.",
     renderedFrom: [".agent-flow/config.json -> git.repository"],
-    usedIn: ["templates/canonical/agents/delivery-agent.md.hbs"]
+    usedIn: [
+      "templates/canonical/agents/delivery-agent.md.hbs",
+      "templates/canonical/guides/worktree-workflow.md.hbs"
+    ]
   },
   {
     key: "git.releaseFlow",
     summary: "Human-readable integration-to-release branch flow.",
     renderedFrom: [".agent-flow/config.json -> git.integrationBranch", ".agent-flow/config.json -> git.releaseBranch"],
     usedIn: ["templates/canonical/agents/delivery-agent.md.hbs"]
+  },
+  {
+    key: "git.remoteName",
+    summary: "Git remote name used in worktree and delivery commands.",
+    renderedFrom: [".agent-flow/config.json -> git.remoteName"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
+    key: "git.integrationBranch",
+    summary: "Integration branch used for feature PRs and task delivery.",
+    renderedFrom: [".agent-flow/config.json -> git.integrationBranch"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
+    key: "git.releaseBranch",
+    summary: "Release branch used for explicit release-sync flow when configured.",
+    renderedFrom: [".agent-flow/config.json -> git.releaseBranch"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
+    key: "git.integrationRef",
+    summary: "Remote integration branch ref used for rebase, parking, and delivery-state checks.",
+    renderedFrom: [".agent-flow/config.json -> git.remoteName", ".agent-flow/config.json -> git.integrationBranch"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
+    key: "git.releaseRef",
+    summary: "Remote release branch ref used for release-sync checks when a release branch is configured.",
+    renderedFrom: [".agent-flow/config.json -> git.remoteName", ".agent-flow/config.json -> git.releaseBranch"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
+    key: "git.worktreeParkCommand",
+    summary: "Installed helper command for parking/syncing local worktrees after delivery.",
+    renderedFrom: ["Agent Flow installed scripts"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
+    key: "git.deliveryStateCommand",
+    summary: "Installed helper command for printing canonical post-delivery state.",
+    renderedFrom: ["Agent Flow installed scripts"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
+    key: "git.deliveryStateRef",
+    summary: "Default post-delivery state ref derived from the configured integration branch.",
+    renderedFrom: [".agent-flow/config.json -> git.remoteName", ".agent-flow/config.json -> git.integrationBranch"],
+    usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
   }
 ];
 

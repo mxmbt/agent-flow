@@ -1,0 +1,142 @@
+# Worktree Workflow
+
+## Ветки
+
+| Ветка | Назначение | Прямой push |
+|-------|-----------|-------------|
+| `{{git.releaseBranch}}` | Production snapshot. Только через `{{git.integrationBranch}}` -> PR -> squash merge. | ❌ никогда |
+| `{{git.integrationBranch}}` | Integration. Все feature PR идут сюда. | ❌ никогда |
+| `feature/{{project.taskPrefix}}-<taskId>-...` | Рабочая ветка задачи. | ✅ + force-with-lease |
+| `bugfix/...`, `hotfix/...`, `infra/...` | Аналогично feature. | ✅ + force-with-lease |
+| `worktree/<dirname>` | Parking-ветка idle worktree. Всегда указывает на `{{git.integrationRef}}`. | ❌ |
+
+**Никогда не работать напрямую в `{{git.releaseBranch}}` или `{{git.integrationBranch}}`.** Любое изменение — через ветку и PR.
+
+## Worktrees
+
+Worktrees паркуются между задачами на своих ветках:
+
+| Worktree | Путь | Parking |
+|---------|------|---------|
+| Main | `<main worktree>` | `{{git.integrationBranch}}` |
+| additional | `<additional worktree>` | `worktree/<dirname>` |
+
+Основной worktree всегда паркуется на `{{git.integrationBranch}}`. Дополнительные worktrees — на `worktree/<dirname>`.
+
+## Что Считать Доставкой
+
+Это три разные операции. Их нельзя смешивать в отчете или в голове:
+
+| Состояние | Что означает | Источник правды |
+|-----------|--------------|-----------------|
+| `delivered to {{git.integrationBranch}}` | task-ветка влита через PR в `{{git.integrationRef}}` | merged feature PR + commit reachable from `{{git.integrationRef}}` |
+| `released to {{git.releaseBranch}}` | интеграционный хвост из `{{git.integrationBranch}}` выпущен в `{{git.releaseRef}}` | merged release PR + `{{git.integrationRef}} == {{git.releaseRef}}` после post-release reset |
+| `parked locally` | текущий worktree очищен и стоит на parking-ветке | local `git branch -vv`, upstream, `HEAD`, `git status` |
+
+Правила:
+
+- По умолчанию `DELIVERY` закрывает задачу в `{{git.integrationBranch}}`, а не в `{{git.releaseBranch}}`.
+- `{{git.integrationBranch}}` может опережать `{{git.releaseBranch}}` между релизами. Это нормальное состояние, а не drift.
+- `worktree/<dirname>` и чистый local `Changes` tab ничего не доказывают про remote delivery сами по себе.
+- В финальном отчете всегда разделяй: что в `{{git.integrationBranch}}`, что в `{{git.releaseBranch}}`, что только локально очищено.
+
+## Начало задачи
+
+```bash
+git fetch {{git.remoteName}}
+git checkout -b feature/{{project.taskPrefix}}-<taskId>-short-desc {{git.integrationRef}}
+```
+
+## Feature Delivery: Task -> {{git.integrationBranch}}
+
+```bash
+# PR всегда в {{git.integrationBranch}}
+gh pr create {{git.prBaseFlag}} --title "feat(scope): ..." --body "..."
+
+# Squash merge — линейная история
+gh pr merge <N> --squash
+```
+
+Delivery по умолчанию не останавливается на создании PR. Агент обязан довести git flow до конца: squash merge, delete remote branch, cleanup и parking worktrees. PR-only stop допустим только если пользователь явно попросил остановиться на открытом PR.
+
+Feature delivery завершает задачу в `{{git.integrationBranch}}`. Сам по себе этот шаг не означает, что изменение уже выпущено в `{{git.releaseBranch}}`.
+
+## Cleanup после merge
+
+```bash
+# Удалить remote branch
+{{git.remoteBranchDeleteCommand}}
+
+# Обязательный helper: он сам fetch'ит remote, обновляет integration branch в main worktree,
+# переводит текущий worktree на parking branch, чинит upstream и валидирует постусловия.
+{{git.worktreeParkCommand}}
+
+# Канонический post-delivery отчет
+{{git.deliveryStateCommand}} --ref {{git.integrationRef}}
+```
+
+**Postcondition is mandatory:** delivery не завершён, пока текущий worktree не стоит на `worktree/<dirname>`, не трекает `{{git.integrationRef}}`, и его `HEAD` не совпадает с `{{git.integrationRef}}`.
+
+Cleanup после merge — это только локальная hygiene-операция. Она не меняет правду про `{{git.releaseBranch}}`.
+
+## Release Sync: {{git.integrationBranch}} -> {{git.releaseBranch}}
+
+Это отдельная операция, не часть каждой task-delivery по умолчанию.
+
+Запускать release-sync только когда нужно реально выпустить накопленный интеграционный хвост в production snapshot.
+
+```bash
+# 1. PR и squash merge
+gh pr create --base {{git.releaseBranch}} --head {{git.integrationBranch}} --title "release: <milestone>" --body "..."
+gh pr merge <N> --squash
+
+# 2. После merge — сбросить {{git.integrationBranch}} на {{git.releaseBranch}} (обязательно после squash-release)
+# Без этого three-dot diff показывает все изменения как "не смёрдженные"
+git fetch {{git.remoteName}}
+git -C <main worktree> reset --hard {{git.releaseRef}}
+git -C <main worktree> push --force-with-lease {{git.remoteName}} {{git.integrationBranch}}
+
+# 3. Синхронизировать все parking worktrees на новый {{git.integrationRef}}
+git worktree list --porcelain \
+  | awk '/^worktree/{wt=$2} /^branch refs\/heads\/worktree\//{print wt}' \
+  | while read wt; do
+      WNAME="$(basename "$wt")"
+      git -C "$wt" checkout -B "worktree/$WNAME" {{git.integrationRef}}
+      git -C "$wt" branch --unset-upstream >/dev/null 2>&1 || true
+      git -C "$wt" branch --set-upstream-to={{git.integrationRef}} "worktree/$WNAME"
+    done
+```
+
+После успешного release-sync `{{git.integrationRef}}` и `{{git.releaseRef}}` обязаны совпадать. До release-sync их расхождение ожидаемо.
+
+## Как Отчитываться
+
+Каждый delivery close-out обязан явно сообщать три статуса:
+
+- `{{git.integrationBranch}}:` merged / not merged, PR number, commit
+- `{{git.releaseBranch}}:` released / not released, release PR number if any
+- `Local worktree:` parked / not parked, current branch, upstream, `HEAD == {{git.integrationRef}}` yes/no
+
+Канонический способ получить этот блок:
+
+```bash
+{{git.deliveryStateCommand}} --ref <merge-commit-or-{{git.integrationRef}}>
+```
+
+## Параллельные worktrees
+
+Перед `gh pr create` — всегда rebase:
+
+```bash
+git fetch {{git.remoteName}}
+git rebase {{git.integrationRef}}
+git push --force-with-lease
+```
+
+| Ситуация | Параллельно? |
+|----------|-------------|
+| Задачи трогают разные файлы | yes, GitHub мёрджит сам |
+| Задача B дополняет файлы задачи A | rebase обязателен |
+| Задача B требует завершения A | только последовательно |
+
+Rebase с конфликтами = задача была зависимой, не должна идти параллельно.

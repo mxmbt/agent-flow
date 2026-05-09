@@ -152,6 +152,13 @@ async function reuseExistingArtifactPaths(
     "docs/content/UX-WRITING-GUIDE.md",
     "docs/content-style.md"
   ], needsReview, evidence);
+  await reuseExistingPath(root, next, "qaSharedAccountFile", [
+    "docs/testing/QA-SHARED-ACCOUNT.md",
+    "docs/QA-SHARED-ACCOUNT.md",
+    "docs/testing/shared-account.md",
+    "docs/qa/shared-account.md",
+    "docs/QA.md"
+  ], needsReview, evidence);
 
   return next;
 }
@@ -254,6 +261,14 @@ async function starterArtifactFiles(root: string, config: CommandContext["config
         "Agent Flow installed this starter UX writing guide.",
         "",
         "Capture voice, terminology, labels, empty states, error messages, and user guidance conventions here."
+      ])
+    },
+    {
+      path: config.artifacts.qaSharedAccountFile,
+      content: markdownStarter("QA Shared Account", [
+        "Agent Flow installed this starter QA shared account reference.",
+        "",
+        "If the project uses shared QA accounts or seeded test identities, document safe usage, credentials location, reset rules, and restrictions here. If not applicable, state that explicitly."
       ])
     }
   ]));
