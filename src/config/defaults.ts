@@ -8,6 +8,9 @@ export interface AgentFlowConfig {
     statusFile: string;
     roadmapFile: string;
     productFile: string;
+    architectureFile: string;
+    userIsolationArchitectureFile: string;
+    schedulingArchitectureFile: string;
     phaseRoot: string;
     walkthroughRoot: string;
   };
@@ -63,6 +66,9 @@ export function createDefaultConfig(projectName = "Example Project"): AgentFlowC
       statusFile: "PROJECT_STATUS.md",
       roadmapFile: "docs/ROADMAP.md",
       productFile: "docs/PRODUCT.md",
+      architectureFile: "docs/ARCHITECTURE.md",
+      userIsolationArchitectureFile: "docs/ARCHITECTURE_MULTI_USER.md",
+      schedulingArchitectureFile: "docs/ARCHITECTURE_SCHEDULING.md",
       phaseRoot: "docs/phases",
       walkthroughRoot: "docs/walkthroughs/agents"
     },

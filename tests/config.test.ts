@@ -14,6 +14,9 @@ test("loadProjectConfig returns defaults when config is missing", async () => {
 
   assert.equal(loaded.source, "defaults");
   assert.equal(loaded.config.project.name, path.basename(cwd));
+  assert.equal(loaded.config.artifacts.architectureFile, "docs/ARCHITECTURE.md");
+  assert.equal(loaded.config.artifacts.userIsolationArchitectureFile, "docs/ARCHITECTURE_MULTI_USER.md");
+  assert.equal(loaded.config.artifacts.schedulingArchitectureFile, "docs/ARCHITECTURE_SCHEDULING.md");
   assert.deepEqual(loaded.config.checks.default, ["npm test"]);
 });
 

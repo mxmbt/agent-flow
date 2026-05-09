@@ -55,7 +55,16 @@ function validateProject(config: Record<string, unknown>, issues: ConfigIssue[])
 function validateArtifacts(config: Record<string, unknown>, issues: ConfigIssue[]): void {
   const artifacts = expectRecord(config.artifacts, "artifacts", issues);
 
-  for (const key of ["statusFile", "roadmapFile", "productFile", "phaseRoot", "walkthroughRoot"]) {
+  for (const key of [
+    "statusFile",
+    "roadmapFile",
+    "productFile",
+    "architectureFile",
+    "userIsolationArchitectureFile",
+    "schedulingArchitectureFile",
+    "phaseRoot",
+    "walkthroughRoot"
+  ]) {
     expectRelativePath(artifacts[key], `artifacts.${key}`, issues);
   }
 }

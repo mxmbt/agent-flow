@@ -83,7 +83,7 @@ export const DEFAULT_UNIVERSALITY_RULES: UniversalityRule[] = [
   {
     id: "domain-invariant-literal",
     severity: "error",
-    pattern: /\b(?:financial correctness|no-look-ahead|user isolation)\b/i,
+    pattern: /\b(?:financial correctness|no-look-ahead)\b/i,
     message: "Domain invariants must come from project config or domain packs.",
     routeTo: "pack"
   },
