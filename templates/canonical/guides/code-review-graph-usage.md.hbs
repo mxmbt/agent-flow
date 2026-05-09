@@ -1,0 +1,243 @@
+# code-review-graph: правила использования
+
+SSOT для всех агентов и оркестратора. Читай перед первым вызовом MCP tools в сессии.
+
+---
+
+## Состояние графа
+
+Для живых цифр используй:
+
+```bash
+code-review-graph status
+```
+
+Surface у текущей версии двухслойный:
+- CLI: `14` subcommands
+- MCP: `22` tools + `5` prompts
+
+Важно:
+- `code-review-graph status --json` в `2.1.0` не поддерживается
+- одинаковый `HEAD` в разных worktrees не гарантирует одинаковый graph state, если worktrees dirty
+- parked/clean worktrees на одном tree state должны сходиться после полного pipeline
+
+### Автообновление: три уровня
+
+#### Уровень 1: Incremental nodes/edges (при каждом Edit/Write)
+
+| Триггер | Механизм | Что делает |
+|---------|----------|-----------|
+| Edit / Write ({{target.agentName}}) | PostToolUse hook (`{{target.toolRoot}}/settings.json`, project-level) | CLI `code-review-graph update --base HEAD` — обновляет **nodes/edges** для изменённых файлов |
+
+**Ограничение:** CLI `update` обновляет **только** nodes и edges. Он **НЕ** пересчитывает FTS-индекс, flows, communities и embeddings. Это ожидаемо — incremental должен быть быстрым (< 1s).
+
+> **Примечание:** PostToolUse hook настроен **только** на project-level (`{{target.toolRoot}}/settings.json`), не на global (`{{target.homeRoot}}/settings.json`). Это исключает двойные вызовы и ложные срабатывания на Bash-команды.
+
+#### Уровень 2: Incremental pipeline (при старте сессии со stale графом)
+
+| Триггер | Механизм | Что делает |
+|---------|----------|-----------|
+| SessionStart ({{target.agentName}}) | `scripts/generate-project-map.sh` → `crg-full-pipeline.py --incremental` | Incremental update + FTS + flows + communities + embeddings + wiki |
+
+Скрипт сравнивает `Built at commit` графа с текущим HEAD. При расхождении запускает **полный incremental pipeline** (не CLI `update`), что включает post-processing. Timeout: 15s.
+
+#### Уровень 3: Full pipeline (при смене ветки / merge / новый worktree)
+
+| Триггер | Механизм | Что делает |
+|---------|----------|-----------|
+| `git checkout` (смена ветки) | `post-checkout` git hook → `crg-full-pipeline.py` | Full rebuild → FTS → flows → communities → embeddings → wiki |
+| `git merge` | `post-merge` git hook → `crg-full-pipeline.py` | Full rebuild → FTS → flows → communities → embeddings → wiki |
+| Новый worktree (граф пуст) | `generate-project-map.sh` → `crg-full-pipeline.py` (background) | Full rebuild в фоне (~30-60s) |
+
+**Pipeline script** (`crg-full-pipeline.py`) вызывает внутреннюю Python API `build_or_update_graph` (из `code_review_graph.tools.build`) — она включает **все** post-processing шаги.
+
+> **ВАЖНО: CLI ≠ Python API.** CLI-команда `code-review-graph build` вызывает `incremental.full_build()` — **без** post-processing (FTS, flows, communities). Python API `build_or_update_graph` вызывает ту же функцию + post-processing. Всегда используй pipeline script или MCP tool, **не** CLI `build`.
+
+### Worktrees
+
+Git hooks шарятся между main repo и всеми worktrees (`core.hooksPath` → `.git/hooks/` в main repo). Pipeline скрипт автоматически определяет repo root через `find_project_root()`. Каждый worktree имеет **свой** отдельный граф (SQLite DB в `.code-review-graph/`).
+
+**Новый worktree:** `git worktree add` → `post-checkout` → full pipeline в фоне. Если {{target.agentName}} стартует до завершения pipeline, `generate-project-map.sh` обнаружит пустой граф, проверит что pipeline уже запущен (через `pgrep`), и не запустит дублирующий build.
+
+Разный `Built on branch`, `Last updated`, wiki count и embeddings count между dirty worktrees — нормальны. Для parked/clean worktrees на одном коммите после полного pipeline состояние должно сходиться.
+
+### Ручной полный rebuild (если граф устарел)
+
+Из {{target.agentName}} сессии:
+```
+build_or_update_graph(full_rebuild=True)   # граф + FTS + flows + communities
+embed_graph_tool()                         # embeddings
+generate_wiki_tool()                       # wiki
+```
+
+Из терминала:
+```bash
+.git/hooks/crg-full-pipeline.py            # полный pipeline (build + embed + wiki)
+.git/hooks/crg-full-pipeline.py --incremental --base HEAD~5  # инкрементальный с post-processing
+```
+
+> **Предпочтительно:** `crg-full-pipeline.py` — один вызов делает всё. MCP tools — если нужен точечный контроль.
+
+### Flows: два типа
+
+~2080 flows, разделённых на два типа:
+
+- **Function flows (~20+)** — HTTP handlers (`GET`, `POST`), React pages (`PageView`, `ChatPanel`, `GroupDetailPage`), сервисные функции (`handlePasswordSubmit`, `indexPage`, `getInstallationToken`). Criticality 0.64-0.90. **Полезны для impact analysis.**
+- **Test flows (~2060)** — точки входа `it:`. Полезны для `tests_for`, но шумят в `list_flows`.
+
+**Как использовать:**
+```
+list_flows(kind="Function", sort_by="criticality")   # только реальные flows
+get_affected_flows(changed_files=[...])               # какие endpoints/pages затронуты
+get_impact_radius(changed_files=[...])                # blast radius через граф зависимостей (дополняет flows)
+```
+
+`get_affected_flows` + `get_impact_radius` — **комплементарные** инструменты. Flows показывают высокоуровневые execution paths, impact radius — граф зависимостей.
+
+---
+
+## Правило №1: Graph-First
+
+Используй code-review-graph MCP **до** Grep/Glob/Read для поиска по коду.
+Fallback на Grep/Glob/Read — только для конфигов, CSS, JSON/YAML/MD, текстов ошибок.
+
+---
+
+## Правило №2: Как писать query для semantic_search_nodes
+
+Инструмент работает в **hybrid** режиме (vector + keyword). Embeddings активны во всех worktrees.
+
+Hybrid mode находит семантически близкие результаты, но **точные имена по-прежнему работают лучше**:
+
+```
+✅ CamelCase имя класса/функции:   query="IndexingService"
+✅ kebab-case имя файла:            query="indexing-service"
+✅ один технический термин:         query="chunk", query="embed", query="rag"
+✅ концептуальная фраза (hybrid):   query="authentication service login"  → находит AuthRequiredStep, onAuthenticationFailed
+
+⚠️ Многословные фразы дают менее точные результаты — scores будут низкие (0.01-0.02)
+```
+
+Если первый запрос вернул 0 — это **не** значит что граф пустой. Попробуй:
+1. Один токен вместо нескольких
+2. CamelCase вариант (`"IndexingService"` вместо `"indexing service"`)
+3. Другое слово из той же темы (`"embed"` вместо `"embedding"`)
+
+**0 результатов ≠ граф пуст. Fallback на Grep разрешён только после 3+ попыток с разными query.**
+
+---
+
+## Правило №3: query_graph — файл, не директория
+
+`children_of`, `importers_of`, `imports_of` принимают **точный путь к файлу**, не директорию.
+
+```
+✅ query_graph(pattern="children_of", target="engine/app/services/signals/preflight_validator.py")
+❌ query_graph(pattern="children_of", target="web/src/lib/realtime")   # директория → ambiguous/not_found
+```
+
+Если `children_of` для директории вернул `ambiguous` — в ответе будут кандидаты (файлы), используй их.
+
+---
+
+## Правило №4: Communities и architecture overview
+
+Communities активны (~620 штук). `get_architecture_overview` и `list_communities` работают.
+
+**Используй для:**
+- High-level обзор кодовой базы: `list_communities(min_size=10)`
+- Кросс-модульный coupling: `get_architecture_overview()`
+- Детали кластера: `get_community(community_name="auth")`
+
+**Предупреждение:** output communities может быть очень большим (780K+ символов). Используй `min_size` для фильтрации:
+```
+✅ list_communities(min_size=10, sort_by="size")   # ~210 communities
+✅ list_communities(min_size=20, sort_by="cohesion") # ещё меньше
+❌ list_communities(min_size=0)                      # 620+ → overflow
+```
+
+---
+
+## Правило №5: query_graph callers_of — указывай qualified_name при ambiguous
+
+Если `callers_of` возвращает `status: "ambiguous"` — граф нашёл несколько нод с одинаковым именем (функция + тест). Используй qualified_name из списка кандидатов:
+
+```
+✅ target="web/src/components/Auth/LoginForm.tsx::LoginForm"
+❌ target="LoginForm"   # ambiguous если есть одноимённый тест/символ
+```
+
+---
+
+## Правило №6: refactor_tool — всегда сужай до runtime кода
+
+`refactor_tool(mode="suggest")` и `refactor_tool(mode="dead_code")` без фильтра возвращают шум из `{{target.toolRoot}}/` и служебных файлов.
+
+```
+✅ refactor_tool(mode="dead_code", file_pattern="web/src/")
+✅ refactor_tool(mode="dead_code", file_pattern="engine/app/")
+✅ refactor_tool(mode="suggest", file_pattern="web/src/")
+❌ refactor_tool(mode="dead_code")   # засорён {{target.toolRoot}}/ Python
+```
+
+---
+
+## Правило №7: file_summary — по имени файла, не модуля
+
+Всегда проверяй реальную структуру файлов. Не подменяй существующий путь воображаемым `service.ts` или `router.ts`:
+
+```
+✅ query_graph(pattern="file_summary", target="web/src/components/Auth/LoginForm.tsx")
+❌ query_graph(pattern="file_summary", target="web/src/components/Auth/service.ts")  # файл не существует → 0 results
+```
+
+---
+
+## Quick Reference
+
+| Задача | Tool | Пример |
+|--------|------|--------|
+| Найти файл по теме | `semantic_search_nodes` | `query="indexing-service", kind="File"` |
+| Найти функцию/класс | `semantic_search_nodes` | `query="IndexingService", kind="Function"` |
+| Содержимое файла | `query_graph children_of` | `target="engine/app/services/signals/preflight_validator.py"` |
+| Кто вызывает функцию | `query_graph callers_of` | `target="createPage"` |
+| Кто импортирует модуль | `query_graph importers_of` | `target="web/src/lib/realtime/realtimeFeedBridge.ts"` |
+| Есть ли тесты | `query_graph tests_for` | `target="IndexingService"` |
+| Blast radius изменений | `get_impact_radius` | `changed_files=["engine/app/services/signals/preflight_validator.py"]` |
+| Затронутые endpoints/pages | `get_affected_flows` | `changed_files=["engine/app/services/signals/preflight_validator.py"]` |
+| Реальные execution flows | `list_flows` | `kind="Function", sort_by="criticality"` |
+| Контекст для ревью | `detect_changes_tool` | `base="HEAD~1", detail_level="minimal"` |
+| Полный ревью-контекст | `get_review_context` | `base="master", include_source=true` |
+| Кандидаты на декомпозицию | `find_large_functions` | `min_lines=100, kind="Function", file_pattern="engine/app/"` |
+| Dead code в runtime code | `refactor_tool dead_code` | `mode="dead_code", file_pattern="web/src/"` |
+| Preview переименования | `refactor_tool rename` | `mode="rename", old_name="foo", new_name="bar"` |
+| Применить переименование | `apply_refactor_tool` | `refactor_id="<id from rename>"` |
+| Communities обзор | `list_communities` | `min_size=10, sort_by="size"` |
+| Архитектура/coupling | `get_architecture_overview` | (без параметров) |
+| Ручной rebuild | `build_or_update_graph` | `full_rebuild=True` + `embed_graph_tool()` |
+
+---
+
+## Known Caveats
+
+- `cross_repo_search_tool` пуст без предварительного `code-review-graph register`
+- `get_docs_section_tool` в текущей версии ведёт себя как broken и может возвращать `not_found` для валидных секций
+- `apply_refactor_tool` требует ручной проверки diff; не считай rename fully safe без верификации
+
+---
+
+## Диагностика проблем
+
+| Симптом | Причина | Решение |
+|---------|---------|---------|
+| `semantic_search` возвращает 0 для концептуальных запросов | Embeddings не вычислены | `embed_graph_tool()` |
+| `list_communities` → 0 | Communities не вычислены (CLI build без post-processing) | `build_or_update_graph(full_rebuild=True)` |
+| Граф не обновляется при edit | Hook не срабатывает | Проверь `{{target.toolRoot}}/settings.json` (project-level) PostToolUse hook |
+| Граф устарел после checkout | post-checkout не executable | `chmod +x .git/hooks/post-checkout` |
+| Worktree drift (разные nodes/edges) | Incremental дрифт между worktrees | `build_or_update_graph(full_rebuild=True, repo_root="<path>")` на обоих |
+| Новый worktree — граф пуст | Pipeline не завершился | Подождать ~60s или `build_or_update_graph(full_rebuild=True)` + `embed_graph_tool()` |
+| `file_summary` → 0 для существующего файла | Парсер не индексирует (re-export, config) | Ожидаемо для некоторых типов файлов |
+| Embeddings count = 0 после build | build не включает embeddings | Отдельно: `embed_graph_tool()` или pipeline |
+| `cross_repo_search` пустой | Не зарегистрированы repos | `code-review-graph register <path>` |
+| `get_docs_section_tool` всегда `not_found` | Текущий баг CRG | Не использовать как источник истины |
+| `apply_refactor_tool` сделал неполный rename | Rename apply ненадёжен | Всегда проверять diff вручную |

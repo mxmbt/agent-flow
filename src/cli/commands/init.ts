@@ -124,6 +124,34 @@ async function reuseExistingArtifactPaths(
     "docs/QUEUES.md",
     "docs/WORKERS.md"
   ], needsReview, evidence);
+  await reuseExistingPath(root, next, "backlogFile", [
+    "docs/tasks.md",
+    "TASKS.md",
+    "docs/TASKS.md",
+    "docs/backlog.md",
+    "docs/BACKLOG.md"
+  ], needsReview, evidence);
+  await reuseExistingPath(root, next, "uiUxSpecificationFile", [
+    "docs/UI-UX-SPECIFICATION.md",
+    "docs/UX.md",
+    "docs/ui-ux.md",
+    "docs/design/UI-UX-SPECIFICATION.md",
+    "docs/design/UX.md"
+  ], needsReview, evidence);
+  await reuseExistingPath(root, next, "designSystemFile", [
+    "docs/design/DESIGN-SYSTEM.md",
+    "docs/DESIGN-SYSTEM.md",
+    "DESIGN-SYSTEM.md",
+    "docs/design-system.md",
+    "docs/design/README.md"
+  ], needsReview, evidence);
+  await reuseExistingPath(root, next, "uxWritingGuideFile", [
+    "docs/design/UX-WRITING-GUIDE.md",
+    "docs/UX-WRITING-GUIDE.md",
+    "docs/ux-writing.md",
+    "docs/content/UX-WRITING-GUIDE.md",
+    "docs/content-style.md"
+  ], needsReview, evidence);
 
   return next;
 }
@@ -194,6 +222,38 @@ async function starterArtifactFiles(root: string, config: CommandContext["config
         "Agent Flow installed this starter scheduling architecture reference.",
         "",
         "Use this file when work touches cron, queues, background jobs, event fan-out, retries, or idempotency."
+      ])
+    },
+    {
+      path: config.artifacts.backlogFile,
+      content: markdownStarter("Backlog", [
+        "Agent Flow installed this starter backlog file.",
+        "",
+        "Use this file for cross-phase follow-ups, deferred work, and task ideas that are not assigned to the active phase."
+      ])
+    },
+    {
+      path: config.artifacts.uiUxSpecificationFile,
+      content: markdownStarter("UI/UX Specification", [
+        "Agent Flow installed this starter UI/UX specification.",
+        "",
+        "Capture user journeys, key screens, interaction requirements, accessibility expectations, and UX risks here."
+      ])
+    },
+    {
+      path: config.artifacts.designSystemFile,
+      content: markdownStarter("Design System", [
+        "Agent Flow installed this starter design system reference.",
+        "",
+        "Capture components, patterns, tokens, visual hierarchy, and interaction conventions here."
+      ])
+    },
+    {
+      path: config.artifacts.uxWritingGuideFile,
+      content: markdownStarter("UX Writing Guide", [
+        "Agent Flow installed this starter UX writing guide.",
+        "",
+        "Capture voice, terminology, labels, empty states, error messages, and user guidance conventions here."
       ])
     }
   ]));

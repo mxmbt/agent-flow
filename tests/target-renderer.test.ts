@@ -15,7 +15,8 @@ const templateRoot = path.join(repoRoot, "templates");
 test("renderTargetFiles renders native Claude and Codex root targets from the same canonical contract", async () => {
   const config = createDefaultConfig("Target Fixture");
   config.checks.default = ["npm test"];
-  const packs = composePacks(builtinPacks, ["finance"]);
+  config.discovery.codeGraphProvider = "code-review-graph";
+  const packs = composePacks(builtinPacks, ["finance", "cloudflare-worker", "code-review-toolkit", "code-review-graph"]);
 
   const files = await renderTargetFiles(config, packs, { templateRoot, version: 7 });
   const byPath = new Map(files.map((file) => [file.path, file.content]));
@@ -29,9 +30,21 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
     path.join(".claude", "agents", "code-simplifier.md"),
     path.join(".claude", "agents", "deep-reviewer.md"),
     path.join(".claude", "agents", "findings-arbiter.md"),
+    path.join(".claude", "agents", "paranoid-architect.md"),
+    path.join(".claude", "agents", "performance-expert.md"),
+    path.join(".claude", "agents", "product-manager.md"),
+    path.join(".claude", "agents", "ux-expert.md"),
     path.join(".claude", "agents", "math-genius.md"),
+    path.join(".claude", "agents", "prt-code-reviewer.md"),
+    path.join(".claude", "agents", "prt-code-simplifier.md"),
+    path.join(".claude", "agents", "prt-comment-analyzer.md"),
+    path.join(".claude", "agents", "prt-pr-test-analyzer.md"),
+    path.join(".claude", "agents", "prt-silent-failure-hunter.md"),
+    path.join(".claude", "agents", "prt-type-design-analyzer.md"),
     path.join(".claude", "agents", "delivery-agent.md"),
     path.join(".claude", "agents", "qa-expert.md"),
+    path.join(".claude", "guides", "gan-protocol.md"),
+    path.join(".claude", "guides", "code-review-graph-usage.md"),
     "AGENTS.md",
     path.join(".codex", "orchestration-policy.md"),
     path.join(".codex", "claude-interop.md"),
@@ -41,9 +54,21 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
     path.join(".codex", "agents", "code-simplifier.md"),
     path.join(".codex", "agents", "deep-reviewer.md"),
     path.join(".codex", "agents", "findings-arbiter.md"),
+    path.join(".codex", "agents", "paranoid-architect.md"),
+    path.join(".codex", "agents", "performance-expert.md"),
+    path.join(".codex", "agents", "product-manager.md"),
+    path.join(".codex", "agents", "ux-expert.md"),
     path.join(".codex", "agents", "math-genius.md"),
+    path.join(".codex", "agents", "prt-code-reviewer.md"),
+    path.join(".codex", "agents", "prt-code-simplifier.md"),
+    path.join(".codex", "agents", "prt-comment-analyzer.md"),
+    path.join(".codex", "agents", "prt-pr-test-analyzer.md"),
+    path.join(".codex", "agents", "prt-silent-failure-hunter.md"),
+    path.join(".codex", "agents", "prt-type-design-analyzer.md"),
     path.join(".codex", "agents", "delivery-agent.md"),
-    path.join(".codex", "agents", "qa-expert.md")
+    path.join(".codex", "agents", "qa-expert.md"),
+    path.join(".codex", "guides", "gan-protocol.md"),
+    path.join(".codex", "guides", "code-review-graph-usage.md")
   ]);
 
   const claude = byPath.get("CLAUDE.md");
@@ -192,6 +217,66 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.match(codexFindingsArbiter, /roadmap \/ milestone follow-up -> `docs\/ROADMAP\.md`/);
   assert.doesNotMatch(codexFindingsArbiter, /financial-math/);
 
+  const claudeParanoidArchitect = byPath.get(path.join(".claude", "agents", "paranoid-architect.md"));
+  const codexParanoidArchitect = byPath.get(path.join(".codex", "agents", "paranoid-architect.md"));
+  assert.ok(claudeParanoidArchitect);
+  assert.ok(codexParanoidArchitect);
+  assert.deepEqual(parseManagedMetadata(claudeParanoidArchitect), {
+    id: "claude-agent-paranoid-architect",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "paranoid-architect.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexParanoidArchitect), {
+    id: "codex-agent-paranoid-architect",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "paranoid-architect.md.hbs")
+  });
+  assert.match(claudeParanoidArchitect, /`\.claude\/guides\/code-review-graph-usage\.md`/);
+  assert.match(codexParanoidArchitect, /`\.codex\/guides\/code-review-graph-usage\.md`/);
+  assert.match(codexParanoidArchitect, /worker bindings\n- D1 migrations\n- R2 buckets\n- KV namespaces/);
+  assert.doesNotMatch(codexParanoidArchitect, /Worker endpoint exposure|Telegram\/webhook/);
+
+  const claudePerformanceExpert = byPath.get(path.join(".claude", "agents", "performance-expert.md"));
+  const codexPerformanceExpert = byPath.get(path.join(".codex", "agents", "performance-expert.md"));
+  assert.ok(claudePerformanceExpert);
+  assert.ok(codexPerformanceExpert);
+  assert.deepEqual(parseManagedMetadata(claudePerformanceExpert), {
+    id: "claude-agent-performance-expert",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "performance-expert.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexPerformanceExpert), {
+    id: "codex-agent-performance-expert",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "performance-expert.md.hbs")
+  });
+  assert.match(claudePerformanceExpert, /`\.claude\/guides\/code-review-graph-usage\.md`/);
+  assert.match(codexPerformanceExpert, /`\.codex\/guides\/code-review-graph-usage\.md`/);
+  assert.match(codexPerformanceExpert, /configured runtime and pack-contributed performance constraints/);
+  assert.doesNotMatch(codexPerformanceExpert, /Cloudflare Worker execution limits|R2 asset fetch/);
+
+  const claudeProductManager = byPath.get(path.join(".claude", "agents", "product-manager.md"));
+  const codexProductManager = byPath.get(path.join(".codex", "agents", "product-manager.md"));
+  assert.ok(claudeProductManager);
+  assert.ok(codexProductManager);
+  assert.deepEqual(parseManagedMetadata(claudeProductManager), {
+    id: "claude-agent-product-manager",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "product-manager.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexProductManager), {
+    id: "codex-agent-product-manager",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "product-manager.md.hbs")
+  });
+  assert.match(codexProductManager, /`PROJECT_STATUS\.md`/);
+  assert.match(codexProductManager, /`docs\/PRODUCT\.md`/);
+  assert.match(codexProductManager, /`docs\/ROADMAP\.md`/);
+  assert.match(codexProductManager, /`docs\/ARCHITECTURE\.md`/);
+  assert.match(codexProductManager, /`docs\/tasks\.md`/);
+  assert.match(codexProductManager, /`docs\/phases\/phase-<phase-token>\/tasks\.md`/);
+  assert.doesNotMatch(codexProductManager, /PROGRESS\.md/);
+
   const claudeMathGenius = byPath.get(path.join(".claude", "agents", "math-genius.md"));
   const codexMathGenius = byPath.get(path.join(".codex", "agents", "math-genius.md"));
   assert.ok(claudeMathGenius);
@@ -208,6 +293,132 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   });
   assert.match(codexMathGenius, /finance pack extension/);
   assert.doesNotMatch(codexMathGenius, /FinAI|ZNAI/);
+
+  const claudePrtCodeReviewer = byPath.get(path.join(".claude", "agents", "prt-code-reviewer.md"));
+  const codexPrtCodeReviewer = byPath.get(path.join(".codex", "agents", "prt-code-reviewer.md"));
+  assert.ok(claudePrtCodeReviewer);
+  assert.ok(codexPrtCodeReviewer);
+  assert.deepEqual(parseManagedMetadata(claudePrtCodeReviewer), {
+    id: "claude-agent-prt-code-reviewer",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "prt-code-reviewer.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexPrtCodeReviewer), {
+    id: "codex-agent-prt-code-reviewer",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "prt-code-reviewer.md.hbs")
+  });
+  assert.match(claudePrtCodeReviewer, /CLAUDE\.md or equivalent root instructions/);
+  assert.match(codexPrtCodeReviewer, /AGENTS\.md or equivalent root instructions/);
+  assert.match(codexPrtCodeReviewer, /root agent instructions/);
+  assert.doesNotMatch(codexPrtCodeReviewer, /explicit AGENTS\.md violation/);
+
+  const claudePrtCodeSimplifier = byPath.get(path.join(".claude", "agents", "prt-code-simplifier.md"));
+  const codexPrtCodeSimplifier = byPath.get(path.join(".codex", "agents", "prt-code-simplifier.md"));
+  assert.ok(claudePrtCodeSimplifier);
+  assert.ok(codexPrtCodeSimplifier);
+  assert.deepEqual(parseManagedMetadata(claudePrtCodeSimplifier), {
+    id: "claude-agent-prt-code-simplifier",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "prt-code-simplifier.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexPrtCodeSimplifier), {
+    id: "codex-agent-prt-code-simplifier",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "prt-code-simplifier.md.hbs")
+  });
+  assert.match(codexPrtCodeSimplifier, /language\/framework docs, and installed packs/);
+  assert.doesNotMatch(codexPrtCodeSimplifier, /React component patterns|ES modules/);
+
+  const claudePrtCommentAnalyzer = byPath.get(path.join(".claude", "agents", "prt-comment-analyzer.md"));
+  const codexPrtCommentAnalyzer = byPath.get(path.join(".codex", "agents", "prt-comment-analyzer.md"));
+  assert.ok(claudePrtCommentAnalyzer);
+  assert.ok(codexPrtCommentAnalyzer);
+  assert.deepEqual(parseManagedMetadata(claudePrtCommentAnalyzer), {
+    id: "claude-agent-prt-comment-analyzer",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "prt-comment-analyzer.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexPrtCommentAnalyzer), {
+    id: "codex-agent-prt-comment-analyzer",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "prt-comment-analyzer.md.hbs")
+  });
+  assert.match(codexPrtCommentAnalyzer, /comment rot/);
+  assert.doesNotMatch(codexPrtCommentAnalyzer, /pull request|Daisy/);
+
+  const claudePrtPrTestAnalyzer = byPath.get(path.join(".claude", "agents", "prt-pr-test-analyzer.md"));
+  const codexPrtPrTestAnalyzer = byPath.get(path.join(".codex", "agents", "prt-pr-test-analyzer.md"));
+  assert.ok(claudePrtPrTestAnalyzer);
+  assert.ok(codexPrtPrTestAnalyzer);
+  assert.deepEqual(parseManagedMetadata(claudePrtPrTestAnalyzer), {
+    id: "claude-agent-prt-pr-test-analyzer",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "prt-pr-test-analyzer.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexPrtPrTestAnalyzer), {
+    id: "codex-agent-prt-pr-test-analyzer",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "prt-pr-test-analyzer.md.hbs")
+  });
+  assert.match(codexPrtPrTestAnalyzer, /change-set review/);
+  assert.match(codexPrtPrTestAnalyzer, /root agent instructions/);
+  assert.doesNotMatch(codexPrtPrTestAnalyzer, /CLAUDE\.md|AGENTS\.md|Daisy|pull request/);
+
+  const claudePrtSilentFailureHunter = byPath.get(path.join(".claude", "agents", "prt-silent-failure-hunter.md"));
+  const codexPrtSilentFailureHunter = byPath.get(path.join(".codex", "agents", "prt-silent-failure-hunter.md"));
+  assert.ok(claudePrtSilentFailureHunter);
+  assert.ok(codexPrtSilentFailureHunter);
+  assert.deepEqual(parseManagedMetadata(claudePrtSilentFailureHunter), {
+    id: "claude-agent-prt-silent-failure-hunter",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "prt-silent-failure-hunter.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexPrtSilentFailureHunter), {
+    id: "codex-agent-prt-silent-failure-hunter",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "prt-silent-failure-hunter.md.hbs")
+  });
+  assert.match(codexPrtSilentFailureHunter, /root agent instructions/);
+  assert.match(codexPrtSilentFailureHunter, /project-standard error identifier/);
+  assert.doesNotMatch(codexPrtSilentFailureHunter, /CLAUDE\.md|AGENTS\.md|Sentry|constants\/errorIds\.ts|pull request|Daisy/);
+
+  const claudePrtTypeDesignAnalyzer = byPath.get(path.join(".claude", "agents", "prt-type-design-analyzer.md"));
+  const codexPrtTypeDesignAnalyzer = byPath.get(path.join(".codex", "agents", "prt-type-design-analyzer.md"));
+  assert.ok(claudePrtTypeDesignAnalyzer);
+  assert.ok(codexPrtTypeDesignAnalyzer);
+  assert.deepEqual(parseManagedMetadata(claudePrtTypeDesignAnalyzer), {
+    id: "claude-agent-prt-type-design-analyzer",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "prt-type-design-analyzer.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexPrtTypeDesignAnalyzer), {
+    id: "codex-agent-prt-type-design-analyzer",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "prt-type-design-analyzer.md.hbs")
+  });
+  assert.match(codexPrtTypeDesignAnalyzer, /language-native guarantees/);
+  assert.doesNotMatch(codexPrtTypeDesignAnalyzer, /compile-time|pull request|Daisy|business requirements/);
+
+  const claudeUxExpert = byPath.get(path.join(".claude", "agents", "ux-expert.md"));
+  const codexUxExpert = byPath.get(path.join(".codex", "agents", "ux-expert.md"));
+  assert.ok(claudeUxExpert);
+  assert.ok(codexUxExpert);
+  assert.deepEqual(parseManagedMetadata(claudeUxExpert), {
+    id: "claude-agent-ux-expert",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "agents", "ux-expert.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexUxExpert), {
+    id: "codex-agent-ux-expert",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "agents", "ux-expert.md.hbs")
+  });
+  assert.match(claudeUxExpert, /`\.claude\/skills\/design-audit\/SKILL\.md`/);
+  assert.match(codexUxExpert, /`\.codex\/skills\/design-audit\/SKILL\.md`/);
+  assert.match(codexUxExpert, /`docs\/UI-UX-SPECIFICATION\.md`/);
+  assert.match(codexUxExpert, /Preferred path:/);
+  assert.doesNotMatch(codexUxExpert, /Preferred path in FinAI:/);
 
   const claudeDeliveryAgent = byPath.get(path.join(".claude", "agents", "delivery-agent.md"));
   const codexDeliveryAgent = byPath.get(path.join(".codex", "agents", "delivery-agent.md"));
@@ -242,6 +453,41 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   });
   assert.match(claudeQaAgent, /`\.claude\/guides\/verification-before-completion\.md`/);
   assert.match(codexQaAgent, /`\.codex\/guides\/verification-before-completion\.md`/);
+
+  const claudeGanGuide = byPath.get(path.join(".claude", "guides", "gan-protocol.md"));
+  const codexGanGuide = byPath.get(path.join(".codex", "guides", "gan-protocol.md"));
+  assert.ok(claudeGanGuide);
+  assert.ok(codexGanGuide);
+  assert.deepEqual(parseManagedMetadata(claudeGanGuide), {
+    id: "claude-guide-gan-protocol",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "guides", "gan-protocol.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexGanGuide), {
+    id: "codex-guide-gan-protocol",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "guides", "gan-protocol.md.hbs")
+  });
+  assert.equal(stripManagedHeader(claudeGanGuide), stripManagedHeader(codexGanGuide));
+
+  const claudeCodeReviewGraphGuide = byPath.get(path.join(".claude", "guides", "code-review-graph-usage.md"));
+  const codexCodeReviewGraphGuide = byPath.get(path.join(".codex", "guides", "code-review-graph-usage.md"));
+  assert.ok(claudeCodeReviewGraphGuide);
+  assert.ok(codexCodeReviewGraphGuide);
+  assert.deepEqual(parseManagedMetadata(claudeCodeReviewGraphGuide), {
+    id: "claude-guide-code-review-graph-usage",
+    version: 7,
+    source: path.join("templates", "targets", "claude", "guides", "code-review-graph-usage.md.hbs")
+  });
+  assert.deepEqual(parseManagedMetadata(codexCodeReviewGraphGuide), {
+    id: "codex-guide-code-review-graph-usage",
+    version: 7,
+    source: path.join("templates", "targets", "codex", "guides", "code-review-graph-usage.md.hbs")
+  });
+  assert.match(claudeCodeReviewGraphGuide, /Edit \/ Write \(Claude Code\)/);
+  assert.match(claudeCodeReviewGraphGuide, /`\.claude\/settings\.json`/);
+  assert.match(codexCodeReviewGraphGuide, /Edit \/ Write \(Codex\)/);
+  assert.match(codexCodeReviewGraphGuide, /`\.codex\/settings\.json`/);
 });
 
 test("renderTargetFiles honors disabled Claude or Codex feature flags", async () => {
@@ -261,10 +507,22 @@ test("renderTargetFiles honors disabled Claude or Codex feature flags", async ()
     path.join(".codex", "agents", "code-simplifier.md"),
     path.join(".codex", "agents", "deep-reviewer.md"),
     path.join(".codex", "agents", "findings-arbiter.md"),
+    path.join(".codex", "agents", "paranoid-architect.md"),
+    path.join(".codex", "agents", "performance-expert.md"),
+    path.join(".codex", "agents", "product-manager.md"),
+    path.join(".codex", "agents", "ux-expert.md"),
     path.join(".codex", "agents", "delivery-agent.md"),
-    path.join(".codex", "agents", "qa-expert.md")
+    path.join(".codex", "agents", "qa-expert.md"),
+    path.join(".codex", "guides", "gan-protocol.md")
   ]);
   assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "math-genius.md")), false);
+  assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "prt-code-reviewer.md")), false);
+  assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "prt-code-simplifier.md")), false);
+  assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "prt-comment-analyzer.md")), false);
+  assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "prt-pr-test-analyzer.md")), false);
+  assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "prt-silent-failure-hunter.md")), false);
+  assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "prt-type-design-analyzer.md")), false);
+  assert.equal(files.some((file) => file.path === path.join(".codex", "guides", "code-review-graph-usage.md")), false);
 });
 
 function canonicalBody(content: string): string {
@@ -272,4 +530,8 @@ function canonicalBody(content: string): string {
   const index = content.indexOf(marker);
   assert.notEqual(index, -1);
   return content.slice(index);
+}
+
+function stripManagedHeader(content: string): string {
+  return content.replace(/^<!-- @agent-flow managed[^\n]* -->\n+/, "");
 }

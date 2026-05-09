@@ -64,5 +64,36 @@ export const builtinPacks: PackManifest[] = [
         }
       }
     }
+  },
+  {
+    name: "code-review-toolkit",
+    version: 1,
+    description: "Auxiliary code review and behavior-preserving simplification agents.",
+    contributes: {
+      agents: [
+        "prt-code-reviewer",
+        "prt-code-simplifier",
+        "prt-comment-analyzer",
+        "prt-pr-test-analyzer",
+        "prt-silent-failure-hunter",
+        "prt-type-design-analyzer"
+      ],
+      validators: ["code-review-toolkit"]
+    }
+  },
+  {
+    name: "code-review-graph",
+    version: 1,
+    description: "Graph-first code discovery and impact-analysis guidance.",
+    contributes: {
+      guides: ["code-review-graph-usage"],
+      validators: ["code-review-graph"],
+      mcpServers: {
+        codeReviewGraph: {
+          enabled: true,
+          required: false
+        }
+      }
+    }
   }
 ];

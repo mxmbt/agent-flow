@@ -49,7 +49,7 @@ core
   lifecycle, agent contracts, skills, guides, artifact templates, validators
 
 packs
-  optional domain/runtime modules such as finance, cloudflare-worker, telegram, webapp
+  optional domain/runtime/toolkit modules such as finance, cloudflare-worker, telegram, webapp, code-review-toolkit
 
 project adapter
   project name, docs, checks, git branches, runtime surfaces, MCP choices, domain risks
@@ -59,6 +59,8 @@ installer
 ```
 
 Core must not mention a concrete product or stack. Project-specific behavior is supplied by `.agent-flow/config.json` or an equivalent config file loaded by the CLI.
+
+Planning has one important abstraction: coding projects need a discovery provider for codebase maps, impact analysis, and affected-flow discovery. Core owns that provider contract. The default onboarding provider is the `code-review-graph` pack when `init` detects a code project and no existing Agent Flow config; projects with another graph/indexing tool configure `discovery.codeGraphProvider: "custom"` and describe it in `discovery.customProvider`.
 
 ### 3. No Mass Replacement
 
@@ -97,7 +99,7 @@ Profiles and packs are different things.
 | Concept | Purpose | Example |
 |---------|---------|---------|
 | Profile | A starting configuration for a project shape | `generic`, `webapp`, `finai.example` |
-| Pack | A reusable capability module | `finance`, `cloudflare-worker`, `telegram`, `playwright-qa` |
+| Pack | A reusable capability module | `finance`, `cloudflare-worker`, `telegram`, `webapp`, `code-review-toolkit` |
 
 Initial pack candidates:
 
@@ -105,6 +107,7 @@ Initial pack candidates:
 - `cloudflare-worker`: Wrangler, Worker runtime limits, D1/R2/KV deployment surfaces
 - `telegram`: Telegram QA and user-facing copy constraints
 - `webapp`: browser QA, accessibility, common frontend checks
+- `code-review-toolkit`: auxiliary PR/code review agents that are useful for coding-heavy projects but not required for a zero-pack core install
 - `design`: design/UI/brand review surfaces and quality checks
 - `github-delivery`: PR, branch cleanup, delivery-state helpers
 - `code-review-graph`: graph-first discovery MCP and hooks
@@ -378,6 +381,7 @@ agent-flow/
     "architectureFile": "docs/ARCHITECTURE.md",
     "userIsolationArchitectureFile": "docs/ARCHITECTURE_MULTI_USER.md",
     "schedulingArchitectureFile": "docs/ARCHITECTURE_SCHEDULING.md",
+    "backlogFile": "docs/tasks.md",
     "phaseRoot": "docs/phases",
     "walkthroughRoot": "docs/walkthroughs/agents"
   },
@@ -791,12 +795,20 @@ When users install Agent Flow, I want the strong FinAI-aligned process without F
 - 2026-05-09: AF-MIG-0003 migrated `FINAI-0002` analyst and `FINAI-0003` architect into canonical agent templates with Claude/Codex target wrappers.
 - 2026-05-09: AF-MIG-0004 migrated `FINAI-0004` code-simplifier and `FINAI-0005` deep-reviewer into canonical agent templates with Claude/Codex target wrappers.
 - 2026-05-09: AF-MIG-0005 migrated `FINAI-0008` findings-arbiter as core and `FINAI-0009` math-genius as a finance pack agent.
-- 2026-05-09: `src/renderer/target-renderer.ts` now renders `.claude/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,delivery-agent,qa-expert}.md` and `.codex/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,delivery-agent,qa-expert}.md` from canonical bodies with target-specific guide and skill roots. Pack-contributed agents such as `math-genius` render only when the selected packs contribute them.
-- 2026-05-09: `npm test` passed with 46 tests, including rendered agent metadata, target-specific paths, pack-contributed invariants, configured checks, config explanation, sync diff preview, template comment handling, similarity logic, universality scanner logic, and rendered universalized migrated agents.
+- 2026-05-09: AF-MIG-0006 migrated `FINAI-0010` paranoid-architect and `FINAI-0011` performance-expert into canonical agent templates with runtime-specific review surfaces routed through config and packs.
+- 2026-05-09: AF-MIG-0007 migrated `FINAI-0012` product-manager into a canonical agent template with product/status/roadmap/architecture/backlog paths routed through artifact config.
+- 2026-05-09: AF-MIG-0008 migrated `FINAI-0013` prt-code-reviewer and `FINAI-0014` prt-code-simplifier as `code-review-toolkit` pack agents with tool-specific root instruction filenames and stack-specific style examples neutralized in canonical bodies.
+- 2026-05-09: AF-MIG-0009 migrated `FINAI-0015` prt-comment-analyzer and `FINAI-0016` prt-pr-test-analyzer as `code-review-toolkit` pack agents with source-specific examples, PR-only wording, and tool-specific root instruction filenames neutralized in canonical bodies.
+- 2026-05-09: AF-MIG-0010 migrated `FINAI-0017` prt-silent-failure-hunter and `FINAI-0018` prt-type-design-analyzer as `code-review-toolkit` pack agents with PR-only wording, concrete logging/Sentry examples, production-code phrasing, and narrow type-design terminology generalized in canonical bodies.
+- 2026-05-09: AF-MIG-0011 migrated `FINAI-0020` ux-expert into a canonical agent template with UX/design reference paths routed through artifact config and starter/reuse behavior added to init.
+- 2026-05-09: AF-MIG-0012 migrated `FINAI-0021` code-review-graph-usage as a `code-review-graph` pack guide and `FINAI-0022` gan-protocol as a core guide.
+- 2026-05-09: `src/renderer/target-renderer.ts` now renders `.claude/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,paranoid-architect,performance-expert,product-manager,ux-expert,delivery-agent,qa-expert}.md` and `.codex/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,paranoid-architect,performance-expert,product-manager,ux-expert,delivery-agent,qa-expert}.md` from canonical bodies with target-specific guide and skill roots. Pack-contributed agents such as `math-genius` and the `prt-*` code-review-toolkit agents render only when the selected packs contribute them. Core guides such as `gan-protocol` render in zero-pack installs; pack guides such as `code-review-graph-usage` render only when the owning pack contributes them.
+- 2026-05-09: `npm test` passed with 50 tests, including rendered agent metadata, target-specific paths, pack-contributed invariants, configured checks, config explanation, sync diff preview, starter artifact reuse, template comment handling, similarity logic, universality scanner logic, and rendered universalized migrated agents.
 - 2026-05-08: Added `npm run check:migration-similarity` with a 99% baseline target. `FINAI-0006`, `FINAI-0007`, and `FINAI-0019` pass after accepted universalization substitutions; `FINAI-0007` is 99.00% line / 99.85% token similarity and the other two are 100.00% line / 100.00% token similarity.
 - 2026-05-08: Added `npm run check:universality` as an advisory scanner for project/runtime/stack/domain/command assumptions. Internal Agent Flow skill/guide links are accepted package links by MRD-0001, and planning/design artifacts are core by MRD-0006. The three migrated agent templates now pass the universality scan after applying accepted config/pack/source-wording decisions.
 - 2026-05-09: Added `agent-flow config explain <key>` as an onboarding/transparency command for rendered placeholders. It shows the current value, source config/pack inputs, and templates that use the value.
 - 2026-05-09: Implemented `agent-flow sync --diff` to preview generated target-file create/update/conflict plans and compact diffs without writing files.
+- 2026-05-09: Added `discovery.codeGraphProvider` onboarding. `init` enables the `code-review-graph` pack by default for detected coding projects without existing Agent Flow config, while `doctor` and `config explain` surface missing or custom planning discovery providers.
 
 ---
 
@@ -985,7 +997,7 @@ When users start with common project types, I want useful profiles, so that one-
 
 ### AF-M7-T2
 
-**Title:** Add finance, cloudflare-worker, telegram, and webapp packs
+**Title:** Add finance, cloudflare-worker, telegram, webapp, and toolkit packs
 **Status:** TODO
 **Complexity:** Red
 **Dependencies:** AF-M6-T2
@@ -1000,6 +1012,7 @@ When users adopt Agent Flow for common domains or runtimes, I want battle-tested
 - `cloudflare-worker` pack contributes Worker runtime, Wrangler, D1/R2/KV, and deployment-impact surfaces.
 - `telegram` pack contributes Telegram QA and UX/copy constraints.
 - `webapp` pack contributes browser QA, accessibility, and common frontend workflow hints.
+- `code-review-toolkit` pack contributes auxiliary PR/code review agents without making them mandatory in a zero-pack install.
 - `finai.example` profile composes `finance + cloudflare-worker + telegram` through config.
 - None of these pack terms appear in core scans.
 

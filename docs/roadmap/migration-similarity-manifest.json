@@ -53,6 +53,90 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0010",
+      "source": ".claude/agents/paranoid-architect.md",
+      "target": "templates/canonical/agents/paranoid-architect.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0011",
+      "source": ".claude/agents/performance-expert.md",
+      "target": "templates/canonical/agents/performance-expert.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0012",
+      "source": ".claude/agents/product-manager.md",
+      "target": "templates/canonical/agents/product-manager.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0013",
+      "source": ".claude/agents/prt-code-reviewer.md",
+      "target": "templates/canonical/agents/prt-code-reviewer.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0014",
+      "source": ".claude/agents/prt-code-simplifier.md",
+      "target": "templates/canonical/agents/prt-code-simplifier.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0015",
+      "source": ".claude/agents/prt-comment-analyzer.md",
+      "target": "templates/canonical/agents/prt-comment-analyzer.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0016",
+      "source": ".claude/agents/prt-pr-test-analyzer.md",
+      "target": "templates/canonical/agents/prt-pr-test-analyzer.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0017",
+      "source": ".claude/agents/prt-silent-failure-hunter.md",
+      "target": "templates/canonical/agents/prt-silent-failure-hunter.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0018",
+      "source": ".claude/agents/prt-type-design-analyzer.md",
+      "target": "templates/canonical/agents/prt-type-design-analyzer.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0020",
+      "source": ".claude/agents/ux-expert.md",
+      "target": "templates/canonical/agents/ux-expert.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0021",
+      "source": ".claude/guides/code-review-graph-usage.md",
+      "target": "templates/canonical/guides/code-review-graph-usage.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0022",
+      "source": ".claude/guides/gan-protocol.md",
+      "target": "templates/canonical/guides/gan-protocol.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0006",
       "source": ".claude/agents/delivery-agent.md",
       "target": "templates/canonical/agents/delivery-agent.md.hbs",

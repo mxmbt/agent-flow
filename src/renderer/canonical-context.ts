@@ -19,6 +19,10 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
       architectureFile: config.artifacts.architectureFile,
       userIsolationArchitectureFile: config.artifacts.userIsolationArchitectureFile,
       schedulingArchitectureFile: config.artifacts.schedulingArchitectureFile,
+      backlogFile: config.artifacts.backlogFile,
+      uiUxSpecificationFile: config.artifacts.uiUxSpecificationFile,
+      designSystemFile: config.artifacts.designSystemFile,
+      uxWritingGuideFile: config.artifacts.uxWritingGuideFile,
       phaseRoot: config.artifacts.phaseRoot,
       walkthroughRoot: config.artifacts.walkthroughRoot,
       taskContextPathPattern: `${config.artifacts.phaseRoot}/phase-<phase-token>/context/<taskId>-context.md`,
@@ -54,6 +58,12 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
       migrationsGlob: `${config.runtime.appRoot}/migrations/**`,
       bindingConfigFile: `${config.runtime.appRoot}/configured-runtime.toml`,
       routeEntrypoint: `${config.runtime.appRoot}/src/index.ts`
+    },
+    discovery: {
+      codeGraphProvider: config.discovery.codeGraphProvider,
+      customProvider: config.discovery.customProvider ?? "none configured",
+      fallback: config.discovery.fallback,
+      planningProviderSummary: renderPlanningProviderSummary(config)
     },
     state: {
       phaseFields: renderPhaseFields(),
@@ -103,6 +113,10 @@ function renderArtifactTable(config: AgentFlowConfig): string {
     `| Architecture reference | \`${config.artifacts.architectureFile}\` |`,
     `| User-isolation architecture reference | \`${config.artifacts.userIsolationArchitectureFile}\` |`,
     `| Scheduling architecture reference | \`${config.artifacts.schedulingArchitectureFile}\` |`,
+    `| Backlog | \`${config.artifacts.backlogFile}\` |`,
+    `| UI/UX specification | \`${config.artifacts.uiUxSpecificationFile}\` |`,
+    `| Design system | \`${config.artifacts.designSystemFile}\` |`,
+    `| UX writing guide | \`${config.artifacts.uxWritingGuideFile}\` |`,
     `| Phase root | \`${config.artifacts.phaseRoot}\` |`,
     `| Walkthrough root | \`${config.artifacts.walkthroughRoot}\` |`,
     `| Design document | \`${config.artifacts.phaseRoot}/phase-<phase-token>/design/<taskId>-design.md\` |`,
@@ -136,6 +150,18 @@ function renderChangedChecks(changed: AgentFlowConfig["checks"]["changed"]): str
   return entries
     .map(([scope, commands]) => [`- ${scope}`, ...commands.map((command) => `  - \`${command}\``)].join("\n"))
     .join("\n");
+}
+
+function renderPlanningProviderSummary(config: AgentFlowConfig): string {
+  if (config.discovery.codeGraphProvider === "code-review-graph") {
+    return "code-review-graph pack";
+  }
+
+  if (config.discovery.codeGraphProvider === "custom") {
+    return config.discovery.customProvider ?? "custom code graph provider";
+  }
+
+  return `no code graph provider; use ${config.discovery.fallback}`;
 }
 
 function renderShellBlock(commands: string[]): string {

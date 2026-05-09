@@ -20,6 +20,12 @@ test("config list shows explainable rendered placeholders", async () => {
   assert.match(stdout, /artifacts\.architectureFile/);
   assert.match(stdout, /artifacts\.userIsolationArchitectureFile/);
   assert.match(stdout, /artifacts\.schedulingArchitectureFile/);
+  assert.match(stdout, /artifacts\.backlogFile/);
+  assert.match(stdout, /artifacts\.uiUxSpecificationFile/);
+  assert.match(stdout, /artifacts\.designSystemFile/);
+  assert.match(stdout, /artifacts\.uxWritingGuideFile/);
+  assert.match(stdout, /discovery\.codeGraphProvider/);
+  assert.match(stdout, /discovery\.planningProviderSummary/);
   assert.match(stdout, /git\.remoteBranchDeleteCommand/);
 });
 
@@ -35,6 +41,12 @@ test("config explain shows current rendered value, sources, and template usage",
   config.artifacts.architectureFile = "docs/architecture/system.md";
   config.artifacts.userIsolationArchitectureFile = "docs/architecture/data-isolation.md";
   config.artifacts.schedulingArchitectureFile = "docs/architecture/jobs.md";
+  config.artifacts.backlogFile = "docs/planning/backlog.md";
+  config.artifacts.uiUxSpecificationFile = "docs/design/ux-spec.md";
+  config.artifacts.designSystemFile = "docs/design/system.md";
+  config.artifacts.uxWritingGuideFile = "docs/design/writing.md";
+  config.discovery.codeGraphProvider = "custom";
+  config.discovery.customProvider = "internal-graph-mcp";
   config.packs = ["cloudflare-worker"];
 
   await writeConfig(cwd, config);
@@ -57,6 +69,32 @@ test("config explain shows current rendered value, sources, and template usage",
   assert.match(architecture.stdout, /docs\/architecture\/data-isolation\.md/);
   assert.match(architecture.stdout, /\.agent-flow\/config\.json -> artifacts\.userIsolationArchitectureFile/);
   assert.match(architecture.stdout, /templates\/canonical\/agents\/architect\.md\.hbs/);
+
+  const backlog = await execFileAsync(
+    process.execPath,
+    [cliPath, "config", "explain", "artifacts.backlogFile"],
+    { cwd }
+  );
+  assert.match(backlog.stdout, /docs\/planning\/backlog\.md/);
+  assert.match(backlog.stdout, /\.agent-flow\/config\.json -> artifacts\.backlogFile/);
+  assert.match(backlog.stdout, /templates\/canonical\/agents\/product-manager\.md\.hbs/);
+
+  const uxWriting = await execFileAsync(
+    process.execPath,
+    [cliPath, "config", "explain", "artifacts.uxWritingGuideFile"],
+    { cwd }
+  );
+  assert.match(uxWriting.stdout, /docs\/design\/writing\.md/);
+  assert.match(uxWriting.stdout, /\.agent-flow\/config\.json -> artifacts\.uxWritingGuideFile/);
+  assert.match(uxWriting.stdout, /templates\/canonical\/agents\/ux-expert\.md\.hbs/);
+
+  const discovery = await execFileAsync(
+    process.execPath,
+    [cliPath, "config", "explain", "discovery.planningProviderSummary"],
+    { cwd }
+  );
+  assert.match(discovery.stdout, /internal-graph-mcp/);
+  assert.match(discovery.stdout, /\.agent-flow\/config\.json -> discovery\.codeGraphProvider/);
 });
 
 async function tempDir(): Promise<string> {

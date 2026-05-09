@@ -31,6 +31,13 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   }
 
   evidence.push("Detected package.json.");
+  config.discovery.codeGraphProvider = "code-review-graph";
+  if (!config.packs.includes("code-review-graph")) {
+    config.packs.push("code-review-graph");
+  }
+  needsReview.push("discovery.codeGraphProvider");
+  evidence.push("Detected a code project and no existing Agent Flow config; enabled the code-review-graph pack as the default planning discovery provider. If this project uses another code graph provider, set discovery.codeGraphProvider to custom and remove or replace the pack.");
+
   const scripts = getScripts(packageJson);
   const run = packageManager === "yarn" ? "yarn" : `${packageManager ?? "npm"} run`;
 

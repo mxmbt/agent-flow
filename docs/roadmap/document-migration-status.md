@@ -3,7 +3,7 @@
 **Created:** 2026-05-08
 **Roadmap:** `docs/roadmap/project-agnostic-core-roadmap.md`
 **Protocol:** `docs/roadmap/document-migration-protocol.md`
-**Status:** Empty package baseline; FinAI reference inventory populated; first nine agent migrations validated and universalized
+**Status:** Empty package baseline; FinAI reference inventory populated; first nineteen agent migrations and first two guide migrations validated and universalized
 
 ---
 
@@ -22,11 +22,11 @@ The separate `migration-ledger.md` file was removed to avoid splitting status ac
 | Migration protocol | Drafted | 1 doc | Approved protocol | Defines per-file migration rules and checklist; status vocabulary reconciled with this register. |
 | Unified migration register | Raw populated | 537 rows | One row per FinAI reference candidate source file | Rows start as `UNCLASSIFIED / RAW_SCANNED` until a migration task reads the full file. |
 | FinAI reference candidates | Dry-run classification started | 537 rows | Narrowed and classified | Broad scan includes `.claude`, `.codex`, scripts, templates, nested skill assets, and some likely out-of-scope files. |
-| File-by-file migration tasks | Started | 5 tasks | One task per source file or approved micro-batch | Agent migration now has one single-agent task and four two-agent micro-batches, all validated and universalized. |
-| Classified rows | Dry-run started | 12 rows | 537 rows | Classification applies only after full-file review; current sample covers root target, nine agents, lifecycle skill, and artifact template. |
-| Migrated rows | Started | 9 rows | TBD | `FINAI-0002`, `FINAI-0003`, `FINAI-0004`, `FINAI-0005`, `FINAI-0006`, `FINAI-0007`, `FINAI-0008`, `FINAI-0009`, and `FINAI-0019` targets exist and pass the similarity gate. Core agent templates pass the universality scan; `FINAI-0009` is classified as finance pack content. |
-| Universality scan | Passing | 1 targeted run | Passing in CI | Reports project/runtime/stack/domain assumptions during baseline review; current migrated core agent templates have been universalized. Finance pack agent content is excluded from the core universality manifest. |
-| Claude/Codex parity validation | Partial | 8 core rendered agent pairs + 1 finance pack pair | Passing in CI | `npm test` validates Claude/Codex target rendering for migrated agent pairs and pack-gated agent rendering. |
+| File-by-file migration tasks | Started | 12 tasks | One task per source file or approved micro-batch | Agent migration now has three single-agent tasks and eight two-agent micro-batches; guide migration has one two-guide micro-batch. |
+| Classified rows | Dry-run started | 24 rows | 537 rows | Classification applies only after full-file review; current sample covers root target, nineteen agents, two guides, lifecycle skill, and artifact template. |
+| Migrated rows | Started | 21 rows | TBD | `FINAI-0002` through `FINAI-0022` except `FINAI-0001`, have targets and pass the similarity gate. Core agent/guide templates pass the universality scan; `FINAI-0009`, `FINAI-0013` through `FINAI-0018`, and `FINAI-0021` are classified as pack content. |
+| Universality scan | Passing | 1 targeted run | Passing in CI | Reports project/runtime/stack/domain assumptions during baseline review; current migrated core and project-agnostic pack agent/guide templates have been universalized. Finance pack agent content is excluded from the core universality manifest. |
+| Claude/Codex parity validation | Partial | 12 core rendered agent pairs + 7 pack agent pairs + 1 core guide pair + 1 pack guide pair | Passing in CI | `npm test` validates Claude/Codex target rendering for migrated agent/guide pairs and pack-gated rendering. |
 
 ---
 
@@ -78,9 +78,9 @@ Notes:
 | Workstream | Scope | Status | Next Action |
 |------------|-------|--------|-------------|
 | Root entrypoints | `AGENTS.md`, `CLAUDE.md`, `.claude/CLAUDE.md`, `.codex/orchestration-policy.md`, `.codex/claude-interop.md` | 1 dry-run classified | Build canonical lifecycle boundary before migrating root targets. |
-| Agents | `.claude/agents/**`, `.codex/agents/**` | 8 core migrated and validated; 1 finance pack agent migrated and validated | Continue one agent or approved micro-batch per task with the migration similarity gate. |
+| Agents | `.claude/agents/**`, `.codex/agents/**` | 12 core migrated and validated; 7 pack agents migrated and validated | Continue one agent or approved micro-batch per task with the migration similarity gate. |
 | Lifecycle skills | planning, implementation, simplify, review, fix, quality, QA, delivery | 1 dry-run classified | Keep planning/design artifacts in core; split runtime/domain assumptions into config and packs. |
-| Auxiliary skills/guides | debugging, TDD, frontend, e2e, commit, architecture, design | Raw registered | Classify vendor/core/pack/obsolete before migration. |
+| Auxiliary skills/guides | debugging, TDD, frontend, e2e, commit, architecture, design | 1 core guide and 1 pack guide migrated and validated | Continue one guide or approved micro-batch per task; route optional-tool guides through packs. |
 | Scripts | sync, validation, delivery, worktree, roadmap checks | Raw registered | Split core scripts from optional packs and out-of-scope project scripts. |
 | Templates | state, design document, report, QA, walkthrough | 1 dry-run classified | Convert artifact paths and project values into config placeholders. |
 | MCP config | settings and MCP files | Raw registered | Classify as installer output; scan for absolute paths. |
@@ -97,7 +97,7 @@ Notes:
    - one agent
    - one lifecycle skill
 4. Classify one script or artifact template row to satisfy the roadmap dry-run variant and test non-prompt extraction. Done 2026-05-08: `FINAI-0503`.
-5. Start per-file migration tasks from the register below only for files selected for porting. Started 2026-05-08: `AF-MIG-0001` migrated `FINAI-0007`; `AF-MIG-0002` migrated `FINAI-0006` and `FINAI-0019`; `AF-MIG-0003` migrated `FINAI-0002` and `FINAI-0003`; `AF-MIG-0004` migrated `FINAI-0004` and `FINAI-0005`; `AF-MIG-0005` migrated `FINAI-0008` and `FINAI-0009`.
+5. Start per-file migration tasks from the register below only for files selected for porting. Started 2026-05-08: `AF-MIG-0001` migrated `FINAI-0007`; `AF-MIG-0002` migrated `FINAI-0006` and `FINAI-0019`; `AF-MIG-0003` migrated `FINAI-0002` and `FINAI-0003`; `AF-MIG-0004` migrated `FINAI-0004` and `FINAI-0005`; `AF-MIG-0005` migrated `FINAI-0008` and `FINAI-0009`; `AF-MIG-0006` migrated `FINAI-0010` and `FINAI-0011`; `AF-MIG-0007` migrated `FINAI-0012`; `AF-MIG-0008` migrated `FINAI-0013` and `FINAI-0014`; `AF-MIG-0009` migrated `FINAI-0015` and `FINAI-0016`; `AF-MIG-0010` migrated `FINAI-0017` and `FINAI-0018`; `AF-MIG-0011` migrated `FINAI-0020`; `AF-MIG-0012` migrated `FINAI-0021` and `FINAI-0022`.
 6. Update each row in place after classification, migration, and validation.
 
 ---
@@ -235,6 +235,155 @@ Migrated findings disposition into core and finance correctness review into the 
 - 2026-05-09: `npm run check:universality` passed across migrated core agent templates.
 - 2026-05-09: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 20` passed for nine migrated agents.
 
+### AF-MIG-0006
+
+**Source:** `FinAI:.claude/agents/paranoid-architect.md`, `FinAI:.claude/agents/performance-expert.md`
+**Mirror:** `FinAI:.codex/agents/paranoid-architect.md`, `FinAI:.codex/agents/performance-expert.md`
+**Target:** `templates/canonical/agents/paranoid-architect.md.hbs`, `templates/canonical/agents/performance-expert.md.hbs`
+**Target wrappers:** `templates/targets/claude/agents/paranoid-architect.md.hbs`, `templates/targets/codex/agents/paranoid-architect.md.hbs`, `templates/targets/claude/agents/performance-expert.md.hbs`, `templates/targets/codex/agents/performance-expert.md.hbs`
+**Classification:** CORE
+**Pack/Config:** security/performance review mechanics are core; concrete runtime constraints and deployment surfaces render from config and installed packs
+**Status:** VALIDATED
+
+#### Result
+
+Migrated security/isolation and performance QUALITY_GATE experts into canonical templates. Source-specific Cloudflare Worker, D1/R2, and Telegram/webhook repo context was replaced with configured runtime and pack-contributed review surfaces. Narrow implementation/runtime wording such as repo context, serverless constraints, webhook, database, and provider calls was generalized per MRD-0013.
+
+#### Validation Evidence
+
+- 2026-05-09: Full Claude sources and Codex mirrors read before migration.
+- 2026-05-09: `npm test` passed with rendered Claude/Codex paranoid-architect and performance-expert paths plus target-specific guide root adaptation.
+- 2026-05-09: `npm run check:universality` passed across migrated core agent templates.
+- 2026-05-09: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 20` passed for eleven migrated agents.
+
+### AF-MIG-0007
+
+**Source:** `FinAI:.claude/agents/product-manager.md`
+**Mirror:** `FinAI:.codex/agents/product-manager.md`
+**Target:** `templates/canonical/agents/product-manager.md.hbs`
+**Target wrappers:** `templates/targets/claude/agents/product-manager.md.hbs`, `templates/targets/codex/agents/product-manager.md.hbs`
+**Classification:** CORE
+**Pack/Config:** product planning is core; status/product/roadmap/architecture/backlog paths render from artifact config
+**Status:** VALIDATED
+
+#### Result
+
+Migrated product planning and PR-copy review into a canonical agent template. The source-specific artifact paths now render from `.agent-flow/config.json`, including the cross-phase backlog path `artifacts.backlogFile`. Narrow repo/code wording was generalized per MRD-0013 while preserving the delivery-agent PR-copy review contract.
+
+#### Validation Evidence
+
+- 2026-05-09: Full Claude source and Codex mirror read before migration.
+- 2026-05-09: `npm test` passed with rendered Claude/Codex product-manager paths, starter backlog creation, and existing backlog reuse.
+- 2026-05-09: `npm run check:universality` passed across migrated core agent templates.
+- 2026-05-09: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 20` passed for twelve migrated agents.
+
+### AF-MIG-0008
+
+**Source:** `FinAI:.claude/agents/prt-code-reviewer.md`, `FinAI:.claude/agents/prt-code-simplifier.md`
+**Mirror:** `FinAI:.codex/agents/prt-code-reviewer.md`, `FinAI:.codex/agents/prt-code-simplifier.md`
+**Target:** `templates/canonical/agents/prt-code-reviewer.md.hbs`, `templates/canonical/agents/prt-code-simplifier.md.hbs`
+**Target wrappers:** `templates/targets/claude/agents/prt-code-reviewer.md.hbs`, `templates/targets/codex/agents/prt-code-reviewer.md.hbs`, `templates/targets/claude/agents/prt-code-simplifier.md.hbs`, `templates/targets/codex/agents/prt-code-simplifier.md.hbs`
+**Classification:** PACK
+**Pack/Config:** optional `code-review-toolkit` pack contributes these auxiliary coding agents; canonical bodies use target-neutral root-instruction wording and generalized style guidance
+**Status:** VALIDATED
+
+#### Result
+
+Migrated two PR/review-toolkit auxiliary coding agents as optional pack-contributed agents instead of always-on core agents. Claude/Codex target wrappers keep tool-native metadata, while canonical bodies avoid hardcoding `CLAUDE.md`/`AGENTS.md` and route stack-specific style examples through root project instructions or installed packs per MRD-0014.
+
+#### Validation Evidence
+
+- 2026-05-09: Full Claude sources and Codex mirrors read before migration.
+- 2026-05-09: `npm test` passed with pack-gated Claude/Codex rendering for `prt-code-reviewer` and `prt-code-simplifier`, and verified they do not render in a zero-pack install.
+- 2026-05-09: `npm run check:universality` passed across migrated core and project-agnostic pack agent templates.
+- 2026-05-09: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 30` passed for fourteen migrated agents.
+
+### AF-MIG-0009
+
+**Source:** `FinAI:.claude/agents/prt-comment-analyzer.md`, `FinAI:.claude/agents/prt-pr-test-analyzer.md`
+**Mirror:** `FinAI:.codex/agents/prt-comment-analyzer.md`, `FinAI:.codex/agents/prt-pr-test-analyzer.md`
+**Target:** `templates/canonical/agents/prt-comment-analyzer.md.hbs`, `templates/canonical/agents/prt-pr-test-analyzer.md.hbs`
+**Target wrappers:** `templates/targets/claude/agents/prt-comment-analyzer.md.hbs`, `templates/targets/codex/agents/prt-comment-analyzer.md.hbs`, `templates/targets/claude/agents/prt-pr-test-analyzer.md.hbs`, `templates/targets/codex/agents/prt-pr-test-analyzer.md.hbs`
+**Classification:** PACK
+**Pack/Config:** optional `code-review-toolkit` pack contributes these auxiliary coding agents; canonical bodies use change-set/root-instruction wording instead of hardcoding PR-only or tool-specific docs
+**Status:** VALIDATED
+
+#### Result
+
+Migrated comment accuracy and test-coverage review agents as optional `code-review-toolkit` pack agents. Source-specific example names and target-specific root instruction filenames were removed from canonical bodies. Pull-request-only wording was generalized to review branches, pull requests, or equivalent change sets where the agent behavior is still the same.
+
+#### Validation Evidence
+
+- 2026-05-09: Full Claude sources and Codex mirrors read before migration.
+- 2026-05-09: `npm test` passed with pack-gated Claude/Codex rendering for `prt-comment-analyzer` and `prt-pr-test-analyzer`, and verified they do not render in a zero-pack install.
+- 2026-05-09: `npm run check:universality` passed across migrated core and project-agnostic pack agent templates.
+- 2026-05-09: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 30` passed for sixteen migrated agents.
+
+### AF-MIG-0010
+
+**Source:** `FinAI:.claude/agents/prt-silent-failure-hunter.md`, `FinAI:.claude/agents/prt-type-design-analyzer.md`
+**Mirror:** `FinAI:.codex/agents/prt-silent-failure-hunter.md`, `FinAI:.codex/agents/prt-type-design-analyzer.md`
+**Target:** `templates/canonical/agents/prt-silent-failure-hunter.md.hbs`, `templates/canonical/agents/prt-type-design-analyzer.md.hbs`
+**Target wrappers:** `templates/targets/claude/agents/prt-silent-failure-hunter.md.hbs`, `templates/targets/codex/agents/prt-silent-failure-hunter.md.hbs`, `templates/targets/claude/agents/prt-type-design-analyzer.md.hbs`, `templates/targets/codex/agents/prt-type-design-analyzer.md.hbs`
+**Classification:** PACK
+**Pack/Config:** optional `code-review-toolkit` pack contributes these auxiliary coding agents; canonical bodies use change-set/root-instruction wording and generalized diagnostics/type-design language instead of stack-specific or tool-specific examples
+**Status:** VALIDATED
+
+#### Result
+
+Migrated silent-failure and type-design review agents as optional `code-review-toolkit` pack agents. The copied behavior is preserved, while PR-only wording, `CLAUDE.md` references, specific logging/Sentry identifiers, production-code phrasing, and narrow compile-time/business-logic language were generalized for project-agnostic use.
+
+#### Validation Evidence
+
+- 2026-05-09: Full Claude sources and Codex mirrors read before migration.
+- 2026-05-09: `npm test` passed with pack-gated Claude/Codex rendering for `prt-silent-failure-hunter` and `prt-type-design-analyzer`, and verified they do not render in a zero-pack install.
+- 2026-05-09: `npm run check:universality` passed across migrated core and project-agnostic pack agent templates.
+- 2026-05-09: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 40` passed for eighteen migrated agents.
+
+### AF-MIG-0011
+
+**Source:** `FinAI:.claude/agents/ux-expert.md`
+**Mirror:** `FinAI:.codex/agents/ux-expert.md`
+**Target:** `templates/canonical/agents/ux-expert.md.hbs`
+**Target wrappers:** `templates/targets/claude/agents/ux-expert.md.hbs`, `templates/targets/codex/agents/ux-expert.md.hbs`
+**Classification:** CORE
+**Pack/Config:** UX/accessibility/UX-copy quality review is core; UX/design reference paths render from artifact config and are created or reused by init
+**Status:** VALIDATED
+
+#### Result
+
+Migrated the UX QUALITY_GATE expert into a canonical agent template. Agent Flow skill links remain internal package links. Source-specific `Preferred path in FinAI` wording became neutral, phase-local research and handoff paths render from `artifacts.phaseRoot`, and UX/design reference documents render from `artifacts.uiUxSpecificationFile`, `artifacts.designSystemFile`, and `artifacts.uxWritingGuideFile`.
+
+#### Validation Evidence
+
+- 2026-05-09: Full Claude source and Codex mirror read before migration.
+- 2026-05-09: `npm test` passed with rendered Claude/Codex `ux-expert` paths, config explanation entries, starter UX/design doc creation, and existing UX/design doc reuse.
+- 2026-05-09: `npm run check:universality` passed across migrated core and project-agnostic pack agent templates.
+- 2026-05-09: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 40` passed for nineteen migrated agents, including `FINAI-0020` at 100.00% line / 100.00% token similarity after accepted artifact-path substitutions.
+- 2026-05-09: `agent-flow init` creates starter UX/design docs for bare projects and reuses common existing UX/design doc paths when present.
+
+### AF-MIG-0012
+
+**Source:** `FinAI:.claude/guides/code-review-graph-usage.md`, `FinAI:.claude/guides/gan-protocol.md`
+**Mirror:** `FinAI:.codex/guides/code-review-graph-usage.md`, `FinAI:.codex/guides/gan-protocol.md`
+**Target:** `templates/canonical/guides/code-review-graph-usage.md.hbs`, `templates/canonical/guides/gan-protocol.md.hbs`
+**Target wrappers:** `templates/targets/claude/guides/code-review-graph-usage.md.hbs`, `templates/targets/codex/guides/code-review-graph-usage.md.hbs`, `templates/targets/claude/guides/gan-protocol.md.hbs`, `templates/targets/codex/guides/gan-protocol.md.hbs`
+**Classification:** `FINAI-0021` PACK; `FINAI-0022` CORE
+**Pack/Config:** `code-review-graph-usage` renders only when the `code-review-graph` pack contributes it; `gan-protocol` is core decision-making guidance
+**Status:** VALIDATED
+
+#### Result
+
+Added guide rendering to the Claude/Codex target renderer. `gan-protocol` now renders as a core guide in zero-pack installs. `code-review-graph-usage` is owned by the optional `code-review-graph` pack, which also contributes the optional `codeReviewGraph` MCP server recommendation. Target-specific Claude Code/Codex names and `.claude`/`.codex` paths render from target placeholders. Planning discovery is now explicit in config: coding-project onboarding defaults to the `code-review-graph` pack when no existing Agent Flow config or custom provider is present, while custom graph providers can be declared through `discovery.codeGraphProvider`.
+
+#### Validation Evidence
+
+- 2026-05-09: Full Claude sources and Codex mirrors read before migration.
+- 2026-05-09: `npm test` passed with rendered Claude/Codex guide paths, core guide rendering in zero-pack installs, and pack-gated `code-review-graph-usage` rendering.
+- 2026-05-09: `agent-flow init` enables `code-review-graph` by default for detected coding projects without existing Agent Flow config, and `agent-flow doctor` reports missing, default, or custom planning discovery providers.
+- 2026-05-09: `npm run check:universality` passed across migrated core and project-agnostic pack agent/guide templates.
+- 2026-05-09: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 40` passed for twenty-one migrated rows. `FINAI-0021` is 99.41% line / 99.93% token similarity after accepted target-placeholder substitutions; `FINAI-0022` is 100.00% line / 100.00% token similarity.
+
 ---
 
 ## Migration Register: FinAI Reference Files
@@ -250,19 +399,19 @@ Migrated findings disposition into core and finance correctness review into the 
 | FINAI-0007 | FinAI:.claude/agents/feature-developer.md | CORE | universalized with config/webapp/runtime/domain pack hooks | port-as-core | VALIDATED | `templates/canonical/agents/feature-developer.md.hbs` | AF-MIG-0001 validated 2026-05-08. Full Claude source and Codex mirror read. Claude/Codex wrappers render native agent files with target-specific `.claude`/`.codex` link adaptation. Similarity gate passed at 99.00% line / 99.85% token similarity after accepted universalization substitutions. `npm run check:universality` passed. |
 | FINAI-0008 | FinAI:.claude/agents/findings-arbiter.md | CORE | configured artifact paths + generic domain correctness | port-as-core | VALIDATED | `templates/canonical/agents/findings-arbiter.md.hbs` | AF-MIG-0005 validated 2026-05-09. Full Claude source and Codex mirror read. Hardcoded phase/roadmap paths render from config; finance-specific defer wording routes to generic domain correctness. Similarity gate passed after accepted universalization substitutions. `npm run check:universality` passed. |
 | FINAI-0009 | FinAI:.claude/agents/math-genius.md | PACK | finance pack | port-as-pack | VALIDATED | `templates/canonical/agents/math-genius.md.hbs` | AF-MIG-0005 validated 2026-05-09. Full Claude source and Codex mirror read. Source-specific FinAI/ZNAI wording removed. Agent remains finance-specific by design and renders only when the finance pack contributes `math-genius`; excluded from core universality manifest. Similarity gate passed after accepted universalization substitutions. |
-| FINAI-0010 | FinAI:.claude/agents/paranoid-architect.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0011 | FinAI:.claude/agents/performance-expert.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0012 | FinAI:.claude/agents/product-manager.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0013 | FinAI:.claude/agents/prt-code-reviewer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0014 | FinAI:.claude/agents/prt-code-simplifier.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0015 | FinAI:.claude/agents/prt-comment-analyzer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0016 | FinAI:.claude/agents/prt-pr-test-analyzer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0017 | FinAI:.claude/agents/prt-silent-failure-hunter.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0018 | FinAI:.claude/agents/prt-type-design-analyzer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
+| FINAI-0010 | FinAI:.claude/agents/paranoid-architect.md | CORE | configured runtime + pack review surfaces | port-as-core | VALIDATED | `templates/canonical/agents/paranoid-architect.md.hbs` | AF-MIG-0006 validated 2026-05-09. Full Claude source and Codex mirror read. Cloudflare/D1/R2/Telegram repo-context bullets route through configured runtime and installed packs per MRD-0010. Webhook/repo wording generalized per MRD-0013. Similarity gate passed after accepted universalization substitutions. `npm run check:universality` passed. |
+| FINAI-0011 | FinAI:.claude/agents/performance-expert.md | CORE | configured runtime + pack performance surfaces | port-as-core | VALIDATED | `templates/canonical/agents/performance-expert.md.hbs` | AF-MIG-0006 validated 2026-05-09. Full Claude source and Codex mirror read. Cloudflare/D1/R2/provider runtime constraints route through configured runtime and installed packs per MRD-0010. Serverless/database/provider wording generalized per MRD-0013. Similarity gate passed after accepted universalization substitutions. `npm run check:universality` passed. |
+| FINAI-0012 | FinAI:.claude/agents/product-manager.md | CORE | configured artifact paths | port-as-core | VALIDATED | `templates/canonical/agents/product-manager.md.hbs` | AF-MIG-0007 validated 2026-05-09. Full Claude source and Codex mirror read. Product planning and PR-copy review are core. Source-specific `PROGRESS.md` and `docs/*` artifact paths render from config, including `artifacts.backlogFile`. Repo/code wording generalized per MRD-0013. Similarity gate passed after accepted artifact-path substitutions. `npm run check:universality` passed. |
+| FINAI-0013 | FinAI:.claude/agents/prt-code-reviewer.md | PACK | code-review-toolkit pack | port-as-pack | VALIDATED | `templates/canonical/agents/prt-code-reviewer.md.hbs` | AF-MIG-0008 validated 2026-05-09. Full Claude source and Codex mirror read. Agent is auxiliary PR/review-toolkit behavior, not required core lifecycle. `CLAUDE.md`/`AGENTS.md` references generalize to root agent instructions per MRD-0014. Similarity gate passed after accepted universalization substitutions. `npm run check:universality` passed. |
+| FINAI-0014 | FinAI:.claude/agents/prt-code-simplifier.md | PACK | code-review-toolkit pack | port-as-pack | VALIDATED | `templates/canonical/agents/prt-code-simplifier.md.hbs` | AF-MIG-0008 validated 2026-05-09. Full Claude source and Codex mirror read. Agent is auxiliary PR/review-toolkit behavior, not required core lifecycle. Source-specific JS/React style examples generalize to root project instructions and installed packs per MRD-0014. Similarity gate passed after accepted universalization substitutions. `npm run check:universality` passed. |
+| FINAI-0015 | FinAI:.claude/agents/prt-comment-analyzer.md | PACK | code-review-toolkit pack | port-as-pack | VALIDATED | `templates/canonical/agents/prt-comment-analyzer.md.hbs` | AF-MIG-0009 validated 2026-05-09. Full Claude source and Codex mirror read. Agent is auxiliary PR/review-toolkit behavior, not required core lifecycle. Source-specific examples were omitted from target wrappers; canonical body passes universality. Similarity gate passed. `npm run check:universality` passed. |
+| FINAI-0016 | FinAI:.claude/agents/prt-pr-test-analyzer.md | PACK | code-review-toolkit pack | port-as-pack | VALIDATED | `templates/canonical/agents/prt-pr-test-analyzer.md.hbs` | AF-MIG-0009 validated 2026-05-09. Full Claude source and Codex mirror read. Agent is auxiliary PR/review-toolkit behavior, not required core lifecycle. PR-only and `CLAUDE.md` wording generalize to change-set and root-instruction wording per MRD-0014. Similarity gate passed after accepted universalization substitutions. `npm run check:universality` passed. |
+| FINAI-0017 | FinAI:.claude/agents/prt-silent-failure-hunter.md | PACK | code-review-toolkit pack | port-as-pack | VALIDATED | `templates/canonical/agents/prt-silent-failure-hunter.md.hbs` | AF-MIG-0010 validated 2026-05-09. Full Claude source and Codex mirror read. Agent is auxiliary PR/review-toolkit behavior, not required core lifecycle. PR-only wording, `CLAUDE.md`, concrete logging/Sentry identifiers, and production-code phrasing generalize to change-set, root-instruction, diagnostics, and released-code wording per MRD-0014 and MRD-0015. Similarity gate passed after accepted universalization substitutions. `npm run check:universality` passed. |
+| FINAI-0018 | FinAI:.claude/agents/prt-type-design-analyzer.md | PACK | code-review-toolkit pack | port-as-pack | VALIDATED | `templates/canonical/agents/prt-type-design-analyzer.md.hbs` | AF-MIG-0010 validated 2026-05-09. Full Claude source and Codex mirror read. Agent is auxiliary type-design review behavior for coding-heavy projects, not required core lifecycle. Business-logic, access-modifier, constructor, and compile-time wording generalizes to domain/workflow, visibility-boundary, construction/initialization, and language-native guarantee wording per MRD-0016. Similarity gate passed after accepted universalization substitutions. `npm run check:universality` passed. |
 | FINAI-0019 | FinAI:.claude/agents/qa-expert.md | CORE | universalized with config/webapp/runtime pack hooks | port-as-core | VALIDATED | `templates/canonical/agents/qa-expert.md.hbs` | AF-MIG-0002 validated 2026-05-08. Full Claude source and Codex mirror read. Claude/Codex wrappers render native agent files with target-specific `.claude`/`.codex` link adaptation. Similarity gate passed at 100.00% line / 100.00% token similarity after accepted universalization substitutions. `npm run check:universality` passed. |
-| FINAI-0020 | FinAI:.claude/agents/ux-expert.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0021 | FinAI:.claude/guides/code-review-graph-usage.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Guide candidate; check for project-specific commands and tool assumptions. |
-| FINAI-0022 | FinAI:.claude/guides/gan-protocol.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Guide candidate; check for project-specific commands and tool assumptions. |
+| FINAI-0020 | FinAI:.claude/agents/ux-expert.md | CORE | configured UX/design artifact paths | port-as-core | VALIDATED | `templates/canonical/agents/ux-expert.md.hbs` | AF-MIG-0011 validated 2026-05-09. Full Claude source and Codex mirror read. UX/accessibility/UX-copy quality review is core. Hardcoded UX/design reference paths render from artifact config per MRD-0017; source-specific `Preferred path in FinAI` wording was neutralized. Similarity gate passed after accepted artifact-path substitutions. `npm run check:universality` passed. |
+| FINAI-0021 | FinAI:.claude/guides/code-review-graph-usage.md | PACK | code-review-graph pack | port-as-pack | VALIDATED | `templates/canonical/guides/code-review-graph-usage.md.hbs` | AF-MIG-0012 validated 2026-05-09. Full Claude source and Codex mirror read. Guide is operational guidance for optional code-review-graph tooling, not zero-pack core. Target-specific Claude/Codex names and `.claude`/`.codex` settings paths render from target placeholders per MRD-0018. Similarity gate passed at 99.41% line / 99.93% token similarity after accepted target-placeholder substitutions. `npm run check:universality` passed. |
+| FINAI-0022 | FinAI:.claude/guides/gan-protocol.md | CORE | core decision protocol | port-as-core | VALIDATED | `templates/canonical/guides/gan-protocol.md.hbs` | AF-MIG-0012 validated 2026-05-09. Full Claude source and Codex mirror read. Adversarial decision-making protocol is core orchestration guidance. Similarity gate passed at 100.00% line / 100.00% token similarity. `npm run check:universality` passed. |
 | FINAI-0023 | FinAI:.claude/guides/systematic-debugging.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Guide candidate; check for project-specific commands and tool assumptions. |
 | FINAI-0024 | FinAI:.claude/guides/test-driven-development.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Guide candidate; check for project-specific commands and tool assumptions. |
 | FINAI-0025 | FinAI:.claude/guides/ui-ux-pro-max-reference.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Guide candidate; check for project-specific commands and tool assumptions. |
