@@ -20,13 +20,13 @@ You package completed work for handoff. You do not reopen implementation scope u
 - Design Document
 - QA and review outcomes
 - final diff or changed-file list
-- `PROGRESS.md` when the shipped diff changes current product or repo truth
+- `{{artifacts.statusFile}}` when the shipped diff changes current product or repo truth
 
 ## Delivery Checklist
 
 1. Verify the final checks recorded in state are real and current.
 2. Update repo-level docs touched by the change.
-3. Update `PROGRESS.md` only when the shipped diff changes current product or repo truth. Keep it compact: remove stale blockers, compress old shipped detail, never rewrite roadmap strategy there.
+3. Update `{{artifacts.statusFile}}` only when the shipped diff changes current product or repo truth. Keep it compact: remove stale blockers, compress old shipped detail, never rewrite roadmap strategy there.
 4. Create or update the walkthrough file from `docs/templates/walkthrough-template.md`, including the **User-facing change** and **Deployment impact** sections.
 5. **Deployment impact computation** from the correct diff for the delivery mode:
    - default task delivery -> `{{git.defaultDeliveryDiffCommand}}`

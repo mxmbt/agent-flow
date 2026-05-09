@@ -21,29 +21,40 @@ interface TargetTemplate {
   packGuide?: string;
 }
 
-interface SkillAssetRoot {
-  skill: string;
-  sourceRoot: string;
-}
-
 interface StaticAsset {
   sourcePath: string;
   relativePath: string;
 }
 
-const PACK_SKILL_ASSET_ROOTS: SkillAssetRoot[] = [
-  {
-    skill: "ui-ux-pro-max",
-    sourceRoot: path.join("static", "skills", "ui-ux-pro-max")
-  },
-  {
-    skill: "ui-styling-uupm",
-    sourceRoot: path.join("static", "skills", "ui-styling-uupm")
-  },
-  {
-    skill: "design-system-uupm",
-    sourceRoot: path.join("static", "skills", "design-system-uupm")
-  }
+const CORE_STATIC_SKILLS = [
+  "architecture-designer",
+  "architecture-patterns",
+  "commit",
+  "architecture-phase",
+  "bugfix-flow",
+  "delivery-phase",
+  "e2e-testing",
+  "e2e-testing-patterns",
+  "fix-phase",
+  "improve-codebase-architecture",
+  "implementation-phase",
+  "rag-implementation",
+  "release-sync",
+  "phase-check",
+  "plan-phase",
+  "planning-lifecycle",
+  "quality-gate-phase",
+  "review-phase",
+  "work-planning",
+  "writing-plans",
+  "shadcn-ui",
+  "simplify",
+  "simplify-phase",
+  "testing-phase",
+  "webapp-testing",
+  "frontend-design",
+  "design-audit",
+  "accessibility-audit"
 ];
 
 const CLAUDE_TARGETS: TargetTemplate[] = [
@@ -511,28 +522,36 @@ async function renderPackSkillAssets(
   packs: ComposedPacks,
   options: TargetRenderOptions
 ): Promise<RenderedFile[]> {
-  const selectedRoots = PACK_SKILL_ASSET_ROOTS.filter((root) => packs.skills.includes(root.skill));
+  const context = buildCanonicalContext(config, packs);
   const targetKinds: TargetKind[] = [
     ...(config.features.claude ? ["claude" as const] : []),
     ...(config.features.codex ? ["codex" as const] : [])
   ];
   const rendered: RenderedFile[] = [];
+  const selectedSkills = [...new Set([...CORE_STATIC_SKILLS, ...packs.skills])];
 
-  for (const root of selectedRoots) {
-    const assets = await listStaticAssets(path.join(options.templateRoot, root.sourceRoot));
+  for (const skill of selectedSkills) {
+    const sourceRoot = path.join("static", "skills", skill);
+    const assets = await listStaticAssets(path.join(options.templateRoot, sourceRoot));
 
     for (const target of targetKinds) {
       for (const asset of assets) {
-        const outputPath = path.join(targetContext(target).toolRoot, "skills", root.skill, asset.relativePath);
-        const sourcePath = path.join(root.sourceRoot, asset.relativePath);
+        const outputPath = path.join(targetContext(target).toolRoot, "skills", skill, asset.relativePath);
+        const sourcePath = path.join(sourceRoot, asset.relativePath);
         const raw = await readFile(asset.sourcePath, "utf8");
-        const body = applyTargetAdapters(raw, target);
+        const renderedBody = needsStaticTemplate(raw)
+          ? renderTemplate(raw, {
+            ...context,
+            target: targetContext(target)
+          })
+          : raw;
+        const body = applyTargetAdapters(renderedBody, target);
 
         rendered.push({
           path: outputPath,
           content: renderManagedAssetFile(
             {
-              id: `${target}-skill-${root.skill}-${asset.relativePath.replaceAll(path.sep, "-")}`,
+              id: `${target}-skill-${skill}-${asset.relativePath.replaceAll(path.sep, "-")}`,
               version: options.version ?? 1,
               source: path.join("templates", sourcePath)
             },
@@ -547,8 +566,22 @@ async function renderPackSkillAssets(
   return rendered;
 }
 
+function needsStaticTemplate(content: string): boolean {
+  return /\{\{\s*(?:target|git|checks|artifacts|runtime|dev|project|quality|packs|discovery|state|lifecycle)\./.test(content);
+}
+
 async function listStaticAssets(root: string, current = root): Promise<StaticAsset[]> {
-  const entries = await readdir(current, { withFileTypes: true });
+  let entries;
+  try {
+    entries = await readdir(current, { withFileTypes: true });
+  } catch (error) {
+    if ((error as { code?: string }).code === "ENOENT" && current === root) {
+      return [];
+    }
+
+    throw error;
+  }
+
   const assets: StaticAsset[] = [];
 
   for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
@@ -596,5 +629,11 @@ function applyTargetAdapters(content: string, target: TargetKind): string {
 
   return content
     .replaceAll(".claude/guides/", ".codex/guides/")
-    .replaceAll(".claude/skills/", ".codex/skills/");
+    .replaceAll(".claude/skills/", ".codex/skills/")
+    .replaceAll(".claude", ".codex")
+    .replaceAll("AskUserQuestion", "ask the user directly")
+    .replaceAll("OpenBrowser", "browser automation")
+    .replaceAll("Claude-native", "runtime-native")
+    .replaceAll("Claude/OpenBrowser", "agent/browser")
+    .replaceAll("Claude consumption", "agent consumption");
 }

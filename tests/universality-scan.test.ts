@@ -10,8 +10,11 @@ test("scanUniversality flags project, runtime, command, and domain assumptions",
     "`cf/wrangler.toml`",
     "gh api repos/id-bu/AI_Finance_Manager/git/refs/heads/<branch> -X DELETE",
     "release-sync delivery -> `git diff --name-only origin/master...origin/develop`",
+    "get_review_context base=\"master\"",
+    "Update PROGRESS.md",
     "`docs/design/DESIGN-SYSTEM.md`",
     "financial correctness and no-look-ahead",
+    "precise arithmetic where financial values matter",
     "user isolation"
   ].join("\n"));
 
@@ -23,6 +26,9 @@ test("scanUniversality flags project, runtime, command, and domain assumptions",
     "cloudflare-worker-runtime",
     "hardcoded-github-repo",
     "hardcoded-branch-flow",
+    "hardcoded-branch-flow",
+    "hardcoded-status-artifact",
+    "domain-invariant-literal",
     "domain-invariant-literal"
   ]);
 });

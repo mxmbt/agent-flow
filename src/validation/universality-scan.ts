@@ -55,8 +55,15 @@ export const DEFAULT_UNIVERSALITY_RULES: UniversalityRule[] = [
   {
     id: "hardcoded-branch-flow",
     severity: "error",
-    pattern: /\b(?:origin\/develop|origin\/master|develop\s*->\s*master|--base\s+develop|base\s+`develop`)\b/,
+    pattern: /(?:\borigin\/develop\b|\borigin\/master\b|\bdevelop\s*->\s*master\b|--base\s+develop\b|base\s+`develop`|base\s*=\s*["']master["'])/,
     message: "Hardcoded branch and release-flow names must come from git config.",
+    routeTo: "config"
+  },
+  {
+    id: "hardcoded-status-artifact",
+    severity: "error",
+    pattern: /\bPROGRESS\.md\b/,
+    message: "Status artifact paths must come from artifact config.",
     routeTo: "config"
   },
   {
@@ -83,7 +90,7 @@ export const DEFAULT_UNIVERSALITY_RULES: UniversalityRule[] = [
   {
     id: "domain-invariant-literal",
     severity: "error",
-    pattern: /\b(?:financial correctness|no-look-ahead)\b/i,
+    pattern: /\b(?:financial correctness|financial values?|financial transactions?|finance-specific|no-look-ahead)\b/i,
     message: "Domain invariants must come from project config or domain packs.",
     routeTo: "pack"
   },

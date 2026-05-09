@@ -13,6 +13,43 @@ import { renderTargetFiles } from "../src/renderer/target-renderer.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..", "..");
 const templateRoot = path.join(repoRoot, "templates");
+const coreStaticSkillFiles: Array<[string, string[]]> = [
+  ["architecture-designer", [
+    path.join("references", "adr-template.md"),
+    path.join("references", "architecture-patterns.md"),
+    path.join("references", "database-selection.md"),
+    path.join("references", "nfr-checklist.md"),
+    path.join("references", "system-design.md"),
+    "SKILL.md"
+  ]],
+  ["architecture-patterns", [path.join("references", "violation-checklist.md"), "SKILL.md"]],
+  ["commit", ["SKILL.md"]],
+  ["architecture-phase", ["SKILL.md"]],
+  ["bugfix-flow", ["SKILL.md"]],
+  ["delivery-phase", ["SKILL.md"]],
+  ["e2e-testing", ["SKILL.md"]],
+  ["e2e-testing-patterns", ["SKILL.md"]],
+  ["fix-phase", ["SKILL.md"]],
+  ["improve-codebase-architecture", ["REFERENCE.md", "SKILL.md"]],
+  ["implementation-phase", ["SKILL.md"]],
+  ["rag-implementation", ["SKILL.md"]],
+  ["release-sync", ["SKILL.md"]],
+  ["phase-check", ["SKILL.md"]],
+  ["plan-phase", ["SKILL.md"]],
+  ["planning-lifecycle", ["SKILL.md"]],
+  ["quality-gate-phase", ["SKILL.md"]],
+  ["review-phase", [path.join("checklist.md"), "SKILL.md"]],
+  ["work-planning", ["SKILL.md"]],
+  ["writing-plans", ["plan-document-reviewer-prompt.md", "SKILL.md"]],
+  ["shadcn-ui", ["SKILL.md"]],
+  ["simplify", ["SKILL.md"]],
+  ["simplify-phase", ["SKILL.md"]],
+  ["testing-phase", ["SKILL.md"]],
+  ["webapp-testing", ["SKILL.md"]],
+  ["frontend-design", ["SKILL.md"]],
+  ["design-audit", ["audit-dimensions.md", "SKILL.md", "ux-principles.md"]],
+  ["accessibility-audit", ["SKILL.md"]]
+];
 
 test("renderTargetFiles renders native Claude and Codex root targets from the same canonical contract", async () => {
   const config = createDefaultConfig("Target Fixture");
@@ -80,7 +117,8 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
     path.join(".codex", "guides", "test-driven-development.md"),
     path.join(".codex", "guides", "verification-before-completion.md"),
     path.join(".codex", "guides", "worktree-workflow.md"),
-    path.join(".codex", "guides", "code-review-graph-usage.md")
+    path.join(".codex", "guides", "code-review-graph-usage.md"),
+    ...expectedCoreStaticSkillPaths(["claude", "codex"])
   ]);
 
   const claude = byPath.get("CLAUDE.md");
@@ -188,6 +226,25 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.match(claudeSimplifier, /`\.claude\/skills\/simplify\/SKILL\.md`/);
   assert.match(codexSimplifier, /`\.codex\/skills\/simplify\/SKILL\.md`/);
   assert.match(codexSimplifier, /Run the repo-native checks after simplification:\n\n```bash\nnpm test\n```/s);
+
+  const codexCommitSkill = byPath.get(path.join(".codex", "skills", "commit", "SKILL.md"));
+  const codexReleaseSkill = byPath.get(path.join(".codex", "skills", "release-sync", "SKILL.md"));
+  assert.ok(codexCommitSkill);
+  assert.ok(codexReleaseSkill);
+  assert.match(codexCommitSkill, /Co-Authored-By: Codex <noreply@example\.invalid>/);
+  assert.match(codexCommitSkill, /```bash\nnpm test\n```/);
+  assert.match(codexReleaseSkill, /Use this skill only when the user explicitly asks to release, deploy, or ship to `none configured`/);
+  assert.doesNotMatch(codexReleaseSkill, /origin\/develop|origin\/master|PROGRESS\.md|FinAI/);
+  const codexBugfixSkill = byPath.get(path.join(".codex", "skills", "bugfix-flow", "SKILL.md"));
+  const codexTestingPhaseSkill = byPath.get(path.join(".codex", "skills", "testing-phase", "SKILL.md"));
+  assert.ok(codexBugfixSkill);
+  assert.ok(codexTestingPhaseSkill);
+  assert.match(codexBugfixSkill, /Common Bug Classes/);
+  assert.match(codexBugfixSkill, /```bash\nnpm test\n```/);
+  assert.doesNotMatch(codexBugfixSkill, /FinAI|cd cf|ux-copy-review/);
+  assert.match(codexTestingPhaseSkill, /reading `docs\/testing\/QA-SHARED-ACCOUNT\.md`/);
+  assert.match(codexTestingPhaseSkill, /confirming a live response from `http:\/\/localhost:3000`/);
+  assert.doesNotMatch(codexTestingPhaseSkill, /localhost:8787|cd cf/);
 
   const claudeDeepReviewer = byPath.get(path.join(".claude", "agents", "deep-reviewer.md"));
   const codexDeepReviewer = byPath.get(path.join(".codex", "agents", "deep-reviewer.md"));
@@ -581,13 +638,17 @@ test("renderTargetFiles renders design pack guide and UI/UX skill assets", async
   const byPath = new Map(files.map((file) => [file.path, file.content]));
   const designAssetPaths = [...byPath.keys()].filter((filePath) => filePath.includes(`${path.sep}skills${path.sep}`));
 
-  assert.equal(designAssetPaths.length, 154);
+  assert.equal(designAssetPaths.length, 340);
   assert.ok(byPath.has(path.join(".claude", "guides", "ui-ux-pro-max-reference.md")));
   assert.ok(byPath.has(path.join(".codex", "guides", "ui-ux-pro-max-reference.md")));
   assert.ok(byPath.has(path.join(".claude", "skills", "ui-ux-pro-max", "SKILL.md")));
   assert.ok(byPath.has(path.join(".codex", "skills", "ui-ux-pro-max", "SKILL.md")));
   assert.ok(byPath.has(path.join(".claude", "skills", "ui-styling-uupm", "references", "shadcn-components.md")));
   assert.ok(byPath.has(path.join(".codex", "skills", "design-system-uupm", "scripts", "generate-tokens.cjs")));
+  assert.ok(byPath.has(path.join(".claude", "skills", "design-uupm", "SKILL.md")));
+  assert.ok(byPath.has(path.join(".codex", "skills", "brand-uupm", "scripts", "inject-brand-context.cjs")));
+  assert.ok(byPath.has(path.join(".codex", "skills", "frontend-design", "SKILL.md")));
+  assert.ok(byPath.has(path.join(".claude", "skills", "banner-design-uupm", "references", "banner-sizes-and-styles.md")));
 
   const codexGuide = byPath.get(path.join(".codex", "guides", "ui-ux-pro-max-reference.md"));
   assert.ok(codexGuide);
@@ -596,8 +657,12 @@ test("renderTargetFiles renders design pack guide and UI/UX skill assets", async
 
   const claudeSkill = byPath.get(path.join(".claude", "skills", "ui-ux-pro-max", "SKILL.md"));
   const codexDesignSystemSkill = byPath.get(path.join(".codex", "skills", "design-system-uupm", "SKILL.md"));
+  const codexDesignSkill = byPath.get(path.join(".codex", "skills", "design-uupm", "SKILL.md"));
+  const codexLogoGenerator = byPath.get(path.join(".codex", "skills", "design-uupm", "scripts", "logo", "generate.py"));
   assert.ok(claudeSkill);
   assert.ok(codexDesignSystemSkill);
+  assert.ok(codexDesignSkill);
+  assert.ok(codexLogoGenerator);
   assert.match(claudeSkill, /^---\nprovenance_class: adapted_vendor/m);
   assert.deepEqual(parseManagedMetadata(claudeSkill), {
     id: "claude-skill-ui-ux-pro-max-SKILL.md",
@@ -605,6 +670,10 @@ test("renderTargetFiles renders design pack guide and UI/UX skill assets", async
     source: path.join("templates", "static", "skills", "ui-ux-pro-max", "SKILL.md")
   });
   assert.match(codexDesignSystemSkill, /node \.codex\/skills\/design-system-uupm\/scripts\/generate-tokens\.cjs/);
+  assert.match(codexDesignSkill, /ask the user directly/);
+  assert.doesNotMatch(codexDesignSkill, /\.claude|AskUserQuestion|OpenBrowser|Claude-native/);
+  assert.match(codexLogoGenerator, /Path\.home\(\) \/ "\.codex" \/ "skills" \/ "\.env"/);
+  assert.doesNotMatch(codexLogoGenerator, /\.claude/);
 
   const csv = byPath.get(path.join(".claude", "skills", "ui-ux-pro-max", "data", "colors.csv"));
   assert.ok(csv);
@@ -621,7 +690,11 @@ test("design pack static skill assets do not contain dangling local references",
   const skillRoots = [
     path.join(templateRoot, "static", "skills", "ui-ux-pro-max"),
     path.join(templateRoot, "static", "skills", "ui-styling-uupm"),
-    path.join(templateRoot, "static", "skills", "design-system-uupm")
+    path.join(templateRoot, "static", "skills", "design-system-uupm"),
+    path.join(templateRoot, "static", "skills", "design-uupm"),
+    path.join(templateRoot, "static", "skills", "brand-uupm"),
+    ...coreStaticSkillFiles.map(([skill]) => path.join(templateRoot, "static", "skills", skill)),
+    path.join(templateRoot, "static", "skills", "banner-design-uupm")
   ];
   const files = (await Promise.all(skillRoots.map((root) => listFiles(root)))).flat();
   const missing: string[] = [];
@@ -670,7 +743,8 @@ test("renderTargetFiles honors disabled Claude or Codex feature flags", async ()
     path.join(".codex", "guides", "systematic-debugging.md"),
     path.join(".codex", "guides", "test-driven-development.md"),
     path.join(".codex", "guides", "verification-before-completion.md"),
-    path.join(".codex", "guides", "worktree-workflow.md")
+    path.join(".codex", "guides", "worktree-workflow.md"),
+    ...expectedCoreStaticSkillPaths(["codex"])
   ]);
   assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "math-genius.md")), false);
   assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "prt-code-reviewer.md")), false);
@@ -695,6 +769,13 @@ async function listFiles(root: string): Promise<string[]> {
   }));
 
   return files.flat().sort();
+}
+
+function expectedCoreStaticSkillPaths(targets: Array<"claude" | "codex">): string[] {
+  return coreStaticSkillFiles.flatMap(([skill, files]) => targets.flatMap((target) => {
+    const toolRoot = target === "claude" ? ".claude" : ".codex";
+    return files.map((file) => path.join(toolRoot, "skills", skill, file));
+  }));
 }
 
 function isReferenceSource(filePath: string): boolean {

@@ -4,13 +4,6 @@
   "targetRoot": ".",
   "pairs": [
     {
-      "id": "FINAI-0007",
-      "source": ".claude/agents/feature-developer.md",
-      "target": "templates/canonical/agents/feature-developer.md.hbs",
-      "threshold": 0.99,
-      "targetSimilarity": 0.99
-    },
-    {
       "id": "FINAI-0002",
       "source": ".claude/agents/analyst.md",
       "target": "templates/canonical/agents/analyst.md.hbs",
@@ -35,6 +28,20 @@
       "id": "FINAI-0005",
       "source": ".claude/agents/deep-reviewer.md",
       "target": "templates/canonical/agents/deep-reviewer.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0006",
+      "source": ".claude/agents/delivery-agent.md",
+      "target": "templates/canonical/agents/delivery-agent.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0007",
+      "source": ".claude/agents/feature-developer.md",
+      "target": "templates/canonical/agents/feature-developer.md.hbs",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
@@ -116,6 +123,13 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0019",
+      "source": ".claude/agents/qa-expert.md",
+      "target": "templates/canonical/agents/qa-expert.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0020",
       "source": ".claude/agents/ux-expert.md",
       "target": "templates/canonical/agents/ux-expert.md.hbs",
@@ -151,6 +165,13 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0025",
+      "source": ".claude/guides/ui-ux-pro-max-reference.md",
+      "target": "templates/canonical/guides/ui-ux-pro-max-reference.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0026",
       "source": ".claude/guides/verification-before-completion.md",
       "target": "templates/canonical/guides/verification-before-completion.md.hbs",
@@ -165,23 +186,247 @@
       "targetSimilarity": 0.99
     },
     {
-      "id": "FINAI-0006",
-      "source": ".claude/agents/delivery-agent.md",
-      "target": "templates/canonical/agents/delivery-agent.md.hbs",
+      "id": "FINAI-0030",
+      "source": ".claude/skills/accessibility-audit/SKILL.md",
+      "target": "templates/static/skills/accessibility-audit/SKILL.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
     {
-      "id": "FINAI-0019",
-      "source": ".claude/agents/qa-expert.md",
-      "target": "templates/canonical/agents/qa-expert.md.hbs",
+      "id": "FINAI-0031",
+      "source": ".claude/skills/architecture-designer/SKILL.md",
+      "target": "templates/static/skills/architecture-designer/SKILL.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
     {
-      "id": "FINAI-0025",
-      "source": ".claude/guides/ui-ux-pro-max-reference.md",
-      "target": "templates/canonical/guides/ui-ux-pro-max-reference.md.hbs",
+      "id": "FINAI-0032",
+      "source": ".claude/skills/architecture-designer/references/adr-template.md",
+      "target": "templates/static/skills/architecture-designer/references/adr-template.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0033",
+      "source": ".claude/skills/architecture-designer/references/architecture-patterns.md",
+      "target": "templates/static/skills/architecture-designer/references/architecture-patterns.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0034",
+      "source": ".claude/skills/architecture-designer/references/database-selection.md",
+      "target": "templates/static/skills/architecture-designer/references/database-selection.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0035",
+      "source": ".claude/skills/architecture-designer/references/nfr-checklist.md",
+      "target": "templates/static/skills/architecture-designer/references/nfr-checklist.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0036",
+      "source": ".claude/skills/architecture-designer/references/system-design.md",
+      "target": "templates/static/skills/architecture-designer/references/system-design.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0037",
+      "source": ".claude/skills/architecture-patterns/SKILL.md",
+      "target": "templates/static/skills/architecture-patterns/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0038",
+      "source": ".claude/skills/architecture-patterns/references/violation-checklist.md",
+      "target": "templates/static/skills/architecture-patterns/references/violation-checklist.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0039",
+      "source": ".claude/skills/architecture-phase/SKILL.md",
+      "target": "templates/static/skills/architecture-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0040",
+      "source": ".claude/skills/banner-design-uupm/SKILL.md",
+      "target": "templates/static/skills/banner-design-uupm/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0041",
+      "source": ".claude/skills/banner-design-uupm/references/banner-sizes-and-styles.md",
+      "target": "templates/static/skills/banner-design-uupm/references/banner-sizes-and-styles.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0050",
+      "source": ".claude/skills/brand-uupm/SKILL.md",
+      "target": "templates/static/skills/brand-uupm/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0051",
+      "source": ".claude/skills/brand-uupm/references/approval-checklist.md",
+      "target": "templates/static/skills/brand-uupm/references/approval-checklist.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0052",
+      "source": ".claude/skills/brand-uupm/references/asset-organization.md",
+      "target": "templates/static/skills/brand-uupm/references/asset-organization.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0053",
+      "source": ".claude/skills/brand-uupm/references/brand-guideline-template.md",
+      "target": "templates/static/skills/brand-uupm/references/brand-guideline-template.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0054",
+      "source": ".claude/skills/brand-uupm/references/color-palette-management.md",
+      "target": "templates/static/skills/brand-uupm/references/color-palette-management.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0055",
+      "source": ".claude/skills/brand-uupm/references/consistency-checklist.md",
+      "target": "templates/static/skills/brand-uupm/references/consistency-checklist.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0056",
+      "source": ".claude/skills/brand-uupm/references/logo-usage-rules.md",
+      "target": "templates/static/skills/brand-uupm/references/logo-usage-rules.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0057",
+      "source": ".claude/skills/brand-uupm/references/messaging-framework.md",
+      "target": "templates/static/skills/brand-uupm/references/messaging-framework.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0058",
+      "source": ".claude/skills/brand-uupm/references/typography-specifications.md",
+      "target": "templates/static/skills/brand-uupm/references/typography-specifications.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0059",
+      "source": ".claude/skills/brand-uupm/references/update.md",
+      "target": "templates/static/skills/brand-uupm/references/update.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0060",
+      "source": ".claude/skills/brand-uupm/references/visual-identity.md",
+      "target": "templates/static/skills/brand-uupm/references/visual-identity.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0061",
+      "source": ".claude/skills/brand-uupm/references/voice-framework.md",
+      "target": "templates/static/skills/brand-uupm/references/voice-framework.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0062",
+      "source": ".claude/skills/brand-uupm/scripts/extract-colors.cjs",
+      "target": "templates/static/skills/brand-uupm/scripts/extract-colors.cjs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0063",
+      "source": ".claude/skills/brand-uupm/scripts/inject-brand-context.cjs",
+      "target": "templates/static/skills/brand-uupm/scripts/inject-brand-context.cjs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0064",
+      "source": ".claude/skills/brand-uupm/scripts/sync-brand-to-tokens.cjs",
+      "target": "templates/static/skills/brand-uupm/scripts/sync-brand-to-tokens.cjs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0065",
+      "source": ".claude/skills/brand-uupm/scripts/validate-asset.cjs",
+      "target": "templates/static/skills/brand-uupm/scripts/validate-asset.cjs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0066",
+      "source": ".claude/skills/brand-uupm/templates/brand-guidelines-starter.md",
+      "target": "templates/static/skills/brand-uupm/templates/brand-guidelines-starter.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0067",
+      "source": ".claude/skills/bugfix-flow/SKILL.md",
+      "target": "templates/static/skills/bugfix-flow/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0068",
+      "source": ".claude/skills/commit/SKILL.md",
+      "target": "templates/static/skills/commit/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0070",
+      "source": ".claude/skills/delivery-phase/SKILL.md",
+      "target": "templates/static/skills/delivery-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0071",
+      "source": ".claude/skills/design-audit/SKILL.md",
+      "target": "templates/static/skills/design-audit/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0072",
+      "source": ".claude/skills/design-audit/audit-dimensions.md",
+      "target": "templates/static/skills/design-audit/audit-dimensions.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0073",
+      "source": ".claude/skills/design-audit/ux-principles.md",
+      "target": "templates/static/skills/design-audit/ux-principles.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
@@ -364,6 +609,405 @@
       "id": "FINAI-0099",
       "source": ".claude/skills/design-system-uupm/templates/design-tokens-starter.json",
       "target": "templates/static/skills/design-system-uupm/templates/design-tokens-starter.json",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0100",
+      "source": ".claude/skills/design-uupm/SKILL.md",
+      "target": "templates/static/skills/design-uupm/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0101",
+      "source": ".claude/skills/design-uupm/data/cip/deliverables.csv",
+      "target": "templates/static/skills/design-uupm/data/cip/deliverables.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0102",
+      "source": ".claude/skills/design-uupm/data/cip/industries.csv",
+      "target": "templates/static/skills/design-uupm/data/cip/industries.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0103",
+      "source": ".claude/skills/design-uupm/data/cip/mockup-contexts.csv",
+      "target": "templates/static/skills/design-uupm/data/cip/mockup-contexts.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0104",
+      "source": ".claude/skills/design-uupm/data/cip/styles.csv",
+      "target": "templates/static/skills/design-uupm/data/cip/styles.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0105",
+      "source": ".claude/skills/design-uupm/data/icon/styles.csv",
+      "target": "templates/static/skills/design-uupm/data/icon/styles.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0106",
+      "source": ".claude/skills/design-uupm/data/logo/colors.csv",
+      "target": "templates/static/skills/design-uupm/data/logo/colors.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0107",
+      "source": ".claude/skills/design-uupm/data/logo/industries.csv",
+      "target": "templates/static/skills/design-uupm/data/logo/industries.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0108",
+      "source": ".claude/skills/design-uupm/data/logo/styles.csv",
+      "target": "templates/static/skills/design-uupm/data/logo/styles.csv",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0109",
+      "source": ".claude/skills/design-uupm/references/banner-sizes-and-styles.md",
+      "target": "templates/static/skills/design-uupm/references/banner-sizes-and-styles.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0110",
+      "source": ".claude/skills/design-uupm/references/cip-deliverable-guide.md",
+      "target": "templates/static/skills/design-uupm/references/cip-deliverable-guide.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0111",
+      "source": ".claude/skills/design-uupm/references/cip-design.md",
+      "target": "templates/static/skills/design-uupm/references/cip-design.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0112",
+      "source": ".claude/skills/design-uupm/references/cip-prompt-engineering.md",
+      "target": "templates/static/skills/design-uupm/references/cip-prompt-engineering.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0113",
+      "source": ".claude/skills/design-uupm/references/cip-style-guide.md",
+      "target": "templates/static/skills/design-uupm/references/cip-style-guide.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0114",
+      "source": ".claude/skills/design-uupm/references/design-routing.md",
+      "target": "templates/static/skills/design-uupm/references/design-routing.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0115",
+      "source": ".claude/skills/design-uupm/references/icon-design.md",
+      "target": "templates/static/skills/design-uupm/references/icon-design.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0116",
+      "source": ".claude/skills/design-uupm/references/logo-color-psychology.md",
+      "target": "templates/static/skills/design-uupm/references/logo-color-psychology.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0117",
+      "source": ".claude/skills/design-uupm/references/logo-design.md",
+      "target": "templates/static/skills/design-uupm/references/logo-design.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0118",
+      "source": ".claude/skills/design-uupm/references/logo-prompt-engineering.md",
+      "target": "templates/static/skills/design-uupm/references/logo-prompt-engineering.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0119",
+      "source": ".claude/skills/design-uupm/references/logo-style-guide.md",
+      "target": "templates/static/skills/design-uupm/references/logo-style-guide.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0120",
+      "source": ".claude/skills/design-uupm/references/slides-copywriting-formulas.md",
+      "target": "templates/static/skills/design-uupm/references/slides-copywriting-formulas.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0121",
+      "source": ".claude/skills/design-uupm/references/slides-create.md",
+      "target": "templates/static/skills/design-uupm/references/slides-create.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0122",
+      "source": ".claude/skills/design-uupm/references/slides-html-template.md",
+      "target": "templates/static/skills/design-uupm/references/slides-html-template.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0123",
+      "source": ".claude/skills/design-uupm/references/slides-layout-patterns.md",
+      "target": "templates/static/skills/design-uupm/references/slides-layout-patterns.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0124",
+      "source": ".claude/skills/design-uupm/references/slides-strategies.md",
+      "target": "templates/static/skills/design-uupm/references/slides-strategies.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0125",
+      "source": ".claude/skills/design-uupm/references/slides.md",
+      "target": "templates/static/skills/design-uupm/references/slides.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0126",
+      "source": ".claude/skills/design-uupm/references/social-photos-design.md",
+      "target": "templates/static/skills/design-uupm/references/social-photos-design.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0127",
+      "source": ".claude/skills/design-uupm/scripts/cip/core.py",
+      "target": "templates/static/skills/design-uupm/scripts/cip/core.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0128",
+      "source": ".claude/skills/design-uupm/scripts/cip/generate.py",
+      "target": "templates/static/skills/design-uupm/scripts/cip/generate.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0129",
+      "source": ".claude/skills/design-uupm/scripts/cip/render-html.py",
+      "target": "templates/static/skills/design-uupm/scripts/cip/render-html.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0130",
+      "source": ".claude/skills/design-uupm/scripts/cip/search.py",
+      "target": "templates/static/skills/design-uupm/scripts/cip/search.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0131",
+      "source": ".claude/skills/design-uupm/scripts/icon/generate.py",
+      "target": "templates/static/skills/design-uupm/scripts/icon/generate.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0132",
+      "source": ".claude/skills/design-uupm/scripts/logo/core.py",
+      "target": "templates/static/skills/design-uupm/scripts/logo/core.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0133",
+      "source": ".claude/skills/design-uupm/scripts/logo/generate.py",
+      "target": "templates/static/skills/design-uupm/scripts/logo/generate.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0134",
+      "source": ".claude/skills/design-uupm/scripts/logo/search.py",
+      "target": "templates/static/skills/design-uupm/scripts/logo/search.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0140",
+      "source": ".claude/skills/e2e-testing-patterns/SKILL.md",
+      "target": "templates/static/skills/e2e-testing-patterns/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0141",
+      "source": ".claude/skills/e2e-testing/SKILL.md",
+      "target": "templates/static/skills/e2e-testing/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0143",
+      "source": ".claude/skills/fix-phase/SKILL.md",
+      "target": "templates/static/skills/fix-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0145",
+      "source": ".claude/skills/frontend-design/SKILL.md",
+      "target": "templates/static/skills/frontend-design/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0147",
+      "source": ".claude/skills/improve-codebase-architecture/REFERENCE.md",
+      "target": "templates/static/skills/improve-codebase-architecture/REFERENCE.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0148",
+      "source": ".claude/skills/improve-codebase-architecture/SKILL.md",
+      "target": "templates/static/skills/improve-codebase-architecture/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0146",
+      "source": ".claude/skills/implementation-phase/SKILL.md",
+      "target": "templates/static/skills/implementation-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0150",
+      "source": ".claude/skills/phase-check/SKILL.md",
+      "target": "templates/static/skills/phase-check/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0151",
+      "source": ".claude/skills/plan-phase/SKILL.md",
+      "target": "templates/static/skills/plan-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0152",
+      "source": ".claude/skills/planning-lifecycle/SKILL.md",
+      "target": "templates/static/skills/planning-lifecycle/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0244",
+      "source": ".claude/skills/work-planning/SKILL.md",
+      "target": "templates/static/skills/work-planning/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0245",
+      "source": ".claude/skills/writing-plans/SKILL.md",
+      "target": "templates/static/skills/writing-plans/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0246",
+      "source": ".claude/skills/writing-plans/plan-document-reviewer-prompt.md",
+      "target": "templates/static/skills/writing-plans/plan-document-reviewer-prompt.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0156",
+      "source": ".claude/skills/rag-implementation/SKILL.md",
+      "target": "templates/static/skills/rag-implementation/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0155",
+      "source": ".claude/skills/quality-gate-phase/SKILL.md",
+      "target": "templates/static/skills/quality-gate-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0161",
+      "source": ".claude/skills/release-sync/SKILL.md",
+      "target": "templates/static/skills/release-sync/SKILL.md",
+      "threshold": 0.74,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0163",
+      "source": ".claude/skills/review-phase/SKILL.md",
+      "target": "templates/static/skills/review-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0164",
+      "source": ".claude/skills/review-phase/checklist.md",
+      "target": "templates/static/skills/review-phase/checklist.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0165",
+      "source": ".claude/skills/shadcn-ui/SKILL.md",
+      "target": "templates/static/skills/shadcn-ui/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0166",
+      "source": ".claude/skills/simplify-phase/SKILL.md",
+      "target": "templates/static/skills/simplify-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0167",
+      "source": ".claude/skills/simplify/SKILL.md",
+      "target": "templates/static/skills/simplify/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0188",
+      "source": ".claude/skills/testing-phase/SKILL.md",
+      "target": "templates/static/skills/testing-phase/SKILL.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
@@ -721,6 +1365,13 @@
       "id": "FINAI-0240",
       "source": ".claude/skills/ui-ux-pro-max/scripts/search.py",
       "target": "templates/static/skills/ui-ux-pro-max/scripts/search.py",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0243",
+      "source": ".claude/skills/webapp-testing/SKILL.md",
+      "target": "templates/static/skills/webapp-testing/SKILL.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     }

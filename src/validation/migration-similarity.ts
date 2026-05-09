@@ -83,11 +83,11 @@ export function normalizeMigrationText(value: string): string {
   let body = stripFrontmatter(lines);
   body = body.filter((line) => !isGeneratedNotice(line) && !isTemplateComment(line));
 
-  return body
+  return normalizeAllowedMigrationText(body
     .map((line) => line.trimEnd())
     .map(normalizeAllowedMigrationDifferences)
     .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
+    .replace(/\n{3,}/g, "\n\n"))
     .trim();
 }
 
@@ -150,7 +150,12 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("{{target.toolRoot}}", ".claude")
     .replaceAll("{{target.homeRoot}}", "~/.claude")
     .replaceAll("{{target.agentName}}", "Claude Code")
+    .replaceAll("{{project.taskPrefix}}", "FINAI")
+    .replaceAll("Claude Code <noreply@example.invalid>", "Claude <noreply@anthropic.com>")
+    .replaceAll("{{lifecycle.sequence}}", "PLAN → [ARCHITECTURE] → IMPLEMENTATION → SIMPLIFY → REVIEW → QUALITY_GATE → QA → DELIVERY")
     .replaceAll("{{artifacts.phaseRoot}}", "docs/phases")
+    .replaceAll("{{artifacts.architectureFile}}", "docs/ARCHITECTURE.md")
+    .replaceAll("{{artifacts.userIsolationArchitectureFile}}", "ARCHITECTURE_MULTI_USER.md")
     .replaceAll("{{artifacts.statusFile}}", "PROGRESS.md")
     .replaceAll("{{artifacts.productFile}}", "docs/PRODUCT.md")
     .replaceAll("{{artifacts.roadmapFile}}", "docs/ROADMAP.md")
@@ -164,7 +169,110 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("{{runtime.bindingConfigFile}}", "cf/wrangler.toml")
     .replaceAll("{{runtime.routeEntrypoint}}", "cf/src/index.ts")
     .replaceAll("{{quality.invariantSummary}}", "financial correctness, user isolation, UTC handling, and no-look-ahead")
+    .replaceAll("{{quality.experts}}", "- `paranoid-architect`\n- `math-genius`\n- `performance-expert`\n- `ux-expert`")
+    .replaceAll("{{quality.domainExpert}}", "math-genius")
+    .replaceAll("the repo-local design document template", "docs/templates/design-document-template.md")
+    .replaceAll("the repo-local state template", "docs/templates/state-template.json")
+    .replaceAll("the repo-local walkthrough template", "docs/templates/walkthrough-template.md")
+    .replaceAll("## Project Guardrails", "## FinAI-Specific Guardrails")
+    .replaceAll("Configured guardrails remain in force:", "FinAI guardrails remain in force:")
+    .replaceAll("Configured project checklist:", "FinAI-specific checklist:")
+    .replaceAll("configured data-isolation and authorization boundaries", "`userId` scoping on all D1 access for user-owned data")
+    .replaceAll("- data-isolation and authorization boundaries", "- `userId` scoping")
+    .replaceAll("financial correctness invariants: financial correctness, user isolation, UTC handling, and no-look-ahead", "fixed-point or integer-safe financial math")
+    .replaceAll("- configured runtime and pack-contributed constraints", "- Worker runtime constraints")
+    .replaceAll("- domain correctness invariants from project config and installed packs: financial correctness, user isolation, UTC handling, and no-look-ahead", "- fixed-point or integer-safe financial math where relevant")
+    .replaceAll("- runtime and pack-contributed constraints", "- Cloudflare Worker constraints")
+    .replaceAll("Use the current shared state shape. Do not force legacy fields such as `lint`, `auditGate`, storage-specific checks, or framework-specific contracts into implementation state when the task does not use them.", "Use the current shared state shape. Do not force old ZNAI-only fields such as `lint`, `auditGate`, Prisma-specific checks, or tRPC/Zod-specific contracts into FinAI implementation state when the task does not use them.")
+    .replaceAll("`DDREF:plan.review`", "`DDREF:codex.review`")
+    .replaceAll("## Step 7: Plan Review Of The Draft Plan", "## Step 7: Codex Review Of The Draft Plan")
+    .replaceAll("Use the configured reviewer invocation rule from the root agent instructions.", "Use the Codex invocation rule from `.agent-tool/CLAUDE.md`.")
+    .replaceAll("configured domain-correctness concerns", "financial correctness concerns")
+    .replaceAll("## Step 8: Request Plan Approval → User Approval → Resume After Approval", "## Step 8: EnterPlanMode → User Approval → ExitPlanMode")
+    .replaceAll("Only after the draft passes internal plan review:", "Only after the draft is Codex-reviewed:")
+    .replaceAll("1. Request plan approval", "1. `EnterPlanMode`")
+    .replaceAll("4. Resume after approval", "4. `ExitPlanMode`")
+    .replaceAll("Primary review", "Codex review")
+    .replaceAll("primary-review", "Codex")
+    .replaceAll("primaryReviewIssues", "codexIssues")
+    .replaceAll("primaryReviewTriage", "codexTriage")
+    .replaceAll("primaryReviewThreadId", "codexThreadId")
+    .replaceAll("data isolation", "userId isolation")
+    .replaceAll("data-isolation", "userId")
+    .replaceAll("query/resource bounds", "D1 query bounds")
+    .replaceAll("configured project rules", "FinAI-specific project rules")
+    .replaceAll("every data access path touching scoped data MUST contain the configured authorization boundary", "every D1 query touching user-owned data MUST contain a userId filter")
+    .replaceAll("Domain correctness: enforce configured invariants from project config and installed packs", "No look-ahead: historical projections must not use future data — violation = P0\n- Financial correctness: integer/fixed-point math for monetary values, no floating-point accumulation")
+    .replaceAll("Runtime constraints: configured runtime and pack-contributed limits must be respected", "Cloudflare Worker constraints: no Node.js built-ins, CPU time budget respected")
+    .replaceAll("No debug output left in released or user-visible code", "No console.log in production code")
+    .replaceAll("Duplicate of configured static analysis/type checks", "Duplicate of linter/TypeScript")
+    .replaceAll("covered by configured static checks", "covered by type-check")
+    .replaceAll("style/static-check", "style/type-check")
+    .replaceAll("missing userId boundary", "missing userId filter")
+    .replaceAll("unique constraint as guard", "unique constraint in D1 as guard")
+    .replaceAll("added userId boundary", "added userId filter")
+    .replaceAll("Agent contract:", "Task tool:")
+    .replaceAll("Configured project focus:", "FinAI-specific focus:")
+    .replaceAll("- `userId` and authorization boundaries on scoped data", "- userId scoping on all D1 queries for user-owned data")
+    .replaceAll("- `userId` scoping on scoped data", "- userId scoping on all D1 queries for user-owned data")
+    .replaceAll("- temporal-leakage or causal-ordering constraints from project config and installed packs", "- No look-ahead in financial projections")
+    .replaceAll("- financial correctness, user isolation, UTC handling, and no-look-ahead", "- Integer/fixed-point math for monetary values")
+    .replaceAll("- Worker runtime and pack-contributed constraints", "- Cloudflare Worker runtime constraints")
+    .replaceAll("  - Worker runtime constraints\"", "  - Cloudflare Worker runtime constraints\"")
+    .replaceAll("domain-correctness defects", "financial-math defects")
+    .replaceAll("description: \"PLAN phase: research → product review → brainstorming → tech review → devil's advocate → Design Document → configured plan review.\"", "description: \"PLAN phase: research → product review → brainstorming → tech review → devil's advocate → Design Document → Codex review.\"")
+    .replaceAll("description: \"QUALITY_GATE phase: security, domain correctness, performance, and UX review → findings arbiter.\"", "description: \"QUALITY_GATE phase: security, financial correctness, performance, and UX review → findings arbiter.\"")
+    .replaceAll("Run configured expert reviews in parallel, then route all findings through `findings-arbiter`.", "Run four expert reviews in parallel, then route all findings through `findings-arbiter`.")
+    .replaceAll("- configured core experts:", "")
+    .replaceAll("- configured domain expert when present: `math-genius`", "")
+    .replaceAll("## Step 2: Experts In Parallel", "## Step 2: Four Experts In Parallel")
+    .replaceAll("Call configured experts in parallel.", "Call all four experts in parallel.")
+    .replaceAll("### configured domain expert", "### math-genius")
+    .replaceAll("- domain-specific edge cases from installed packs", "- no look-ahead in projections or historical analysis")
+    .replaceAll("- deterministic handling of rounding, aggregation, or boundary behavior where relevant", "- deterministic rounding behavior")
+    .replaceAll("- correctness of derived calculations and summaries", "- aggregation correctness")
+    .replaceAll("- query/resource counts and hot-path amplification", "- D1 query counts and hot-path amplification")
+    .replaceAll("- configured runtime time-budget risks", "- Worker CPU/time-budget risks")
+    .replaceAll("- user-facing clarity and brevity", "- Telegram-first clarity and brevity")
+    .replaceAll("domain-correctness defects", "financial-math defects")
+    .replaceAll("Non-negotiable `FIX NOW` cases:", "Non-negotiable `FIX NOW` cases in FinAI:")
+    .replaceAll("- missing configured `userId` or authorization boundary on scoped data", "- missing `userId` isolation on user-owned D1 data")
+    .replaceAll("- missing configured userId or authorization boundary on scoped data", "- missing `userId` isolation on user-owned D1 data")
+    .replaceAll("- violation of configured domain correctness invariants", "- look-ahead in financial logic")
+    .replaceAll("- violation of configured numeric precision or accumulation invariants", "- floating-point accumulation for canonical monetary logic")
+    .replaceAll("- `domainExpert`", "- `mathGenius`")
+    .replaceAll("Agent contract (general-purpose):", "Task tool (general-purpose):")
+    .replaceAll("- `develop: merged`", "- `Develop: merged`")
+    .replaceAll("`develop: merged`", "`Develop: merged`")
+    .replaceAll("`master` is already released", "`Master` is already released")
+    .replaceAll("configured runtime bindings in cf/wrangler.toml", "D1/R2/KV bindings in wrangler.toml")
+    .replaceAll("(binding, storage, namespace, or trigger changes)", "(binding or `[[d1_databases]]` / `[[r2_buckets]]` / `[[kv_namespaces]]` / `[triggers]` changes)")
+    .replaceAll("without matching configured secret-management documentation", "without a matching `wrangler secret put` doc")
+    .replaceAll("agent prompt contracts or tier-1 prompt assembly", "`cf/src/agents/*/SOUL.md`, `cf/src/agents/*/RULES.md`, or tier-1 prompt assembly")
+    .replaceAll("user-visible copy, status rendering, or notifier fan-out", "user-visible Telegram copy, `/pending` rendering, or notifier fan-out")
+    .replaceAll("Prefix `Deploy <date> — <one-line summary>`", "Prefix `📢 FinAI deploy <date> — <one-line summary>`")
+    .replaceAll("previous release tip", "previous master tip")
+    .replaceAll("This is the rule that prevents stale-status drift: shipped tickets that don't carry SHIPPED markers confuse future sessions and reconciliation passes.", "This is the rule that prevents stale-status drift: shipped tickets that don't carry SHIPPED markers confuse future sessions and reconciliation passes (M3.5 T2/T5 went unmarked for ~5 days because their tracker PRs were missed, which caused a reconciliation session to report M3.5 as in-flight when it was fully released — see CLAUDE.md rule 16).")
+    .replaceAll("## Numeric / Data Correctness", "## Financial / Data Correctness")
+    .replaceAll("precise arithmetic where high-value numeric or regulated values matter", "precise arithmetic where financial values matter")
+    .replaceAll("Strong-consistency transactions (ACID compliance)", "Financial transactions (ACID compliance)")
+    .replaceAll("ACID compliance for business-critical transactions", "ACID compliance for financial transactions")
+    .replaceAll("## Common Bug Classes", "## Common FinAI Bug Classes")
+    .replaceAll("incorrect domain arithmetic or aggregation", "incorrect financial math or aggregation")
+    .replaceAll("`.agent-tool/skills/frontend-design/SKILL.md`, `docs/design/DESIGN-SYSTEM.md`, `docs/design/UX-WRITING-GUIDE.md`, relevant design docs", "`.agent-tool/skills/frontend-design/SKILL.md`, `.agent-tool/skills/ux-copy-review/SKILL.md`, relevant design docs")
+    .replaceAll("active Agent Flow lifecycle", "active FinAI lifecycle")
+    .replaceAll("produce a concrete ADD or ADR in the configured repo-local architecture decision location", "produce a concrete ADD or ADR under `docs/ADRs/`")
+    .replaceAll("Use the repo-local QA report template only if a fuller repo-local QA report is actually produced.", "Use `docs/templates/qa-report-template.md` only if a fuller repo-local QA report is actually produced.")
+    .replaceAll("Milestone or phase-scoped work |", "Milestone or phase-scoped work (M4, fix, etc.) |")
+    .replaceAll("Cross-phase fix/planned backlog (`FINAI-FIX-*`, `FINAI-PLAN-*`) |", "Cross-phase fix/planned backlog (FINAI-FIX-*, FINAI-PLAN-*) |")
+    .replaceAll("<!-- or: # Cross-Phase Fix Now and Planned Work  for the configured backlog file -->", "<!-- or: # FinAI Fix Now and Planned Work  for docs/tasks.md -->")
+    .replaceAll("#FINAI-x-t1", "#finai-x-t1")
+    .replaceAll("#FINAI-x-t2", "#finai-x-t2")
     .replaceAll("{{checks.defaultShellBlock}}", "cd cf && npm test\ncd cf && npm run type-check")
+    .replaceAll("<project-root>/src/", "cf/src/")
+    .replaceAll("`webhook`, `auth`, `db`, `tools`, `agents`, `jobs`, `orchestrator`, `infra`, `docs`", "`webhook`, `auth`, `db`, `tools`, `agents`, `cron`, `orchestrator`, `market`, `media`, `infra`, `docs`")
+    .replaceAll("docs(architecture): updated data flow for task context", "docs(architecture): updated data flow for M3 userId threading")
+    .replaceAll("chore(deps): bumped runtime dependency", "chore(deps): bumped wrangler to latest")
     .replaceAll("For code changes in the active project:", "For code changes in the active Worker app:")
     .replaceAll("{{checks.focusedTestCommand}}", "npm test -- path/to/test.test.ts")
     .replaceAll("- [ ] All configured checks pass", "- [ ] All tests pass: `npm test`")
@@ -183,6 +291,7 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("{{git.integrationBranch}}", "develop")
     .replaceAll("{{git.releaseBranch}}", "master")
     .replaceAll("{{git.integrationRef}}", "origin/develop")
+    .replaceAll('base="origin/develop", include_source=true', 'base="master", include_source=true')
     .replaceAll("{{git.releaseRef}}", "origin/master")
     .replaceAll("{{git.remoteName}}", "origin")
     .replaceAll("{{git.defaultDeliveryDiffCommand}}", "git diff --name-only origin/develop...HEAD")
@@ -193,7 +302,12 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("{{git.deliveryStateRef}}", "<merged-commit-or-origin/develop>")
     .replaceAll("{{git.worktreeParkCommand}}", "./scripts/park-worktrees.sh")
     .replaceAll("{{git.deliveryStateCommand}}", "./scripts/report-delivery-state.sh")
-    .replaceAll("{{project.taskPrefix}}", "FINAI")
+    .replaceAll("- `develop: merged`", "- `Develop: merged`")
+    .replaceAll("`develop: merged`", "`Develop: merged`")
+    .replaceAll("`master` is already released", "`Master` is already released")
+    .replaceAll("## Step 8: Request Plan Approval", "## Step 8: EnterPlanMode")
+    .replaceAll("Resume After Approval", "ExitPlanMode")
+    .replaceAll("## Stage 1: Primary Review", "## Stage 1: Codex Review")
     .replaceAll("->", "→")
     .replaceAll("## Feature Delivery: Task → develop", "## Feature Delivery: Task → Develop")
     .replaceAll("## Release Sync: develop → master", "## Release Sync: Develop → Master")
@@ -213,6 +327,7 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("`{{artifacts.architectureFile}}`", "`docs/ARCHITECTURE.md`")
     .replaceAll("- user-isolation work -> `{{artifacts.userIsolationArchitectureFile}}`", "- `ARCHITECTURE_MULTI_USER.md` when user isolation or scheduling is involved")
     .replaceAll("- user-isolation work → `{{artifacts.userIsolationArchitectureFile}}`", "- `ARCHITECTURE_MULTI_USER.md` when user isolation or scheduling is involved")
+    .replaceAll("- user-isolation work → `ARCHITECTURE_MULTI_USER.md`", "- `ARCHITECTURE_MULTI_USER.md` when user isolation or scheduling is involved")
     .replaceAll("- scheduling or asynchronous work -> `{{artifacts.schedulingArchitectureFile}}`\n", "")
     .replaceAll("- scheduling or asynchronous work -> `{{artifacts.schedulingArchitectureFile}}`", "")
     .replaceAll("- scheduling or asynchronous work → `{{artifacts.schedulingArchitectureFile}}`\n", "")
@@ -265,6 +380,7 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("Important domain or workflow logic that could cause user-facing errors", "Important business logic that could cause user-facing errors")
     .replaceAll("trivial accessors unless they contain logic", "trivial getters/setters unless they contain logic")
     .replaceAll("security or isolation patterns specific to this project's configured runtime and packs", "security or isolation patterns specific to this Worker/D1/Telegram stack")
+    .replaceAll("user/account isolation", "user/tenant isolation")
     .replaceAll("performance patterns in this project's configured runtime and packs", "performance patterns in this Worker/D1/R2 stack")
     .replaceAll("properly surfaced, recorded, and actionable.", "properly surfaced, logged, and actionable.")
     .replaceAll("without proper diagnostics and user feedback", "without proper logging and user feedback")
@@ -321,10 +437,154 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("Runtime bindings (`cf/wrangler.toml` configured binding changes)", "Bindings (`cf/wrangler.toml` D1/R2/KV changes)")
     .replaceAll("Secrets (new configured secret references without existing secret provisioning history)", "Secrets (new `env.<NAME>` references without existing `wrangler secret put` history)")
     .replaceAll("Cron (configured scheduled triggers and handlers)", "Cron (`[triggers]` in wrangler.toml; `scheduled()` handlers)")
+    .replaceAll("scheduled-task or cron handlers", "`scheduled()` / cron handlers")
+    .replaceAll("configured release-notes aggregation", "`RELEASES.md` aggregation")
+    .replaceAll("Release-notes aggregation skips these entries.", "`RELEASES.md` aggregation skips these entries.")
+    .replaceAll("configured operator/admin release-announcement destination", "`release_notes_admins` workflow input")
+    .replaceAll("configured user-facing release-announcement destination", "`release_notes_users` workflow input")
+    .replaceAll("for the `release_notes_admins` workflow input", "for `release_notes_admins` workflow input")
+    .replaceAll("## Copy into configured admin release announcement destination", "## ⤵ Copy into deploy.yml release_notes_admins input")
+    .replaceAll("## Copy into configured user release announcement destination", "## ⤵ Copy into deploy.yml release_notes_users input")
+    .replaceAll("write directly to the configured release-notes artifact", "write to `RELEASES.md` directly")
+    .replaceAll("new configured release-notes block", "new `RELEASES.md` block")
+    .replaceAll("to the configured release-notes artifact", "to `RELEASES.md`")
+    .replaceAll("release-notes aggregation only", "`RELEASES.md` aggregation only")
+    .replaceAll("updated the configured release-notes artifact", "updated `RELEASES.md`")
     .replaceAll("diff touches configured high-risk prompt or agent assembly surfaces, configured messaging copy changed, or approval/registration flow semantics changed", "diff touches `cf/src/agents/*/SOUL.md`|`RULES.md`|tier-1 prompt assembly, Telegram copy changed (including the `pending` command, notifier fan-out), or approval/registration flow semantics changed")
     .replaceAll("📢 Deploy <YYYY-MM-DD>", "📢 FinAI deploy <YYYY-MM-DD>")
     .replaceAll("Reference the current Design Document or ADD/ADR for full architectural rationale when the release-announcement contract changed.", "Reference: `docs/phases/phase-observe/design/FINAI-PLAN-OBSERVE-T0-ADR.md` (delivery-agent Contract Delta section) for full architectural rationale.")
     .replaceAll("Enumerate squashed commits between the prior release branch tip and the new release branch tip", "Enumerate squashed commits between prior master tip and new master tip");
+}
+
+function normalizeAllowedMigrationText(value: string): string {
+  return value
+    .replaceAll(
+      [
+        "## FinAI-Specific Guardrails",
+        "",
+        "Implementation must preserve:",
+        "",
+        "- `userId` scoping on all D1 access for user-owned data",
+        "- input validation on user-facing inputs",
+        "- UTC handling for timestamps",
+        "- financial correctness invariants: financial correctness, user isolation, UTC handling, and no-look-ahead",
+        "- Worker runtime constraints"
+      ].join("\n"),
+      [
+        "## FinAI-Specific Guardrails",
+        "",
+        "Implementation must preserve:",
+        "",
+        "- `userId` scoping on all D1 access for user-owned data",
+        "- input validation on user-facing inputs",
+        "- UTC handling for timestamps",
+        "- fixed-point or integer-safe math for monetary values",
+        "- Cloudflare Worker runtime constraints"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
+        "Default checks for code changes:",
+        "",
+        "```bash",
+        "cd cf && npm test",
+        "cd cf && npm run type-check",
+        "```"
+      ].join("\n"),
+      [
+        "Default checks for code changes:",
+        "",
+        "1. `cd cf && npm test`",
+        "2. `cd cf && npm run type-check`"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
+        "FinAI guardrails remain in force:",
+        "",
+        "- `userId` scoping",
+        "- input validation",
+        "- UTC handling",
+        "- financial correctness invariants: financial correctness, user isolation, UTC handling, and no-look-ahead",
+        "- Worker runtime constraints"
+      ].join("\n"),
+      [
+        "FinAI guardrails remain in force:",
+        "",
+        "- `userId` scoping",
+        "- input validation",
+        "- UTC handling",
+        "- fixed-point or integer-safe financial math",
+        "- Worker runtime constraints"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
+        "FinAI-specific checklist:",
+        "",
+        "- `userId` scoping",
+        "- UTC handling for timestamps",
+        "- fixed-point or integer-safe financial math where relevant",
+        "- Cloudflare Worker constraints"
+      ].join("\n"),
+      [
+        "FinAI-specific checklist:",
+        "",
+        "- `userId` scoping on user-owned D1 data",
+        "- UTC handling for timestamps",
+        "- no look-ahead assumptions in historical projections",
+        "- fixed-point or integer-safe financial math where relevant",
+        "- Cloudflare Worker constraints"
+      ].join("\n")
+    )
+    .replaceAll(
+      "  - financial correctness invariants: financial correctness, user isolation, UTC handling, and no-look-ahead",
+      "  - Integer/fixed-point math for monetary values"
+    )
+    .replaceAll(
+      [
+        "### math-genius",
+        "",
+        "Must focus on:",
+        "",
+        "- financial correctness invariants: financial correctness, user isolation, UTC handling, and no-look-ahead"
+      ].join("\n"),
+      [
+        "### math-genius",
+        "",
+        "Must focus on:",
+        "",
+        "- fixed-point / integer-safe money math"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
+        "- Проходить configured checks:",
+        "",
+        "```bash",
+        "cd cf && npm test",
+        "cd cf && npm run type-check",
+        "```"
+      ].join("\n"),
+      [
+        "- Компилироваться (`npm run type-check`)",
+        "- Проходить тесты (`npm test`)"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
+        "- running configured checks:",
+        "",
+        "```bash",
+        "cd cf && npm test",
+        "cd cf && npm run type-check",
+        "```"
+      ].join("\n"),
+      [
+        "- `cd cf && npm test`",
+        "- `cd cf && npm run type-check`"
+      ].join("\n")
+    );
 }
 
 function tokenize(value: string): string[] {

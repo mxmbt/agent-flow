@@ -71,7 +71,14 @@ export const builtinPacks: PackManifest[] = [
     description: "UI/UX design intelligence, styling references, and design-system tooling.",
     contributes: {
       guides: ["ui-ux-pro-max-reference"],
-      skills: ["ui-ux-pro-max", "ui-styling-uupm", "design-system-uupm"],
+      skills: [
+        "ui-ux-pro-max",
+        "ui-styling-uupm",
+        "design-system-uupm",
+        "design-uupm",
+        "brand-uupm",
+        "banner-design-uupm"
+      ],
       validators: ["design-review"]
     }
   },
