@@ -148,12 +148,37 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("{{target.skillRoot}}/", ".agent-tool/skills/")
     .replaceAll("{{target.toolRoot}}/", ".agent-tool/")
     .replaceAll("{{target.toolRoot}}", ".claude")
+    .replaceAll(".agent-tool/, agent/tooling config", ".agent-tool/, .agent-tool/")
     .replaceAll("{{target.homeRoot}}", "~/.claude")
     .replaceAll("{{target.agentName}}", "Claude Code")
+    .replaceAll(".agent-flow/brainstorm", ".superpowers/brainstorm")
+    .replaceAll(".agent-flow/", ".superpowers/")
+    .replaceAll(".superpowers/brainstorm/) are", ".superpowers/) are")
+    .replaceAll("Agent Flow Brainstorming", "Superpowers Brainstorming")
+    .replaceAll("<h1>Superpowers Brainstorming</h1>", "<h1><a href=\"https://github.com/obra/superpowers\" style=\"color: inherit; text-decoration: none;\">Superpowers Brainstorming</a></h1>")
+    .replaceAll("brainstorm-content", "claude-content")
+    .replaceAll("host's file-writing tool", "Write tool")
+    .replaceAll("the Write tool", "Write tool")
+    .replaceAll("Codex or another process-reaping runtime:", "Codex:")
+    .replaceAll("Other foreground runners:", "Gemini CLI:")
+    .replaceAll("before configured plan review", "before Codex review")
+    .replaceAll("Something the agent just built or proposed", "Something Claude just built or proposed")
+    .replaceAll("high-risk production system", "production financial system")
+    .replaceAll("Any output from any other Agent Flow skill", "Any output from any other Claude Code skill")
+    .replaceAll("Where AI coding assistants systematically fall short", "Where AI coding assistants (including Claude) systematically fall short")
+    .replaceAll("{{artifacts.productFile}}", "docs/PRODUCT.md")
+    .replaceAll("{{artifacts.uiUxSpecificationFile}}", "docs/UI-UX-SPECIFICATION.md")
+    .replaceAll("Runtime memory/context загружается согласно активной среде агента", "Auto-memory Claude Code загружается автоматически")
+    .replaceAll("data/schema definitions если они есть", "ORM schema")
+    .replaceAll("{{target.toolRoot}}/, agent/tooling config", ".claude/, .codex")
+    .replaceAll("dashboard / workflow / collection / profile / ops", "Dashboard / Collection / Lens / Profile / ops")
     .replaceAll("{{project.taskPrefix}}", "FINAI")
+    .replaceAll("FINAI-<MILESTONE>-T<n>", "FINAI-M4-T1")
     .replaceAll("Claude Code <noreply@example.invalid>", "Claude <noreply@anthropic.com>")
     .replaceAll("{{lifecycle.sequence}}", "PLAN → [ARCHITECTURE] → IMPLEMENTATION → SIMPLIFY → REVIEW → QUALITY_GATE → QA → DELIVERY")
     .replaceAll("{{artifacts.phaseRoot}}", "docs/phases")
+    .replaceAll("docs/phases/phase-<phase-token>/handoffs/<taskId>/<phase>-detail.md", "docs/phases/phase-<token>/handoffs/<taskId>/<phase>-detail.md")
+    .replaceAll("docs/phases/phase-<phase-token>/design/<taskId>-design.md", "docs/phases/phase-m4/design/FINAI-M4-T1-design.md")
     .replaceAll("{{artifacts.architectureFile}}", "docs/ARCHITECTURE.md")
     .replaceAll("{{artifacts.userIsolationArchitectureFile}}", "ARCHITECTURE_MULTI_USER.md")
     .replaceAll("{{artifacts.statusFile}}", "PROGRESS.md")
@@ -164,11 +189,103 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("{{artifacts.designSystemFile}}", "docs/design/DESIGN-SYSTEM.md")
     .replaceAll("{{artifacts.uxWritingGuideFile}}", "docs/design/UX-WRITING-GUIDE.md")
     .replaceAll("{{artifacts.qaSharedAccountFile}}", "docs/testing/QA-SHARED-ACCOUNT.md")
+    .replaceAll("user-provided review aspects.", "\"$ARGUMENTS\"")
+    .replaceAll("pr-review-toolkit all parallel", "/pr-review-toolkit:review-pr all parallel")
+    .replaceAll("pr-review-toolkit tests errors", "/pr-review-toolkit:review-pr tests errors")
+    .replaceAll("pr-review-toolkit comments", "/pr-review-toolkit:review-pr comments")
+    .replaceAll("pr-review-toolkit simplify", "/pr-review-toolkit:review-pr simplify")
+    .replaceAll("pr-review-toolkit all", "/pr-review-toolkit:review-pr")
+    .replaceAll("Run: pr-review-toolkit code errors", "Run: /pr-review-toolkit:review-pr code errors")
+    .replaceAll("Run: pr-review-toolkit all", "Run: /pr-review-toolkit:review-pr all")
+    .replaceAll("**Request:** user-provided presentation topic, goal, and slide count.", "<args>$ARGUMENTS</args>")
+    .replaceAll("<task>user-provided presentation topic, goal, and slide count</task>", "<task>$ARGUMENTS</task>")
+    .replaceAll("<args>user-provided brand update request</args>", "<args>$ARGUMENTS</args>")
+    .replaceAll("Ask the user directly to collect:", "Use `AskUserQuestion` to collect:")
+    .replaceAll("or invoke the brand update flow", "or use /brand update")
+    .replaceAll("# 1. Edit docs/brand-guidelines.md or use /brand update", "# 1. Edit docs/brand-guidelines.md (or use /brand update)")
+    .replaceAll("Parse subcommand from the user request (first word when explicitly provided)", "Parse subcommand from `$ARGUMENTS` (first word)")
+    .replaceAll("After generation, **ALWAYS** ask the user directly about HTML preview. If yes, invoke `ui-ux-pro-max` for gallery.", "After generation, **ALWAYS** ask user about HTML preview via `AskUserQuestion`. If yes, invoke `/ui-ux-pro-max` for gallery.")
+    .replaceAll("browser automation export flow", "OpenBrowser export flow")
+    .replaceAll("by asking the user directly — purpose, platform, content, brand, style, quantity", "via `AskUserQuestion` — purpose, platform, content, brand, style, quantity")
+    .replaceAll("via browser automation", "via OpenBrowser `execute_code`")
+    .replaceAll("browser automation screenshot flow", "OpenBrowser screenshot flow")
+    .replaceAll("present by asking the user directly", "present via `AskUserQuestion`")
+    .replaceAll("`brand-uupm` → `design-system-uupm` → randomly invoke `ui-ux-pro-max` OR `frontend-design`", "`/ckm:brand` → `/ckm:design-system` → randomly invoke `/ck:ui-ux-pro-max` OR `/ck:frontend-design`")
+    .replaceAll("browser automation screenshot at exact px dimensions", "OpenBrowser screenshot at exact px dimensions")
+    .replaceAll("Use browser automation visual inspection", "Use OpenBrowser visual inspection")
+    .replaceAll("Ask the user directly about HTML preview", "Ask user about HTML preview → `AskUserQuestion` tool")
+    .replaceAll("invoke `ui-ux-pro-max` for HTML gallery", "invoke `/ui-ux-pro-max` for HTML gallery")
+    .replaceAll("browser automation-based export/inspection", "OpenBrowser-based export/inspection")
+    .replaceAll("Present ideas to the user directly for approval before designing.", "Present ideas to user via `AskUserQuestion` for approval before designing.")
+    .replaceAll("**`brand-uupm`**", "**`/ckm:brand`**")
+    .replaceAll("**`design-system-uupm`**", "**`/ckm:design-system`**")
+    .replaceAll("`ui-ux-pro-max` OR `frontend-design`", "`/ck:ui-ux-pro-max` OR `/ck:frontend-design`")
+    .replaceAll("Use browser automation or Chrome headless CLI", "Use OpenBrowser `execute_code` or Chrome headless CLI")
+    .replaceAll("#### Option B: Browser Automation", "#### Option B: OpenBrowser `execute_code`")
+    .replaceAll("Use browser automation with instructions to:", "Use OpenBrowser with instructions to:")
+    .replaceAll("agent/browser/runtime setup", "Claude/OpenBrowser/runtime setup")
+    .replaceAll("agent/browser-assisted review", "Claude/OpenBrowser-assisted review")
+    .replaceAll("agent/browser and extract dominant colors manually", "Claude/OpenBrowser and extract dominant colors manually")
+    .replaceAll("name: ui-styling-uupm", "name: ckm:ui-styling")
+    .replaceAll("name: banner-design-uupm", "name: ckm:banner-design")
+    .replaceAll("name: slides-uupm", "name: ckm:slides")
+    .replaceAll("name: brand-uupm", "name: ckm:brand")
+    .replaceAll("name: design-system-uupm", "name: ckm:design-system")
+    .replaceAll("name: design-uupm", "name: ckm:design")
+    .replaceAll("browser automation export. Actions:", "OpenBrowser export. Actions:")
+    .replaceAll("brand context, and browser automation.", "brand context, and OpenBrowser.")
+    .replaceAll("### Step 1: Gather Requirements", "### Step 1: Gather Requirements (AskUserQuestion)")
+    .replaceAll("Ask the user directly for:", "Collect via AskUserQuestion:")
+    .replaceAll("using browser automation:", "using OpenBrowser `execute_code`:")
+    .replaceAll("open it with browser automation", "open it in OpenBrowser")
+    .replaceAll("{{target.skillRoot}}/design-system-uupm", ".claude/skills/design-system-uupm")
+    .replaceAll("Checks root agent instruction compliance", "Checks CLAUDE.md compliance")
+    .replaceAll("All agents must be installed by the `code-review-toolkit` pack.", "All agents available in `/agents` list")
+    .replaceAll("// From: test infrastructure improvements", "// From: Lace test infrastructure improvements (2025-10-03)")
+    .replaceAll("AppEventType", "LaceEventType")
+    .replaceAll("AppEvent", "LaceEvent")
+    .replaceAll("EventStore", "ThreadManager")
+    .replaceAll("eventStore", "threadManager")
+    .replaceAll("streamId", "threadId")
+    .replaceAll("jobStreamId", "agentThreadId")
+    .replaceAll("The event store to query", "The thread manager to query")
+    .replaceAll("Stream to check for events", "Thread to check for events")
+    .replaceAll("e.data === 'call_123'", "e.data.id === 'call_123'")
+    .replaceAll("Error: git init failed in /path/to/project/packages/core", "Error: git init failed in /Users/jesse/project/packages/core")
+    .replaceAll("TEST_COMMAND_TEMPLATE=\"${AGENT_FLOW_FOCUSED_TEST_COMMAND:-npm test -- path/to/test.test.ts}\"", "")
+    .replaceAll("  TEST_COMMAND=\"${TEST_COMMAND_TEMPLATE//<test-file>/$TEST_FILE}\"", "")
+    .replaceAll("  bash -lc \"$TEST_COMMAND\" > /dev/null 2>&1 || true", "  npm test \"$TEST_FILE\" > /dev/null 2>&1 || true")
+    .replaceAll("    echo \"  $TEST_COMMAND    # Run just this test\"", "    echo \"  npm test $TEST_FILE    # Run just this test\"")
+    .replaceAll("{{artifacts.phaseRoot}}/phase-<phase-token>/handoffs/<taskId>/<phase>-detail.md", "docs/phases/phase-<token>/handoffs/<taskId>/<phase>-detail.md")
+    .replaceAll("### Domain Correctness\n\nConfigured invariants: {{quality.invariantSummary}}", "### Financial Correctness")
+    .replaceAll("### Domain Correctness\n\nConfigured invariants: financial correctness, user isolation, UTC handling, and no-look-ahead", "### Financial Correctness")
+    .replaceAll("Run the configured validation checks:\n\n```bash\ncd cf && npm test\ncd cf && npm run type-check\n```\n\nOther checks:", "- `cd cf && npm test`:\n- `cd cf && npm run type-check`:\n- Other checks:")
+    .replaceAll("Run the configured validation checks:\n\n```bash\n{{checks.defaultShellBlock}}\n```\n\nOther checks:", "- `cd cf && npm test`:\n- `cd cf && npm run type-check`:\n- Other checks:")
+    .replaceAll('"project": "{{project.name}}"', '"project": "FinAI"')
+    .replaceAll('"taskId": "{{project.taskPrefix}}-<MILESTONE>-T<n>"', '"taskId": "FINAI-M4-T1"')
+    .replaceAll('"phaseToken": "<phase-token>"', '"phaseToken": "m4"')
+    .replaceAll('"designDocument": "{{artifacts.phaseRoot}}/phase-<phase-token>/design/<taskId>-design.md"', '"designDocument": "docs/phases/phase-m4/design/FINAI-M4-T1-design.md"')
+    .replaceAll('"diffBase": "{{git.integrationBranch}}"', '"diffBase": "master"')
+    .replaceAll('"researchPack": "{{artifacts.phaseRoot}}/phase-<phase-token>/research/<taskId>-research-pack.md"', '"researchPack": "docs/phases/phase-<phase-token>/research/<taskId>-research-pack.md"')
+    .replaceAll('"domainExpert": {}', '"mathGenius": {}')
+    .replaceAll('"walkthroughFile": "{{artifacts.walkthroughRoot}}/<taskId>.md"', '"walkthroughFile": "docs/walkthroughs/agents/FINAI-M4-T1.md"')
+    .replaceAll('"releaseAnnouncementInternal": ""', '"releaseAnnouncementAdmins": ""')
+    .replaceAll('"releaseAnnouncementExternal": ""', '"releaseAnnouncementUsers": ""')
+    .replaceAll('"runtimeResources": "none"', '"bindings": "none"')
+    .replaceAll('"schedules": "none"', '"cron": "none"')
+    .replaceAll("Internal/infra only - no user-facing change", "Internal/infra only — no user-facing change")
+    .replaceAll("- Runtime resources: <none | new/changed databases, buckets, queues, caches, or similar resources>", "- Bindings: <none | new/changed D1/R2/KV>")
+    .replaceAll("- Schedules: <none | new/changed schedules>", "- Cron: <none | new/changed cron>")
+    .replaceAll("- Schedules: <none | schedule or handler changes>", "- Cron: <none | schedule or handler changes>")
+    .replaceAll("- Runtime routes: <none | new/changed HTTP routes, jobs, events, or entrypoints>", "- Runtime routes: <none | new/changed HTTP routes>")
+    .replaceAll("Aggregated into release notes: yes/no", "Aggregated into RELEASES.md: yes/no")
+    .replaceAll("Aggregated into release notes: <only on release-sync deliveries>", "Aggregated into RELEASES.md: <only on release-sync deliveries>")
     .replaceAll("{{runtime.appRoot}}", "cf")
     .replaceAll("{{runtime.migrationsGlob}}", "cf/migrations/**")
     .replaceAll("{{runtime.bindingConfigFile}}", "cf/wrangler.toml")
     .replaceAll("{{runtime.routeEntrypoint}}", "cf/src/index.ts")
     .replaceAll("{{quality.invariantSummary}}", "financial correctness, user isolation, UTC handling, and no-look-ahead")
+    .replaceAll("### Domain Correctness\n\nConfigured invariants: financial correctness, user isolation, UTC handling, and no-look-ahead", "### Financial Correctness")
     .replaceAll("{{quality.experts}}", "- `paranoid-architect`\n- `math-genius`\n- `performance-expert`\n- `ux-expert`")
     .replaceAll("{{quality.domainExpert}}", "math-genius")
     .replaceAll("the repo-local design document template", "docs/templates/design-document-template.md")
@@ -269,6 +386,7 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("#FINAI-x-t1", "#finai-x-t1")
     .replaceAll("#FINAI-x-t2", "#finai-x-t2")
     .replaceAll("{{checks.defaultShellBlock}}", "cd cf && npm test\ncd cf && npm run type-check")
+    .replaceAll("Run the configured validation checks:\n\n```bash\ncd cf && npm test\ncd cf && npm run type-check\n```\n\nOther checks:", "- `cd cf && npm test`:\n- `cd cf && npm run type-check`:\n- Other checks:")
     .replaceAll("<project-root>/src/", "cf/src/")
     .replaceAll("`webhook`, `auth`, `db`, `tools`, `agents`, `jobs`, `orchestrator`, `infra`, `docs`", "`webhook`, `auth`, `db`, `tools`, `agents`, `cron`, `orchestrator`, `market`, `media`, `infra`, `docs`")
     .replaceAll("docs(architecture): updated data flow for task context", "docs(architecture): updated data flow for M3 userId threading")
@@ -278,6 +396,7 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("- [ ] All configured checks pass", "- [ ] All tests pass: `npm test`")
     .replaceAll("{{checks.changedSchemaInline}}", "`cd cf && npm run generate` and `cd cf && npm run migrate:local`")
     .replaceAll("{{checks.changedSchemaIndented}}", "  - `cd cf && npm run generate`\n  - `cd cf && npm run migrate:local`")
+    .replaceAll("npm test -- path/to/test.test.ts", "npm test path/to/test.test.ts")
     .replaceAll('csv.DictReader(line for line in f if not line.startswith("# @agent-flow managed "))', "csv.DictReader(f)")
     .replaceAll('csv.DictReader(line for line in f if not line.startswith("# -flow managed "))', "csv.DictReader(f)")
     .replaceAll("{{dev.startCommand}}", "cd cf && npm run dev")
@@ -460,6 +579,69 @@ function normalizeAllowedMigrationText(value: string): string {
   return value
     .replaceAll(
       [
+        "type LaceEventType = string;",
+        "",
+        "interface LaceEvent {",
+        "  type: LaceEventType;",
+        "  data?: unknown;",
+        "}",
+        "",
+        "interface ThreadManager {",
+        "  getEvents(threadId: string): LaceEvent[];",
+        "}"
+      ].join("\n"),
+      [
+        "import type { ThreadManager } from '~/threads/thread-manager';",
+        "import type { LaceEvent, LaceEventType } from '~/threads/types';"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
+        "**Run and capture:**",
+        "```bash",
+        "cd cf && npm test",
+        "cd cf && npm run type-check",
+        "```"
+      ].join("\n"),
+      [
+        "**Run and capture:**",
+        "```bash",
+        "npm test 2>&1 | grep 'DEBUG git init'",
+        "```"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
+        "```bash",
+        "cd cf && npm test",
+        "cd cf && npm run type-check",
+        "FAIL: expected 'Email required', got undefined",
+        "```"
+      ].join("\n"),
+      [
+        "```bash",
+        "$ npm test",
+        "FAIL: expected 'Email required', got undefined",
+        "```"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
+        "```bash",
+        "cd cf && npm test",
+        "cd cf && npm run type-check",
+        "PASS",
+        "```"
+      ].join("\n"),
+      [
+        "```bash",
+        "$ npm test",
+        "PASS",
+        "```"
+      ].join("\n")
+    )
+    .replaceAll(
+      [
         "## FinAI-Specific Guardrails",
         "",
         "Implementation must preserve:",
@@ -584,6 +766,14 @@ function normalizeAllowedMigrationText(value: string): string {
         "- `cd cf && npm test`",
         "- `cd cf && npm run type-check`"
       ].join("\n")
+    )
+    .replace(
+      /### Domain Correctness\s+Configured invariants: financial correctness, user isolation, UTC handling, and no-look-ahead/g,
+      "### Financial Correctness"
+    )
+    .replace(
+      /Run the configured validation checks:\s+```bash\s+cd cf && npm test\s+cd cf && npm run type-check\s+```\s+Other checks:/g,
+      "- `cd cf && npm test`:\n- `cd cf && npm run type-check`:\n- Other checks:"
     );
 }
 

@@ -66,6 +66,15 @@ export const builtinPacks: PackManifest[] = [
     }
   },
   {
+    name: "nextjs",
+    version: 1,
+    description: "Next.js App Router best-practice guidance.",
+    contributes: {
+      skills: ["next-best-practices"],
+      validators: ["nextjs-app-router"]
+    }
+  },
+  {
     name: "design",
     version: 1,
     description: "UI/UX design intelligence, styling references, and design-system tooling.",
@@ -77,7 +86,8 @@ export const builtinPacks: PackManifest[] = [
         "design-system-uupm",
         "design-uupm",
         "brand-uupm",
-        "banner-design-uupm"
+        "banner-design-uupm",
+        "slides-uupm"
       ],
       validators: ["design-review"]
     }
@@ -95,6 +105,7 @@ export const builtinPacks: PackManifest[] = [
         "prt-silent-failure-hunter",
         "prt-type-design-analyzer"
       ],
+      skills: ["pr-review-toolkit"],
       validators: ["code-review-toolkit"]
     }
   },
@@ -104,6 +115,7 @@ export const builtinPacks: PackManifest[] = [
     description: "Graph-first code discovery and impact-analysis guidance.",
     contributes: {
       guides: ["code-review-graph-usage"],
+      skillFiles: ["debug-issue.md", "explore-codebase.md", "refactor-safely.md", "review-changes.md"],
       validators: ["code-review-graph"],
       mcpServers: {
         codeReviewGraph: {

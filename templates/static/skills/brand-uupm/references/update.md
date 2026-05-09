@@ -1,6 +1,6 @@
 Update brand colors, typography, and style - automatically syncs to all design system files.
 
-<args>$ARGUMENTS</args>
+<args>user-provided brand update request</args>
 
 ## Overview
 
@@ -13,7 +13,7 @@ This command systematically updates:
 
 ### Step 1: Gather Brand Input
 
-Use `AskUserQuestion` to collect:
+Ask the user directly to collect:
 
 **Theme Selection:**
 - Theme name (e.g., "Ocean Professional", "Electric Creative", "Forest Calm")

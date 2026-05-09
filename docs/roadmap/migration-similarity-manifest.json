@@ -270,6 +270,62 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0042",
+      "source": ".claude/skills/brainstorming/SKILL.md",
+      "target": "templates/static/skills/brainstorming/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0043",
+      "source": ".claude/skills/brainstorming/scripts/frame-template.html",
+      "target": "templates/static/skills/brainstorming/scripts/frame-template.html",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0044",
+      "source": ".claude/skills/brainstorming/scripts/helper.js",
+      "target": "templates/static/skills/brainstorming/scripts/helper.js",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0045",
+      "source": ".claude/skills/brainstorming/scripts/server.cjs",
+      "target": "templates/static/skills/brainstorming/scripts/server.cjs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0046",
+      "source": ".claude/skills/brainstorming/scripts/start-server.sh",
+      "target": "templates/static/skills/brainstorming/scripts/start-server.sh",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0047",
+      "source": ".claude/skills/brainstorming/scripts/stop-server.sh",
+      "target": "templates/static/skills/brainstorming/scripts/stop-server.sh",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0048",
+      "source": ".claude/skills/brainstorming/spec-document-reviewer-prompt.md",
+      "target": "templates/static/skills/brainstorming/spec-document-reviewer-prompt.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0049",
+      "source": ".claude/skills/brainstorming/visual-companion.md",
+      "target": "templates/static/skills/brainstorming/visual-companion.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0050",
       "source": ".claude/skills/brand-uupm/SKILL.md",
       "target": "templates/static/skills/brand-uupm/SKILL.md",
@@ -399,6 +455,13 @@
       "id": "FINAI-0068",
       "source": ".claude/skills/commit/SKILL.md",
       "target": "templates/static/skills/commit/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0069",
+      "source": ".claude/skills/debug-issue.md",
+      "target": "templates/static/skills/debug-issue.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
@@ -858,6 +921,34 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0136",
+      "source": ".claude/skills/devils-advocate/SKILL.md",
+      "target": "templates/static/skills/devils-advocate/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0137",
+      "source": ".claude/skills/devils-advocate/references/ai-blind-spots.md",
+      "target": "templates/static/skills/devils-advocate/references/ai-blind-spots.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0138",
+      "source": ".claude/skills/devils-advocate/references/blind-spots.md",
+      "target": "templates/static/skills/devils-advocate/references/blind-spots.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0139",
+      "source": ".claude/skills/devils-advocate/references/questioning-frameworks.md",
+      "target": "templates/static/skills/devils-advocate/references/questioning-frameworks.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0140",
       "source": ".claude/skills/e2e-testing-patterns/SKILL.md",
       "target": "templates/static/skills/e2e-testing-patterns/SKILL.md",
@@ -868,6 +959,13 @@
       "id": "FINAI-0141",
       "source": ".claude/skills/e2e-testing/SKILL.md",
       "target": "templates/static/skills/e2e-testing/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0142",
+      "source": ".claude/skills/explore-codebase.md",
+      "target": "templates/static/skills/explore-codebase.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
@@ -886,6 +984,13 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0146",
+      "source": ".claude/skills/implementation-phase/SKILL.md",
+      "target": "templates/static/skills/implementation-phase/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0147",
       "source": ".claude/skills/improve-codebase-architecture/REFERENCE.md",
       "target": "templates/static/skills/improve-codebase-architecture/REFERENCE.md",
@@ -900,9 +1005,9 @@
       "targetSimilarity": 0.99
     },
     {
-      "id": "FINAI-0146",
-      "source": ".claude/skills/implementation-phase/SKILL.md",
-      "target": "templates/static/skills/implementation-phase/SKILL.md",
+      "id": "FINAI-0149",
+      "source": ".claude/skills/next-best-practices/SKILL.md",
+      "target": "templates/static/skills/next-best-practices/SKILL.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
@@ -928,30 +1033,16 @@
       "targetSimilarity": 0.99
     },
     {
-      "id": "FINAI-0244",
-      "source": ".claude/skills/work-planning/SKILL.md",
-      "target": "templates/static/skills/work-planning/SKILL.md",
+      "id": "FINAI-0153",
+      "source": ".claude/skills/pr-review-toolkit/SKILL.md",
+      "target": "templates/static/skills/pr-review-toolkit/SKILL.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
     {
-      "id": "FINAI-0245",
-      "source": ".claude/skills/writing-plans/SKILL.md",
-      "target": "templates/static/skills/writing-plans/SKILL.md",
-      "threshold": 0.99,
-      "targetSimilarity": 0.99
-    },
-    {
-      "id": "FINAI-0246",
-      "source": ".claude/skills/writing-plans/plan-document-reviewer-prompt.md",
-      "target": "templates/static/skills/writing-plans/plan-document-reviewer-prompt.md",
-      "threshold": 0.99,
-      "targetSimilarity": 0.99
-    },
-    {
-      "id": "FINAI-0156",
-      "source": ".claude/skills/rag-implementation/SKILL.md",
-      "target": "templates/static/skills/rag-implementation/SKILL.md",
+      "id": "FINAI-0154",
+      "source": ".claude/skills/product-review/SKILL.md",
+      "target": "templates/static/skills/product-review/SKILL.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
@@ -963,10 +1054,52 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0156",
+      "source": ".claude/skills/rag-implementation/SKILL.md",
+      "target": "templates/static/skills/rag-implementation/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0157",
+      "source": ".claude/skills/refactor-method-complexity-reduce/SKILL.md",
+      "target": "templates/static/skills/refactor-method-complexity-reduce/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0158",
+      "source": ".claude/skills/refactor-plan/SKILL.md",
+      "target": "templates/static/skills/refactor-plan/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0159",
+      "source": ".claude/skills/refactor-safely.md",
+      "target": "templates/static/skills/refactor-safely.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0160",
+      "source": ".claude/skills/refactor/SKILL.md",
+      "target": "templates/static/skills/refactor/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0161",
       "source": ".claude/skills/release-sync/SKILL.md",
       "target": "templates/static/skills/release-sync/SKILL.md",
       "threshold": 0.74,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0162",
+      "source": ".claude/skills/review-changes.md",
+      "target": "templates/static/skills/review-changes.md",
+      "threshold": 0.99,
       "targetSimilarity": 0.99
     },
     {
@@ -1001,6 +1134,111 @@
       "id": "FINAI-0167",
       "source": ".claude/skills/simplify/SKILL.md",
       "target": "templates/static/skills/simplify/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0168",
+      "source": ".claude/skills/slides-uupm/SKILL.md",
+      "target": "templates/static/skills/slides-uupm/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0169",
+      "source": ".claude/skills/slides-uupm/references/copywriting-formulas.md",
+      "target": "templates/static/skills/slides-uupm/references/copywriting-formulas.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0170",
+      "source": ".claude/skills/slides-uupm/references/create.md",
+      "target": "templates/static/skills/slides-uupm/references/create.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0171",
+      "source": ".claude/skills/slides-uupm/references/html-template.md",
+      "target": "templates/static/skills/slides-uupm/references/html-template.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0172",
+      "source": ".claude/skills/slides-uupm/references/layout-patterns.md",
+      "target": "templates/static/skills/slides-uupm/references/layout-patterns.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0173",
+      "source": ".claude/skills/slides-uupm/references/slide-strategies.md",
+      "target": "templates/static/skills/slides-uupm/references/slide-strategies.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0175",
+      "source": ".claude/skills/systematic-debugging/SKILL.md",
+      "target": "templates/static/skills/systematic-debugging/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0176",
+      "source": ".claude/skills/systematic-debugging/condition-based-waiting-example.ts",
+      "target": "templates/static/skills/systematic-debugging/condition-based-waiting-example.ts",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0177",
+      "source": ".claude/skills/systematic-debugging/condition-based-waiting.md",
+      "target": "templates/static/skills/systematic-debugging/condition-based-waiting.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0178",
+      "source": ".claude/skills/systematic-debugging/defense-in-depth.md",
+      "target": "templates/static/skills/systematic-debugging/defense-in-depth.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0179",
+      "source": ".claude/skills/systematic-debugging/find-polluter.sh",
+      "target": "templates/static/skills/systematic-debugging/find-polluter.sh",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0180",
+      "source": ".claude/skills/systematic-debugging/root-cause-tracing.md",
+      "target": "templates/static/skills/systematic-debugging/root-cause-tracing.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0185",
+      "source": ".claude/skills/tech-review/SKILL.md",
+      "target": "templates/static/skills/tech-review/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0186",
+      "source": ".claude/skills/test-driven-development/SKILL.md",
+      "target": "templates/static/skills/test-driven-development/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0187",
+      "source": ".claude/skills/test-driven-development/testing-anti-patterns.md",
+      "target": "templates/static/skills/test-driven-development/testing-anti-patterns.md",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     },
@@ -1369,9 +1607,79 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0241",
+      "source": ".claude/skills/ux-copy-review/SKILL.md",
+      "target": "templates/static/skills/ux-copy-review/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0242",
+      "source": ".claude/skills/verification-before-completion/SKILL.md",
+      "target": "templates/static/skills/verification-before-completion/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0243",
       "source": ".claude/skills/webapp-testing/SKILL.md",
       "target": "templates/static/skills/webapp-testing/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0244",
+      "source": ".claude/skills/work-planning/SKILL.md",
+      "target": "templates/static/skills/work-planning/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0245",
+      "source": ".claude/skills/writing-plans/SKILL.md",
+      "target": "templates/static/skills/writing-plans/SKILL.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0246",
+      "source": ".claude/skills/writing-plans/plan-document-reviewer-prompt.md",
+      "target": "templates/static/skills/writing-plans/plan-document-reviewer-prompt.md",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0503",
+      "source": "docs/templates/agent-report-template.md",
+      "target": "templates/shared/docs/templates/agent-report-template.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0504",
+      "source": "docs/templates/design-document-template.md",
+      "target": "templates/shared/docs/templates/design-document-template.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0505",
+      "source": "docs/templates/qa-report-template.md",
+      "target": "templates/shared/docs/templates/qa-report-template.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0506",
+      "source": "docs/templates/state-template.json",
+      "target": "templates/shared/docs/templates/state-template.json.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0507",
+      "source": "docs/templates/walkthrough-template.md",
+      "target": "templates/shared/docs/templates/walkthrough-template.md.hbs",
       "threshold": 0.99,
       "targetSimilarity": 0.99
     }

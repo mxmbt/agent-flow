@@ -4,8 +4,8 @@ provenance_origin: upstream-adapted
 upstream_sync_policy: baseline_only
 provenance_reference: docs/architecture/AI-SKILL-PROVENANCE.md
 provenance_url: attribution-pending
-name: ckm:banner-design
-description: "Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options using HTML/CSS-first composition, brand context, and OpenBrowser export. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, brand context, and OpenBrowser."
+name: banner-design-uupm
+description: "Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options using HTML/CSS-first composition, brand context, and browser automation export. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, brand context, and browser automation."
 argument-hint: "[platform] [style] [dimensions]"
 license: MIT
 metadata:
@@ -28,9 +28,9 @@ Design banners across social, ads, web, and print formats. Generates multiple ar
 
 ## Workflow
 
-### Step 1: Gather Requirements (AskUserQuestion)
+### Step 1: Gather Requirements
 
-Collect via AskUserQuestion:
+Ask the user directly for:
 1. **Purpose** — social cover, ad banner, website hero, print, or creative asset?
 2. **Platform/size** — which platform or custom dimensions?
 3. **Content** — headline, subtext, CTA, logo placement?
@@ -75,12 +75,12 @@ For each art direction option:
 
 ### Step 4: Export Banners to Images
 
-After designing HTML banners, export each to PNG using OpenBrowser `execute_code`:
+After designing HTML banners, export each to PNG using browser automation:
 
 1. **Serve HTML files** via local server (python http.server or similar)
 2. **Screenshot each banner** at exact platform dimensions:
    ```bash
-   # Serve the HTML locally, open it in OpenBrowser, set viewport to exact size,
+   # Serve the HTML locally, open it with browser automation, set viewport to exact size,
    # wait for fonts/images to load, then take a screenshot to assets/banners/{campaign}/...
    ```
 3. **Compress if needed** using project-standard image tooling after export

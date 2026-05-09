@@ -26,6 +26,11 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.match(stdout, /docs\/design\/DESIGN-SYSTEM\.md/);
   assert.match(stdout, /docs\/design\/UX-WRITING-GUIDE\.md/);
   assert.match(stdout, /docs\/testing\/QA-SHARED-ACCOUNT\.md/);
+  assert.match(stdout, /docs\/templates\/agent-report-template\.md/);
+  assert.match(stdout, /docs\/templates\/design-document-template\.md/);
+  assert.match(stdout, /docs\/templates\/qa-report-template\.md/);
+  assert.match(stdout, /docs\/templates\/state-template\.json/);
+  assert.match(stdout, /docs\/templates\/walkthrough-template\.md/);
   assert.match(stdout, /\.claude\/agents\/architect\.md/);
   assert.match(stdout, /\.codex\/agents\/architect\.md/);
   assert.match(stdout, /\.codex\/agents\/code-simplifier\.md/);
@@ -75,6 +80,23 @@ test("init creates config, starter docs, and target agent files in a bare projec
   const qaExpert = await readFile(path.join(cwd, ".codex", "agents", "qa-expert.md"), "utf8");
   assert.match(qaExpert, /`docs\/testing\/QA-SHARED-ACCOUNT\.md`/);
   assert.match(qaExpert, /Use the configured local runtime URL/);
+
+  const qaReportTemplate = await readFile(path.join(cwd, "docs", "templates", "qa-report-template.md"), "utf8");
+  assert.match(qaReportTemplate, /npm test/);
+  assert.doesNotMatch(qaReportTemplate, /cd cf/);
+
+  const designDocumentTemplate = await readFile(path.join(cwd, "docs", "templates", "design-document-template.md"), "utf8");
+  assert.match(designDocumentTemplate, /### Domain Correctness/);
+  assert.doesNotMatch(designDocumentTemplate, /Financial Correctness/);
+
+  const stateTemplate = JSON.parse(await readFile(path.join(cwd, "docs", "templates", "state-template.json"), "utf8"));
+  assert.equal(stateTemplate.project, config.project.name);
+  assert.equal(stateTemplate.diffBase, "main");
+  assert.equal(stateTemplate.reports.delivery.walkthroughFile, "docs/walkthroughs/agents/<taskId>.md");
+  assert.equal(stateTemplate.reports.delivery.releaseAnnouncementInternal, "");
+  assert.equal(stateTemplate.reports.delivery.releaseAnnouncementExternal, "");
+  assert.equal("releaseAnnouncementAdmins" in stateTemplate.reports.delivery, false);
+  assert.equal("releaseAnnouncementUsers" in stateTemplate.reports.delivery, false);
 });
 
 test("init enables code-review-graph as default discovery provider for detected code projects", async () => {

@@ -1,0 +1,28 @@
+# AGENT_REPORT Template
+
+## Compact Report
+
+```json
+{
+  "verdict": "APPROVED|NEEDS_FIX|BLOCKED|DONE|FIX_REQUIRED|VERIFIED",
+  "score": 1,
+  "findings": [
+    {
+      "severity": "CRITICAL|MAJOR|MINOR",
+      "file": "path/to/file",
+      "line": 1,
+      "description": "What is wrong"
+    }
+  ],
+  "selfCritique": "What might still be missing",
+  "handoffFile": "{{artifacts.phaseRoot}}/phase-<phase-token>/handoffs/<taskId>/<phase>-detail.md",
+  "lessons": [],
+  "memoryLessons": []
+}
+```
+
+## Notes
+
+- `lessons` are task-local observations that stay in state.
+- `memoryLessons` are durable lessons worth carrying across sessions.
+- Use a handoff file for detailed fix steps, not the compact report body.

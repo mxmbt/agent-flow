@@ -4,7 +4,7 @@ provenance_origin: upstream-adapted
 upstream_sync_policy: baseline_only
 provenance_reference: docs/architecture/AI-SKILL-PROVENANCE.md
 provenance_url: attribution-pending
-name: ckm:ui-styling
+name: ui-styling-uupm
 description: Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, creating responsive layouts, adding accessible components (dialogs, dropdowns, forms, tables), customizing themes and colors, implementing dark mode, generating visual designs and posters, or establishing consistent styling patterns across applications.
 argument-hint: "[component or layout]"
 license: MIT

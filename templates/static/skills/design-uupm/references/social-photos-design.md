@@ -1,6 +1,6 @@
 # Social Photos Design Guide
 
-Design social media images via HTML/CSS rendering + screenshot export. Orchestrates `ui-ux-pro-max`, `brand`, `design-system`, and OpenBrowser-based export/inspection.
+Design social media images via HTML/CSS rendering + screenshot export. Orchestrates `ui-ux-pro-max`, `brand`, `design-system`, and browser automation-based export/inspection.
 
 ## Platform Sizes
 
@@ -51,15 +51,15 @@ Create 3-5 concept ideas that:
 - Vary in composition, color, typography approach
 - Align with brand guidelines if available
 
-Present ideas to user via `AskUserQuestion` for approval before designing.
+Present ideas to the user directly for approval before designing.
 
 ### Step 4: Design HTML Files
 
 Activate these skills in sequence:
 
-1. **`/ckm:brand`** — Extract brand colors, fonts, voice from user's project
-2. **`/ckm:design-system`** — Get design tokens (spacing, typography scale, color palette)
-3. **Randomly invoke ONE of:** `/ck:ui-ux-pro-max` OR `/ck:frontend-design` — for layout, hierarchy, visual balance. Pick one at random each run for design variety.
+1. **`brand-uupm`** — Extract brand colors, fonts, voice from user's project
+2. **`design-system-uupm`** — Get design tokens (spacing, typography scale, color palette)
+3. **Randomly invoke ONE of:** `ui-ux-pro-max` OR `frontend-design` — for layout, hierarchy, visual balance. Pick one at random each run for design variety.
 
 For each approved idea + each target size, create an HTML file:
 
@@ -119,7 +119,7 @@ assets/social-photos/
 
 ### Step 5: Screenshot Export
 
-Use OpenBrowser `execute_code` or Chrome headless CLI to capture exact-size screenshots.
+Use browser automation or Chrome headless CLI to capture exact-size screenshots.
 
 **IMPORTANT:** Always add a delay (3-5s) after page load for fonts/images to fully render before capture.
 
@@ -145,9 +145,9 @@ Key flags:
 - `--hide-scrollbars` — prevents scrollbar artifacts in screenshots
 - `--window-size=WxH` — sets exact pixel dimensions
 
-#### Option B: OpenBrowser `execute_code`
+#### Option B: Browser Automation
 
-Use OpenBrowser with instructions to:
+Use browser automation with instructions to:
 1. Open each HTML file in browser
 2. Set viewport to exact target dimensions
 3. Wait 3-5s for fonts/images to fully load
@@ -156,7 +156,7 @@ Use OpenBrowser with instructions to:
 
 ### Step 6: Verify & Fix Designs
 
-Use OpenBrowser visual inspection to review each exported PNG:
+Use browser automation visual inspection to review each exported PNG:
 
 1. Open exported screenshots and check for layout/styling issues
 2. Verify: fonts rendered correctly, colors match brand, text readable at thumbnail size
@@ -272,4 +272,4 @@ This sub-skill handles social media image design only. Does NOT handle:
 - Animation/motion graphics
 - Print production files (CMYK, bleed)
 - Direct social media posting/scheduling
-- Fully custom image-generation pipelines outside the currently available Claude/OpenBrowser/runtime setup
+- Fully custom image-generation pipelines outside the currently available agent/browser/runtime setup
