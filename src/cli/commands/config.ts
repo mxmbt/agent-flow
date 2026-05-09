@@ -27,7 +27,10 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
       "templates/canonical/agents/feature-developer.md.hbs",
       "templates/canonical/agents/delivery-agent.md.hbs",
       "templates/canonical/agents/qa-expert.md.hbs",
-      "templates/canonical/guides/verification-before-completion.md.hbs"
+      "templates/canonical/guides/verification-before-completion.md.hbs",
+      "templates/static/skills/bugfix-flow/SKILL.md",
+      "templates/static/skills/simplify-phase/SKILL.md",
+      "templates/static/skills/testing-phase/SKILL.md"
     ]
   },
   {
@@ -49,19 +52,52 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     key: "dev.startCommand",
     summary: "Command an agent should use to start the local runtime when needed.",
     renderedFrom: [".agent-flow/config.json -> dev.start.command"],
-    usedIn: ["templates/canonical/agents/qa-expert.md.hbs"]
+    usedIn: [
+      "templates/canonical/agents/qa-expert.md.hbs",
+      "templates/static/skills/testing-phase/SKILL.md"
+    ]
   },
   {
     key: "dev.startUrl",
     summary: "Configured local runtime URL agents should use for QA smoke checks when applicable.",
     renderedFrom: [".agent-flow/config.json -> dev.start.url"],
-    usedIn: ["templates/canonical/agents/qa-expert.md.hbs"]
+    usedIn: [
+      "templates/canonical/agents/qa-expert.md.hbs",
+      "templates/static/skills/testing-phase/SKILL.md"
+    ]
   },
   {
     key: "runtime.appRoot",
     summary: "Project-relative root for the active application/runtime surface.",
     renderedFrom: [".agent-flow/config.json -> runtime.appRoot"],
     usedIn: ["templates/canonical/agents/feature-developer.md.hbs"]
+  },
+  {
+    key: "artifacts.statusFile",
+    summary: "Current project status snapshot used by planning and delivery guidance.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.statusFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/static/skills/work-planning/SKILL.md"
+    ]
+  },
+  {
+    key: "artifacts.roadmapFile",
+    summary: "Project roadmap used for milestone planning and delivery follow-up placement.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.roadmapFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/static/skills/work-planning/SKILL.md"
+    ]
+  },
+  {
+    key: "artifacts.productFile",
+    summary: "Product reference used during high-level work planning.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.productFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/static/skills/work-planning/SKILL.md"
+    ]
   },
   {
     key: "artifacts.architectureFile",
@@ -96,7 +132,19 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     renderedFrom: [".agent-flow/config.json -> artifacts.backlogFile"],
     usedIn: [
       "templates/canonical/artifact-contracts.md.hbs",
-      "templates/canonical/agents/product-manager.md.hbs"
+      "templates/canonical/agents/product-manager.md.hbs",
+      "templates/static/skills/work-planning/SKILL.md"
+    ]
+  },
+  {
+    key: "artifacts.phaseRoot",
+    summary: "Root directory for phase-scoped task, state, design, research, and handoff artifacts.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.phaseRoot"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/static/skills/phase-check/SKILL.md",
+      "templates/static/skills/testing-phase/SKILL.md",
+      "templates/static/skills/work-planning/SKILL.md"
     ]
   },
   {
@@ -136,7 +184,8 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     renderedFrom: [".agent-flow/config.json -> artifacts.qaSharedAccountFile"],
     usedIn: [
       "templates/canonical/artifact-contracts.md.hbs",
-      "templates/canonical/agents/qa-expert.md.hbs"
+      "templates/canonical/agents/qa-expert.md.hbs",
+      "templates/static/skills/testing-phase/SKILL.md"
     ]
   },
   {

@@ -19,7 +19,14 @@ test("composePacks includes design guide and UI/UX skill bundle", () => {
   const composed = composePacks(builtinPacks, ["design"]);
 
   assert.deepEqual(composed.guides, ["ui-ux-pro-max-reference"]);
-  assert.deepEqual(composed.skills, ["ui-ux-pro-max", "ui-styling-uupm", "design-system-uupm"]);
+  assert.deepEqual(composed.skills, [
+    "ui-ux-pro-max",
+    "ui-styling-uupm",
+    "design-system-uupm",
+    "design-uupm",
+    "brand-uupm",
+    "banner-design-uupm"
+  ]);
   assert.deepEqual(composed.validators, ["design-review"]);
 });
 

@@ -207,7 +207,7 @@ Communities активны (~620 штук). `get_architecture_overview` и `list
 | Затронутые endpoints/pages | `get_affected_flows` | `changed_files=["engine/app/services/signals/preflight_validator.py"]` |
 | Реальные execution flows | `list_flows` | `kind="Function", sort_by="criticality"` |
 | Контекст для ревью | `detect_changes_tool` | `base="HEAD~1", detail_level="minimal"` |
-| Полный ревью-контекст | `get_review_context` | `base="master", include_source=true` |
+| Полный ревью-контекст | `get_review_context` | `base="{{git.integrationRef}}", include_source=true` |
 | Кандидаты на декомпозицию | `find_large_functions` | `min_lines=100, kind="Function", file_pattern="engine/app/"` |
 | Dead code в runtime code | `refactor_tool dead_code` | `mode="dead_code", file_pattern="web/src/"` |
 | Preview переименования | `refactor_tool rename` | `mode="rename", old_name="foo", new_name="bar"` |
