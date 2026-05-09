@@ -42,6 +42,15 @@ test("renderTemplate reports missing values", () => {
   );
 });
 
+test("renderTemplate removes mustache comments", () => {
+  const rendered = renderTemplate(
+    "Before\n{{! This explains a template placeholder without rendering. }}\nAfter {{ value }}",
+    { value: "done" }
+  );
+
+  assert.equal(rendered, "Before\nAfter done");
+});
+
 test("renderManagedFile writes parseable metadata", () => {
   const content = renderManagedFile(
     { id: "root-agents", version: 1, source: "templates/targets/codex/AGENTS.md.hbs" },

@@ -1,0 +1,8 @@
+{
+  "files": [
+    "templates/canonical/agents/feature-developer.md.hbs",
+    "templates/canonical/agents/delivery-agent.md.hbs",
+    "templates/canonical/agents/qa-expert.md.hbs"
+  ],
+  "exceptions": []
+}

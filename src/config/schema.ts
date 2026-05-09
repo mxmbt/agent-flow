@@ -62,6 +62,12 @@ function validateArtifacts(config: Record<string, unknown>, issues: ConfigIssue[
 
 function validateGit(config: Record<string, unknown>, issues: ConfigIssue[]): void {
   const git = expectRecord(config.git, "git", issues);
+  expectNonEmptyString(git.remoteName, "git.remoteName", issues);
+
+  if (git.repository !== null) {
+    expectRepositoryRef(git.repository, "git.repository", issues);
+  }
+
   expectBranchName(git.integrationBranch, "git.integrationBranch", issues);
 
   if (git.releaseBranch !== null) {
@@ -70,6 +76,16 @@ function validateGit(config: Record<string, unknown>, issues: ConfigIssue[]): vo
 
   expectStringArray(git.branchPrefixes, "git.branchPrefixes", issues);
   expectBoolean(git.worktreeParking, "git.worktreeParking", issues);
+}
+
+function expectRepositoryRef(value: unknown, path: string, issues: ConfigIssue[]): string | undefined {
+  const repository = expectNonEmptyString(value, path, issues);
+
+  if (typeof repository === "string" && !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository)) {
+    issues.push({ path, message: "must be a GitHub-style owner/repo reference" });
+  }
+
+  return repository;
 }
 
 function validateChecks(config: Record<string, unknown>, issues: ConfigIssue[]): void {

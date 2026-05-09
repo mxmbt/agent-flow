@@ -1,3 +1,4 @@
+import { configCommand } from "./config.js";
 import { doctorCommand } from "./doctor.js";
 import { initCommand } from "./init.js";
 import { packCommand } from "./pack.js";
@@ -14,6 +15,7 @@ export const commandModules: CommandModule[] = [
   upgradeCommand,
   syncCommand,
   doctorCommand,
+  configCommand,
   renderCommand,
   validateCommand,
   packCommand

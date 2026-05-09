@@ -1,0 +1,28 @@
+{
+  "threshold": 0.7,
+  "targetSimilarity": 0.99,
+  "targetRoot": ".",
+  "pairs": [
+    {
+      "id": "FINAI-0007",
+      "source": ".claude/agents/feature-developer.md",
+      "target": "templates/canonical/agents/feature-developer.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0006",
+      "source": ".claude/agents/delivery-agent.md",
+      "target": "templates/canonical/agents/delivery-agent.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0019",
+      "source": ".claude/agents/qa-expert.md",
+      "target": "templates/canonical/agents/qa-expert.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    }
+  ]
+}

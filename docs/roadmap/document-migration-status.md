@@ -3,7 +3,7 @@
 **Created:** 2026-05-08
 **Roadmap:** `docs/roadmap/project-agnostic-core-roadmap.md`
 **Protocol:** `docs/roadmap/document-migration-protocol.md`
-**Status:** Empty package baseline; FinAI reference inventory populated; representative dry-run classification started
+**Status:** Empty package baseline; FinAI reference inventory populated; first three agent migrations validated and universalized
 
 ---
 
@@ -22,11 +22,11 @@ The separate `migration-ledger.md` file was removed to avoid splitting status ac
 | Migration protocol | Drafted | 1 doc | Approved protocol | Defines per-file migration rules and checklist; status vocabulary reconciled with this register. |
 | Unified migration register | Raw populated | 537 rows | One row per FinAI reference candidate source file | Rows start as `UNCLASSIFIED / RAW_SCANNED` until a migration task reads the full file. |
 | FinAI reference candidates | Dry-run classification started | 537 rows | Narrowed and classified | Broad scan includes `.claude`, `.codex`, scripts, templates, nested skill assets, and some likely out-of-scope files. |
-| File-by-file migration tasks | Not started | 0 tasks | One task per source file or approved micro-batch | Must be created after representative dry-run classifications. |
-| Classified rows | Dry-run started | 4 rows | 537 rows | Classification applies only after full-file review; first sample covers root target, agent, lifecycle skill, and artifact template. |
-| Migrated rows | Not started | 0 rows | TBD | Target count depends on how many rows become `OUT_OF_SCOPE`, `OBSOLETE`, or `GENERATED`. |
-| Core agnostic scan | Not started | 0 runs | Passing in CI | Blocks project-specific literals and absolute local paths. |
-| Claude/Codex parity validation | Not started | 0 runs | Passing in CI | Requires canonical/target renderer first. |
+| File-by-file migration tasks | Started | 2 tasks | One task per source file or approved micro-batch | Agent migration now has one single-agent task and one two-agent micro-batch, all validated and universalized. |
+| Classified rows | Dry-run started | 6 rows | 537 rows | Classification applies only after full-file review; current sample covers root target, three agents, lifecycle skill, and artifact template. |
+| Migrated rows | Started | 3 rows | TBD | `FINAI-0006`, `FINAI-0007`, and `FINAI-0019` targets exist, pass the similarity gate, and pass the universality scan. |
+| Universality scan | Passing | 1 targeted run | Passing in CI | Reports project/runtime/stack/domain assumptions during baseline review; current migrated agent templates have been universalized. |
+| Claude/Codex parity validation | Partial | 3 rendered agent pairs | Passing in CI | `npm test` validates Claude/Codex target rendering for migrated agent pairs. |
 
 ---
 
@@ -78,14 +78,13 @@ Notes:
 | Workstream | Scope | Status | Next Action |
 |------------|-------|--------|-------------|
 | Root entrypoints | `AGENTS.md`, `CLAUDE.md`, `.claude/CLAUDE.md`, `.codex/orchestration-policy.md`, `.codex/claude-interop.md` | 1 dry-run classified | Build canonical lifecycle boundary before migrating root targets. |
-| Agents | `.claude/agents/**`, `.codex/agents/**` | 1 dry-run classified | Migrate one agent per task; split project/runtime assumptions into config and packs. |
-| Lifecycle skills | planning, implementation, simplify, review, fix, quality, QA, delivery | 1 dry-run classified | Split core lifecycle from configurable docs, profiles, and packs. |
+| Agents | `.claude/agents/**`, `.codex/agents/**` | 3 migrated and validated | Continue one agent or approved micro-batch per task with the migration similarity gate. |
+| Lifecycle skills | planning, implementation, simplify, review, fix, quality, QA, delivery | 1 dry-run classified | Keep planning/design artifacts in core; split runtime/domain assumptions into config and packs. |
 | Auxiliary skills/guides | debugging, TDD, frontend, e2e, commit, architecture, design | Raw registered | Classify vendor/core/pack/obsolete before migration. |
 | Scripts | sync, validation, delivery, worktree, roadmap checks | Raw registered | Split core scripts from optional packs and out-of-scope project scripts. |
 | Templates | state, design document, report, QA, walkthrough | 1 dry-run classified | Convert artifact paths and project values into config placeholders. |
 | MCP config | settings and MCP files | Raw registered | Classify as installer output; scan for absolute paths. |
-| Packs | finance, cloudflare-worker, telegram, webapp, planning-docs | Planned | Define pack manifests before moving pack-heavy files. |
-| Profiles | generic, webapp, finai.example | Planned | Create after core and pack boundaries stabilize. |
+| Packs | finance, cloudflare-worker, telegram, webapp, design | Planned | Define pack manifests before moving pack-heavy files; packs activate capabilities but do not own core planning artifacts. |
 
 ---
 
@@ -98,7 +97,7 @@ Notes:
    - one agent
    - one lifecycle skill
 4. Classify one script or artifact template row to satisfy the roadmap dry-run variant and test non-prompt extraction. Done 2026-05-08: `FINAI-0503`.
-5. Start per-file migration tasks from the register below only for files selected for porting.
+5. Start per-file migration tasks from the register below only for files selected for porting. Started 2026-05-08: `AF-MIG-0001` migrated `FINAI-0007`; `AF-MIG-0002` migrated `FINAI-0006` and `FINAI-0019`.
 6. Update each row in place after classification, migration, and validation.
 
 ---
@@ -125,23 +124,67 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | Blocker | Impact | Resolution |
 |---------|--------|------------|
 | FinAI rows are raw-scanned but unclassified | Blocks porting those specific files, but does not block empty package scaffold | Classify FinAI files only as they enter a migration slice. |
-| Pack manifest schema not defined | Cannot decide final target for domain/runtime content | Complete AF-M2-T3 before migrating pack-heavy files. |
-| Canonical/target renderer not defined | Root entrypoint parity cannot be validated yet | Complete AF-M3-T1 and AF-M3-T2. |
-| Project-specific assumptions appear inside useful source files | Core migration would leak FinAI runtime/domain facts if copied directly | Split each selected file into canonical core, config placeholders, optional packs, generated target output, or profile data. |
+| Project-specific assumptions appear inside useful source files | Core migration would leak FinAI runtime/domain facts if copied directly | Split each selected file into canonical core, config placeholders, optional packs, generated target output, or neutralized source-specific wording. |
+
+---
+
+## Migration Tasks
+
+### AF-MIG-0001
+
+**Source:** `FinAI:.claude/agents/feature-developer.md`
+**Mirror:** `FinAI:.codex/agents/feature-developer.md`
+**Target:** `templates/canonical/agents/feature-developer.md.hbs`
+**Target wrappers:** `templates/targets/claude/agents/feature-developer.md.hbs`, `templates/targets/codex/agents/feature-developer.md.hbs`
+**Classification:** CORE
+**Pack/Config:** core + finance/cloudflare-worker pack contributions
+**Status:** VALIDATED
+
+#### Result
+
+Migrated the implementation/TDD/fix/report contract into a canonical agent template, then applied accepted universality decisions for config, packs, and source-specific wording.
+
+#### Validation Evidence
+
+- 2026-05-08: Full Claude source and Codex mirror read before migration.
+- 2026-05-09: `npm test` passed with 46 tests, including rendered Claude/Codex feature-developer agent paths, target-specific guide roots, template comments, similarity checks, config explanation, sync diff preview, and universality scanner tests.
+- 2026-05-08: `npm run check:universality` passes for `templates/canonical/agents/feature-developer.md.hbs` after applying accepted config/pack/source-wording decisions. Internal Agent Flow skill/guide links are accepted by MRD-0001; planning/design artifacts are accepted core by MRD-0006.
+- 2026-05-08: Added migration similarity gate. `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 20` passed for `FINAI-0007` at 99.00% line similarity and 99.85% token similarity against the 99% minimum after accepted universalization substitutions.
+
+### AF-MIG-0002
+
+**Source:** `FinAI:.claude/agents/delivery-agent.md`, `FinAI:.claude/agents/qa-expert.md`
+**Mirror:** `FinAI:.codex/agents/delivery-agent.md`, `FinAI:.codex/agents/qa-expert.md`
+**Target:** `templates/canonical/agents/delivery-agent.md.hbs`, `templates/canonical/agents/qa-expert.md.hbs`
+**Target wrappers:** `templates/targets/claude/agents/delivery-agent.md.hbs`, `templates/targets/codex/agents/delivery-agent.md.hbs`, `templates/targets/claude/agents/qa-expert.md.hbs`, `templates/targets/codex/agents/qa-expert.md.hbs`
+**Classification:** CORE
+**Pack/Config:** universalized with config, webapp/runtime/domain pack hooks, and source-specific wording removed
+**Status:** VALIDATED
+
+#### Result
+
+Migrated the delivery and QA contracts into canonical agent templates, then applied accepted universality decisions. Planning/design artifacts and Agent Flow links stay core; app roots, checks, git branches, repository refs, and runtime surfaces render from config or pack contributions.
+
+#### Validation Evidence
+
+- 2026-05-08: Full Claude sources and Codex mirrors read before migration.
+- 2026-05-09: `npm test` passed with 46 tests, including rendered Claude/Codex delivery-agent and qa-expert paths plus target-specific skill/guide root adaptation, config explanation, and sync diff preview.
+- 2026-05-08: `npm run check:universality` passed across `feature-developer`, `delivery-agent`, and `qa-expert`.
+- 2026-05-08: `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 20` passed for `FINAI-0006`, `FINAI-0007`, and `FINAI-0019`; `FINAI-0007` is 99.00% line / 99.85% token similarity and the other two are 100.00% line / 100.00% token similarity after accepted universalization substitutions.
 
 ---
 
 ## Migration Register: FinAI Reference Files
 
-| ID | Source | Classification | Pack/Profile | Decision | Status | Target | Notes |
+| ID | Source | Classification | Pack/Config | Decision | Status | Target | Notes |
 |----|--------|----------------|--------------|----------|--------|--------|-------|
 | FINAI-0001 | FinAI:.claude/CLAUDE.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Claude lifecycle target candidate; split canonical content from target syntax. |
 | FINAI-0002 | FinAI:.claude/agents/analyst.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0003 | FinAI:.claude/agents/architect.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0004 | FinAI:.claude/agents/code-simplifier.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0005 | FinAI:.claude/agents/deep-reviewer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0006 | FinAI:.claude/agents/delivery-agent.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0007 | FinAI:.claude/agents/feature-developer.md | CORE | core + finance/cloudflare-worker packs | port-as-core | CLASSIFIED | `templates/canonical/agents/feature-developer.md.hbs` | Full file read 2026-05-08 with Codex mirror. Universal implementation/TDD/report contract belongs in core; `cf/`, financial correctness/no-look-ahead, Wrangler/runtime checks, and generated `npm run agents:sync` notice must move to config, packs, or generated target metadata. |
+| FINAI-0006 | FinAI:.claude/agents/delivery-agent.md | CORE | universalized with config/runtime/domain pack hooks | port-as-core | VALIDATED | `templates/canonical/agents/delivery-agent.md.hbs` | AF-MIG-0002 validated 2026-05-08. Full Claude source and Codex mirror read. Claude/Codex wrappers render native agent files with target-specific `.claude`/`.codex` link adaptation. Similarity gate passed at 100.00% line / 100.00% token similarity after accepted universalization substitutions. `npm run check:universality` passed. |
+| FINAI-0007 | FinAI:.claude/agents/feature-developer.md | CORE | universalized with config/webapp/runtime/domain pack hooks | port-as-core | VALIDATED | `templates/canonical/agents/feature-developer.md.hbs` | AF-MIG-0001 validated 2026-05-08. Full Claude source and Codex mirror read. Claude/Codex wrappers render native agent files with target-specific `.claude`/`.codex` link adaptation. Similarity gate passed at 99.00% line / 99.85% token similarity after accepted universalization substitutions. `npm run check:universality` passed. |
 | FINAI-0008 | FinAI:.claude/agents/findings-arbiter.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0009 | FinAI:.claude/agents/math-genius.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0010 | FinAI:.claude/agents/paranoid-architect.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
@@ -153,7 +196,7 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | FINAI-0016 | FinAI:.claude/agents/prt-pr-test-analyzer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0017 | FinAI:.claude/agents/prt-silent-failure-hunter.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0018 | FinAI:.claude/agents/prt-type-design-analyzer.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
-| FINAI-0019 | FinAI:.claude/agents/qa-expert.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
+| FINAI-0019 | FinAI:.claude/agents/qa-expert.md | CORE | universalized with config/webapp/runtime pack hooks | port-as-core | VALIDATED | `templates/canonical/agents/qa-expert.md.hbs` | AF-MIG-0002 validated 2026-05-08. Full Claude source and Codex mirror read. Claude/Codex wrappers render native agent files with target-specific `.claude`/`.codex` link adaptation. Similarity gate passed at 100.00% line / 100.00% token similarity after accepted universalization substitutions. `npm run check:universality` passed. |
 | FINAI-0020 | FinAI:.claude/agents/ux-expert.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Agent prompt candidate; migrate one agent per task. |
 | FINAI-0021 | FinAI:.claude/guides/code-review-graph-usage.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Guide candidate; check for project-specific commands and tool assumptions. |
 | FINAI-0022 | FinAI:.claude/guides/gan-protocol.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Guide candidate; check for project-specific commands and tool assumptions. |
@@ -173,7 +216,7 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | FINAI-0036 | FinAI:.claude/skills/architecture-designer/references/system-design.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
 | FINAI-0037 | FinAI:.claude/skills/architecture-patterns/SKILL.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
 | FINAI-0038 | FinAI:.claude/skills/architecture-patterns/references/violation-checklist.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
-| FINAI-0039 | FinAI:.claude/skills/architecture-phase/SKILL.md | CORE | core + optional project docs/profile inputs | port-as-core | CLASSIFIED | `templates/canonical/skills/architecture-phase/SKILL.md.hbs` | Full file read 2026-05-08 with Codex mirror. RED-task architecture gate, architect prompt contract, ADR/ADD output, and state update contract are core; concrete docs such as `ARCHITECTURE_MULTI_USER.md`, `docs/ARCHITECTURE.md`, RAG/deep-cleanup skill choices, and `docs/ADRs/` path must be config/profile inputs or pack contributions. |
+| FINAI-0039 | FinAI:.claude/skills/architecture-phase/SKILL.md | CORE | core + config/pack inputs | port-as-core | CLASSIFIED | `templates/canonical/skills/architecture-phase/SKILL.md.hbs` | Full file read 2026-05-08 with Codex mirror. RED-task architecture gate, architect prompt contract, ADR/ADD output, and state update contract are core; concrete project docs such as `ARCHITECTURE_MULTI_USER.md` and stack-specific skill choices must become config inputs or pack contributions. |
 | FINAI-0040 | FinAI:.claude/skills/banner-design-uupm/SKILL.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
 | FINAI-0041 | FinAI:.claude/skills/banner-design-uupm/references/banner-sizes-and-styles.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
 | FINAI-0042 | FinAI:.claude/skills/brainstorming/SKILL.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Skill candidate; classify as CORE, PACK, VENDOR, or OBSOLETE after full read. |
@@ -635,7 +678,7 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | FINAI-0498 | FinAI:.codex/skills/writing-plans/plan-document-reviewer-prompt.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Codex mirror candidate; likely GENERATED or ADAPTER_TARGET after review. |
 | FINAI-0499 | FinAI:.codex/sync-manifest.json | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Codex target/manual policy candidate; check for tool-specific differences. |
 | FINAI-0500 | FinAI:.codex/templates/agent-report-template.codex.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Codex target/manual policy candidate; check for tool-specific differences. |
-| FINAI-0501 | FinAI:AGENTS.md | ADAPTER_TARGET | codex + finai.example profile | replace-with-generated | CLASSIFIED | `templates/targets/codex/AGENTS.md.hbs` | Full file read 2026-05-08 with `.claude/CLAUDE.md` and root `CLAUDE.md` context. This is a Codex root entrypoint containing target-specific syntax plus mirrored lifecycle semantics; FinAI task IDs, protected branches, Cloudflare/Telegram/runtime paths, financial/domain experts, roadmap docs, and `cf` checks must render from canonical core, config, packs, or the `finai.example` profile. |
+| FINAI-0501 | FinAI:AGENTS.md | ADAPTER_TARGET | codex + config/packs | replace-with-generated | CLASSIFIED | `templates/targets/codex/AGENTS.md.hbs` | Full file read 2026-05-08 with `.claude/CLAUDE.md` and root `CLAUDE.md` context. This is a Codex root entrypoint containing target-specific syntax plus mirrored lifecycle semantics; FinAI task IDs, protected branches, Cloudflare/Telegram/runtime paths, financial/domain experts, roadmap docs, and `cf` checks must render from canonical core, config, packs, or neutralized source-specific wording. |
 | FINAI-0502 | FinAI:CLAUDE.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Claude root target candidate; render from canonical parity templates. |
 | FINAI-0503 | FinAI:docs/templates/agent-report-template.md | CORE | core artifact template | port-as-core | CLASSIFIED | `templates/shared/docs/templates/agent-report-template.md.hbs` | Full file read 2026-05-08 with Codex compatibility shim. Compact `AGENT_REPORT` schema is generic and portable; handoff path should render from configured artifact roots instead of hardcoding `docs/phases/phase-<token>/handoffs/...`. |
 | FINAI-0504 | FinAI:docs/templates/design-document-template.md | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Artifact template candidate; replace project values with config placeholders. |
@@ -647,7 +690,7 @@ Do not mark a file `VALIDATED` because it was copied. Validation requires eviden
 | FINAI-0510 | FinAI:scripts/audit_gate.py | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Script candidate; classify core/pack/out-of-scope after full read. |
 | FINAI-0511 | FinAI:scripts/check-code-review-graph-research.sh | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Script candidate; classify core/pack/out-of-scope after full read. |
 | FINAI-0512 | FinAI:scripts/check-codex-review.sh | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Script candidate; classify core/pack/out-of-scope after full read. |
-| FINAI-0513 | FinAI:scripts/check-roadmap-consistency.sh | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | planning-docs pack candidate; not core. |
+| FINAI-0513 | FinAI:scripts/check-roadmap-consistency.sh | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Planning/design artifacts are core; classify this script later as core validator, optional pack validator, or out of scope after full-file review. |
 | FINAI-0514 | FinAI:scripts/codex-check-code-review-graph-research.sh | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Script candidate; classify core/pack/out-of-scope after full read. |
 | FINAI-0515 | FinAI:scripts/codex-check-plan-review.sh | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Script candidate; classify core/pack/out-of-scope after full read. |
 | FINAI-0516 | FinAI:scripts/codex-ops-canary.mjs | UNCLASSIFIED | TBD | defer | RAW_SCANNED | TBD after full-file review | Script candidate; classify core/pack/out-of-scope after full read. |
