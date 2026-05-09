@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "project": "{{project.name}}",
+  "taskId": "{{project.taskPrefix}}-<MILESTONE>-T<n>",
+  "phaseToken": "<phase-token>",
+  "currentPhase": "PLAN",
+  "status": "in_progress",
+  "updatedAt": "",
+  "branch": "",
+  "designDocument": "{{artifacts.phaseRoot}}/phase-<phase-token>/design/<taskId>-design.md",
+  "diffBase": "{{git.integrationBranch}}",
+  "memoryLessons": [],
+  "phases": {
+    "plan": {
+      "status": "pending"
+    },
+    "architecture": {
+      "status": "pending"
+    },
+    "implementation": {
+      "status": "pending"
+    },
+    "simplify": {
+      "status": "pending"
+    },
+    "review": {
+      "status": "pending"
+    },
+    "qualityGate": {
+      "status": "pending"
+    },
+    "qa": {
+      "status": "pending"
+    },
+    "delivery": {
+      "status": "pending"
+    }
+  },
+  "reports": {
+    "plan": {
+      "progress": {
+        "artifactsBootstrapped": false
+      },
+      "analysis": {
+        "researchPack": "{{artifacts.phaseRoot}}/phase-<phase-token>/research/<taskId>-research-pack.md"
+      },
+      "complexity": "",
+      "scope": {
+        "in": [],
+        "out": []
+      },
+      "approvedAt": "",
+      "productReview": "",
+      "techReview": "",
+      "devilsAdvocate": ""
+    },
+    "architecture": {
+      "addFile": "",
+      "decisions": []
+    },
+    "implementation": {
+      "branch": "",
+      "diffBase": "",
+      "filesCreated": [],
+      "filesModified": [],
+      "filesDeleted": [],
+      "tdd": "",
+      "checks": [],
+      "qualityGates": []
+    },
+    "simplify": {
+      "verdict": "",
+      "filesReviewed": [],
+      "filesChanged": [],
+      "findings": [],
+      "summary": ""
+    },
+    "review": {
+      "verdict": "",
+      "primaryReviewIssues": [],
+      "primaryReviewTriage": [],
+      "primaryReviewThreadId": "",
+      "deepReviewIssues": [],
+      "deepReviewTriage": [],
+      "deferred": [],
+      "cycles": 0
+    },
+    "qualityGate": {
+      "paranoidArchitect": {},
+      "domainExpert": {},
+      "performanceExpert": {},
+      "uxExpert": {},
+      "arbiterDisposition": [],
+      "arbiterVerdict": ""
+    },
+    "qa": {
+      "testPlan": [],
+      "verdict": "",
+      "summary": "",
+      "failedTests": [],
+      "healthScore": 0,
+      "categoryScores": {},
+      "tier": "",
+      "cycles": 0
+    },
+    "delivery": {
+      "commit": "",
+      "pr": "",
+      "walkthroughFile": "{{artifacts.walkthroughRoot}}/<taskId>.md",
+      "docsUpdated": [],
+      "followUpsCaptured": false,
+      "lessonsSaved": false,
+      "userFacingChange": "",
+      "releaseAnnouncementInternal": "",
+      "releaseAnnouncementExternal": "",
+      "productVoiceConfidence": "",
+      "deploymentImpact": {
+        "migrations": "none",
+        "runtimeResources": "none",
+        "secrets": "none",
+        "schedules": "none",
+        "runtimeRoutes": "none",
+        "operatorNotes": "none"
+      },
+      "releaseNotesAggregated": false
+    }
+  }
+}

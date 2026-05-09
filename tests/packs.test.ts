@@ -10,6 +10,7 @@ test("composePacks supports an empty core install", () => {
   assert.deepEqual(composed.agents, []);
   assert.deepEqual(composed.guides, []);
   assert.deepEqual(composed.skills, []);
+  assert.deepEqual(composed.skillFiles, []);
   assert.deepEqual(composed.validators, []);
   assert.deepEqual(composed.checks.default, []);
   assert.equal(composed.quality.domainExpert, null);
@@ -25,7 +26,8 @@ test("composePacks includes design guide and UI/UX skill bundle", () => {
     "design-system-uupm",
     "design-uupm",
     "brand-uupm",
-    "banner-design-uupm"
+    "banner-design-uupm",
+    "slides-uupm"
   ]);
   assert.deepEqual(composed.validators, ["design-review"]);
 });
@@ -34,6 +36,12 @@ test("composePacks includes code-review-graph guide and optional MCP server", ()
   const composed = composePacks(builtinPacks, ["code-review-graph"]);
 
   assert.deepEqual(composed.guides, ["code-review-graph-usage"]);
+  assert.deepEqual(composed.skillFiles, [
+    "debug-issue.md",
+    "explore-codebase.md",
+    "refactor-safely.md",
+    "review-changes.md"
+  ]);
   assert.deepEqual(composed.validators, ["code-review-graph"]);
   assert.deepEqual(composed.mcpServers, {
     codeReviewGraph: {
@@ -41,6 +49,13 @@ test("composePacks includes code-review-graph guide and optional MCP server", ()
       required: false
     }
   });
+});
+
+test("composePacks includes nextjs App Router skill", () => {
+  const composed = composePacks(builtinPacks, ["nextjs"]);
+
+  assert.deepEqual(composed.skills, ["next-best-practices"]);
+  assert.deepEqual(composed.validators, ["nextjs-app-router"]);
 });
 
 test("composePacks composes finance, cloudflare-worker, telegram, and code-review-toolkit deterministically", () => {
@@ -56,6 +71,7 @@ test("composePacks composes finance, cloudflare-worker, telegram, and code-revie
     "prt-silent-failure-hunter",
     "prt-type-design-analyzer"
   ]);
+  assert.deepEqual(composed.skills, ["pr-review-toolkit"]);
   assert.deepEqual(composed.validators, [
     "finance-invariants",
     "cloudflare-bindings",

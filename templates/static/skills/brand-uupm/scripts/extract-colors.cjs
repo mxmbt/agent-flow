@@ -14,7 +14,7 @@
  *   node extract-colors.cjs --palette  # Show brand palette from guidelines
  *
  * Integration:
- *   For image color analysis, use: ImageMagick or Claude/OpenBrowser-assisted review
+ *   For image color analysis, use: ImageMagick or agent/browser-assisted review
  *   magick <image> -colors 10 -depth 8 -format "%c" histogram:info:
  */
 
@@ -287,7 +287,7 @@ function main() {
       "1. Run the ImageMagick command to extract colors:",
       `   ${generateImageMagickCommand(resolvedPath)}`,
       "",
-      "2. Or inspect the image with Claude/OpenBrowser and extract dominant colors manually",
+      "2. Or inspect the image with agent/browser and extract dominant colors manually",
       "",
       "3. Then compare extracted colors against brand palette",
     ],

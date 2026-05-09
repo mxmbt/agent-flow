@@ -37,18 +37,50 @@ const coreStaticSkillFiles: Array<[string, string[]]> = [
   ["phase-check", ["SKILL.md"]],
   ["plan-phase", ["SKILL.md"]],
   ["planning-lifecycle", ["SKILL.md"]],
+  ["product-review", ["SKILL.md"]],
   ["quality-gate-phase", ["SKILL.md"]],
+  ["refactor", ["SKILL.md"]],
+  ["refactor-plan", ["SKILL.md"]],
+  ["refactor-method-complexity-reduce", ["SKILL.md"]],
   ["review-phase", [path.join("checklist.md"), "SKILL.md"]],
   ["work-planning", ["SKILL.md"]],
   ["writing-plans", ["plan-document-reviewer-prompt.md", "SKILL.md"]],
   ["shadcn-ui", ["SKILL.md"]],
   ["simplify", ["SKILL.md"]],
   ["simplify-phase", ["SKILL.md"]],
+  ["systematic-debugging", [
+    "condition-based-waiting-example.ts",
+    "condition-based-waiting.md",
+    "defense-in-depth.md",
+    "find-polluter.sh",
+    "root-cause-tracing.md",
+    "SKILL.md"
+  ]],
+  ["tech-review", ["SKILL.md"]],
+  ["test-driven-development", ["SKILL.md", "testing-anti-patterns.md"]],
   ["testing-phase", ["SKILL.md"]],
+  ["ux-copy-review", ["SKILL.md"]],
+  ["verification-before-completion", ["SKILL.md"]],
   ["webapp-testing", ["SKILL.md"]],
   ["frontend-design", ["SKILL.md"]],
   ["design-audit", ["audit-dimensions.md", "SKILL.md", "ux-principles.md"]],
-  ["accessibility-audit", ["SKILL.md"]]
+  ["accessibility-audit", ["SKILL.md"]],
+  ["brainstorming", [
+    path.join("scripts", "frame-template.html"),
+    path.join("scripts", "helper.js"),
+    path.join("scripts", "server.cjs"),
+    path.join("scripts", "start-server.sh"),
+    path.join("scripts", "stop-server.sh"),
+    "SKILL.md",
+    "spec-document-reviewer-prompt.md",
+    "visual-companion.md"
+  ]],
+  ["devils-advocate", [
+    path.join("references", "ai-blind-spots.md"),
+    path.join("references", "blind-spots.md"),
+    path.join("references", "questioning-frameworks.md"),
+    "SKILL.md"
+  ]]
 ];
 
 test("renderTargetFiles renders native Claude and Codex root targets from the same canonical contract", async () => {
@@ -57,7 +89,13 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   config.checks.focusedTestCommand = "npm test -- <test-file>";
   config.dev.start.url = "http://localhost:3000";
   config.discovery.codeGraphProvider = "code-review-graph";
-  const packs = composePacks(builtinPacks, ["finance", "cloudflare-worker", "code-review-toolkit", "code-review-graph"]);
+  const packs = composePacks(builtinPacks, [
+    "finance",
+    "cloudflare-worker",
+    "code-review-toolkit",
+    "nextjs",
+    "code-review-graph"
+  ]);
 
   const files = await renderTargetFiles(config, packs, { templateRoot, version: 7 });
   const byPath = new Map(files.map((file) => [file.path, file.content]));
@@ -118,7 +156,20 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
     path.join(".codex", "guides", "verification-before-completion.md"),
     path.join(".codex", "guides", "worktree-workflow.md"),
     path.join(".codex", "guides", "code-review-graph-usage.md"),
-    ...expectedCoreStaticSkillPaths(["claude", "codex"])
+    ...expectedCoreStaticSkillPaths(["claude", "codex"]),
+    path.join(".claude", "skills", "pr-review-toolkit", "SKILL.md"),
+    path.join(".codex", "skills", "pr-review-toolkit", "SKILL.md"),
+    path.join(".claude", "skills", "next-best-practices", "SKILL.md"),
+    path.join(".codex", "skills", "next-best-practices", "SKILL.md"),
+    path.join(".claude", "skills", "debug-issue.md"),
+    path.join(".codex", "skills", "debug-issue.md"),
+    path.join(".claude", "skills", "explore-codebase.md"),
+    path.join(".codex", "skills", "explore-codebase.md"),
+    path.join(".claude", "skills", "refactor-safely.md"),
+    path.join(".codex", "skills", "refactor-safely.md"),
+    path.join(".claude", "skills", "review-changes.md"),
+    path.join(".codex", "skills", "review-changes.md"),
+    ...expectedSharedTemplatePaths()
   ]);
 
   const claude = byPath.get("CLAUDE.md");
@@ -245,6 +296,88 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.match(codexTestingPhaseSkill, /reading `docs\/testing\/QA-SHARED-ACCOUNT\.md`/);
   assert.match(codexTestingPhaseSkill, /confirming a live response from `http:\/\/localhost:3000`/);
   assert.doesNotMatch(codexTestingPhaseSkill, /localhost:8787|cd cf/);
+  const codexProductReviewSkill = byPath.get(path.join(".codex", "skills", "product-review", "SKILL.md"));
+  const codexTechReviewSkill = byPath.get(path.join(".codex", "skills", "tech-review", "SKILL.md"));
+  assert.ok(codexProductReviewSkill);
+  assert.ok(codexTechReviewSkill);
+  assert.match(codexProductReviewSkill, /`docs\/PRODUCT\.md`/);
+  assert.match(codexProductReviewSkill, /`docs\/design\/DESIGN-SYSTEM\.md`/);
+  assert.match(codexProductReviewSkill, /Internal \(docs\/, \.codex\/, agent\/tooling config, infra\/\)/);
+  assert.doesNotMatch(codexProductReviewSkill, /Auto-memory Claude Code|ORM schema|\.claude/);
+  assert.match(codexTechReviewSkill, /Tech Review turns product scope into an implementation-safe engineering plan/);
+  const codexRefactorSkill = byPath.get(path.join(".codex", "skills", "refactor", "SKILL.md"));
+  const codexRefactorPlanSkill = byPath.get(path.join(".codex", "skills", "refactor-plan", "SKILL.md"));
+  const codexRefactorMethodSkill = byPath.get(path.join(".codex", "skills", "refactor-method-complexity-reduce", "SKILL.md"));
+  assert.ok(codexRefactorSkill);
+  assert.ok(codexRefactorPlanSkill);
+  assert.ok(codexRefactorMethodSkill);
+  assert.match(codexRefactorSkill, /```bash\nnpm test\n```/);
+  assert.match(codexRefactorPlanSkill, /```bash\nnpm test\n```/);
+  assert.match(codexRefactorMethodSkill, /```bash\nnpm test\n```/);
+  assert.doesNotMatch(codexRefactorSkill, /cd cf/);
+  const codexPrReviewToolkit = byPath.get(path.join(".codex", "skills", "pr-review-toolkit", "SKILL.md"));
+  const codexNextBestPractices = byPath.get(path.join(".codex", "skills", "next-best-practices", "SKILL.md"));
+  const codexReviewChanges = byPath.get(path.join(".codex", "skills", "review-changes.md"));
+  assert.ok(codexPrReviewToolkit);
+  assert.ok(codexNextBestPractices);
+  assert.ok(codexReviewChanges);
+  assert.match(codexPrReviewToolkit, /Comprehensive PR Review/);
+  assert.match(codexPrReviewToolkit, /pr-review-toolkit all/);
+  assert.match(codexPrReviewToolkit, /Checks root agent instruction compliance/);
+  assert.doesNotMatch(codexPrReviewToolkit, /\$ARGUMENTS|\/pr-review-toolkit:review-pr|CLAUDE\.md|\/agents list/);
+  assert.match(codexNextBestPractices, /Next\.js Best Practices/);
+  assert.match(codexReviewChanges, /Run `detect_changes`/);
+  const codexSystematicDebuggingSkill = byPath.get(path.join(".codex", "skills", "systematic-debugging", "SKILL.md"));
+  const codexConditionExample = byPath.get(path.join(".codex", "skills", "systematic-debugging", "condition-based-waiting-example.ts"));
+  const codexFindPolluter = byPath.get(path.join(".codex", "skills", "systematic-debugging", "find-polluter.sh"));
+  const codexRootCauseTracing = byPath.get(path.join(".codex", "skills", "systematic-debugging", "root-cause-tracing.md"));
+  assert.ok(codexSystematicDebuggingSkill);
+  assert.ok(codexConditionExample);
+  assert.ok(codexFindPolluter);
+  assert.ok(codexRootCauseTracing);
+  assert.match(codexSystematicDebuggingSkill, /NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST/);
+  assert.match(codexConditionExample, /interface EventStore/);
+  assert.match(codexFindPolluter, /AGENT_FLOW_FOCUSED_TEST_COMMAND/);
+  assert.match(codexRootCauseTracing, /\/path\/to\/project\/packages\/core/);
+  assert.doesNotMatch(codexConditionExample, /Lace|~\/threads/);
+  assert.doesNotMatch(codexRootCauseTracing, /\/Users\/jesse|npm test 2>&1/);
+  const codexTddSkill = byPath.get(path.join(".codex", "skills", "test-driven-development", "SKILL.md"));
+  const codexTddAntiPatterns = byPath.get(path.join(".codex", "skills", "test-driven-development", "testing-anti-patterns.md"));
+  assert.ok(codexTddSkill);
+  assert.ok(codexTddAntiPatterns);
+  assert.match(codexTddSkill, /NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST/);
+  assert.match(codexTddSkill, /npm test -- <test-file>/);
+  assert.doesNotMatch(codexTddSkill, /npm test path\/to\/test\.test\.ts|\$ npm test/);
+  assert.match(codexTddAntiPatterns, /NEVER test mock behavior/);
+  const codexUxCopyReview = byPath.get(path.join(".codex", "skills", "ux-copy-review", "SKILL.md"));
+  const codexVerificationSkill = byPath.get(path.join(".codex", "skills", "verification-before-completion", "SKILL.md"));
+  assert.ok(codexUxCopyReview);
+  assert.ok(codexVerificationSkill);
+  assert.match(codexUxCopyReview, /UX Copy Review/);
+  assert.match(codexVerificationSkill, /NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE/);
+  const codexBrainstormingSkill = byPath.get(path.join(".codex", "skills", "brainstorming", "SKILL.md"));
+  const codexVisualCompanion = byPath.get(path.join(".codex", "skills", "brainstorming", "visual-companion.md"));
+  const codexFrameTemplate = byPath.get(path.join(".codex", "skills", "brainstorming", "scripts", "frame-template.html"));
+  assert.ok(codexBrainstormingSkill);
+  assert.ok(codexVisualCompanion);
+  assert.ok(codexFrameTemplate);
+  assert.match(codexBrainstormingSkill, /`\.codex\/skills\/brainstorming\/visual-companion\.md`/);
+  assert.match(codexVisualCompanion, /\*\*Codex \(macOS \/ Linux\):\*\*/);
+  assert.match(codexVisualCompanion, /\.agent-flow\/brainstorm/);
+  assert.doesNotMatch(codexVisualCompanion, /Claude Code \(macOS|\.superpowers/);
+  assert.match(codexFrameTemplate, /Agent Flow Brainstorming/);
+  assert.match(codexFrameTemplate, /<title>Agent Flow Brainstorming<\/title>/);
+  assert.doesNotMatch(codexFrameTemplate, /Superpowers Brainstorming/);
+  assert.doesNotMatch(codexFrameTemplate, /claude-content/);
+  const codexDevilsAdvocate = byPath.get(path.join(".codex", "skills", "devils-advocate", "SKILL.md"));
+  const codexAiBlindSpots = byPath.get(path.join(".codex", "skills", "devils-advocate", "references", "ai-blind-spots.md"));
+  assert.ok(codexDevilsAdvocate);
+  assert.ok(codexAiBlindSpots);
+  assert.match(codexDevilsAdvocate, /before configured plan review/);
+  assert.match(codexDevilsAdvocate, /Something the agent just built or proposed/);
+  assert.match(codexDevilsAdvocate, /Any output from any other Agent Flow skill/);
+  assert.doesNotMatch(codexDevilsAdvocate, /Claude|Codex review|production financial system/);
+  assert.doesNotMatch(codexAiBlindSpots, /including Claude/);
 
   const claudeDeepReviewer = byPath.get(path.join(".claude", "agents", "deep-reviewer.md"));
   const codexDeepReviewer = byPath.get(path.join(".codex", "agents", "deep-reviewer.md"));
@@ -526,6 +659,23 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.match(codexQaAgent, /`docs\/testing\/QA-SHARED-ACCOUNT\.md`/);
   assert.match(codexQaAgent, /`docs\/design\/DESIGN-SYSTEM\.md`, `docs\/design\/UX-WRITING-GUIDE\.md`/);
 
+  const stateTemplate = byPath.get(path.join("docs", "templates", "state-template.json"));
+  const qaReportTemplate = byPath.get(path.join("docs", "templates", "qa-report-template.md"));
+  const designDocumentTemplate = byPath.get(path.join("docs", "templates", "design-document-template.md"));
+  assert.ok(stateTemplate);
+  assert.ok(qaReportTemplate);
+  assert.ok(designDocumentTemplate);
+  assert.equal(JSON.parse(stateTemplate).project, "Target Fixture");
+  assert.match(stateTemplate, /"diffBase": "main"/);
+  assert.match(stateTemplate, /"walkthroughFile": "docs\/walkthroughs\/agents\/<taskId>\.md"/);
+  assert.match(stateTemplate, /"releaseAnnouncementInternal": ""/);
+  assert.match(stateTemplate, /"releaseAnnouncementExternal": ""/);
+  assert.doesNotMatch(stateTemplate, /releaseAnnouncementAdmins|releaseAnnouncementUsers/);
+  assert.match(qaReportTemplate, /npm test/);
+  assert.doesNotMatch(qaReportTemplate, /cd cf/);
+  assert.match(designDocumentTemplate, /### Domain Correctness/);
+  assert.doesNotMatch(designDocumentTemplate, /Financial Correctness/);
+
   const claudeGanGuide = byPath.get(path.join(".claude", "guides", "gan-protocol.md"));
   const codexGanGuide = byPath.get(path.join(".codex", "guides", "gan-protocol.md"));
   assert.ok(claudeGanGuide);
@@ -628,6 +778,38 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.match(claudeCodeReviewGraphGuide, /`\.claude\/settings\.json`/);
   assert.match(codexCodeReviewGraphGuide, /Edit \/ Write \(Codex\)/);
   assert.match(codexCodeReviewGraphGuide, /`\.codex\/settings\.json`/);
+
+  const claudeDebugIssueSkill = byPath.get(path.join(".claude", "skills", "debug-issue.md"));
+  const codexDebugIssueSkill = byPath.get(path.join(".codex", "skills", "debug-issue.md"));
+  const claudeExploreCodebaseSkill = byPath.get(path.join(".claude", "skills", "explore-codebase.md"));
+  const codexExploreCodebaseSkill = byPath.get(path.join(".codex", "skills", "explore-codebase.md"));
+  assert.ok(claudeDebugIssueSkill);
+  assert.ok(codexDebugIssueSkill);
+  assert.ok(claudeExploreCodebaseSkill);
+  assert.ok(codexExploreCodebaseSkill);
+  assert.deepEqual(parseManagedMetadata(claudeDebugIssueSkill), {
+    id: "claude-skill-file-debug-issue.md",
+    version: 7,
+    source: path.join("templates", "static", "skills", "debug-issue.md")
+  });
+  assert.deepEqual(parseManagedMetadata(codexDebugIssueSkill), {
+    id: "codex-skill-file-debug-issue.md",
+    version: 7,
+    source: path.join("templates", "static", "skills", "debug-issue.md")
+  });
+  assert.match(codexDebugIssueSkill, /semantic_search_nodes/);
+  assert.deepEqual(parseManagedMetadata(claudeExploreCodebaseSkill), {
+    id: "claude-skill-file-explore-codebase.md",
+    version: 7,
+    source: path.join("templates", "static", "skills", "explore-codebase.md")
+  });
+  assert.deepEqual(parseManagedMetadata(codexExploreCodebaseSkill), {
+    id: "codex-skill-file-explore-codebase.md",
+    version: 7,
+    source: path.join("templates", "static", "skills", "explore-codebase.md")
+  });
+  assert.match(codexExploreCodebaseSkill, /list_graph_stats/);
+  assert.match(codexExploreCodebaseSkill, /query_graph/);
 });
 
 test("renderTargetFiles renders design pack guide and UI/UX skill assets", async () => {
@@ -638,7 +820,7 @@ test("renderTargetFiles renders design pack guide and UI/UX skill assets", async
   const byPath = new Map(files.map((file) => [file.path, file.content]));
   const designAssetPaths = [...byPath.keys()].filter((filePath) => filePath.includes(`${path.sep}skills${path.sep}`));
 
-  assert.equal(designAssetPaths.length, 340);
+  assert.equal(designAssetPaths.length, 406);
   assert.ok(byPath.has(path.join(".claude", "guides", "ui-ux-pro-max-reference.md")));
   assert.ok(byPath.has(path.join(".codex", "guides", "ui-ux-pro-max-reference.md")));
   assert.ok(byPath.has(path.join(".claude", "skills", "ui-ux-pro-max", "SKILL.md")));
@@ -649,6 +831,7 @@ test("renderTargetFiles renders design pack guide and UI/UX skill assets", async
   assert.ok(byPath.has(path.join(".codex", "skills", "brand-uupm", "scripts", "inject-brand-context.cjs")));
   assert.ok(byPath.has(path.join(".codex", "skills", "frontend-design", "SKILL.md")));
   assert.ok(byPath.has(path.join(".claude", "skills", "banner-design-uupm", "references", "banner-sizes-and-styles.md")));
+  assert.ok(byPath.has(path.join(".codex", "skills", "slides-uupm", "references", "html-template.md")));
 
   const codexGuide = byPath.get(path.join(".codex", "guides", "ui-ux-pro-max-reference.md"));
   assert.ok(codexGuide);
@@ -658,11 +841,25 @@ test("renderTargetFiles renders design pack guide and UI/UX skill assets", async
   const claudeSkill = byPath.get(path.join(".claude", "skills", "ui-ux-pro-max", "SKILL.md"));
   const codexDesignSystemSkill = byPath.get(path.join(".codex", "skills", "design-system-uupm", "SKILL.md"));
   const codexDesignSkill = byPath.get(path.join(".codex", "skills", "design-uupm", "SKILL.md"));
+  const codexDesignSlidesCreateRef = byPath.get(path.join(".codex", "skills", "design-uupm", "references", "slides-create.md"));
+  const codexBrandSkill = byPath.get(path.join(".codex", "skills", "brand-uupm", "SKILL.md"));
+  const codexBrandUpdateRef = byPath.get(path.join(".codex", "skills", "brand-uupm", "references", "update.md"));
+  const codexSocialPhotosRef = byPath.get(path.join(".codex", "skills", "design-uupm", "references", "social-photos-design.md"));
+  const codexBrandExtractColors = byPath.get(path.join(".codex", "skills", "brand-uupm", "scripts", "extract-colors.cjs"));
   const codexLogoGenerator = byPath.get(path.join(".codex", "skills", "design-uupm", "scripts", "logo", "generate.py"));
+  const codexSlidesSkill = byPath.get(path.join(".codex", "skills", "slides-uupm", "SKILL.md"));
+  const codexSlidesCreateRef = byPath.get(path.join(".codex", "skills", "slides-uupm", "references", "create.md"));
   assert.ok(claudeSkill);
   assert.ok(codexDesignSystemSkill);
   assert.ok(codexDesignSkill);
+  assert.ok(codexDesignSlidesCreateRef);
+  assert.ok(codexBrandSkill);
+  assert.ok(codexBrandUpdateRef);
+  assert.ok(codexSocialPhotosRef);
+  assert.ok(codexBrandExtractColors);
   assert.ok(codexLogoGenerator);
+  assert.ok(codexSlidesSkill);
+  assert.ok(codexSlidesCreateRef);
   assert.match(claudeSkill, /^---\nprovenance_class: adapted_vendor/m);
   assert.deepEqual(parseManagedMetadata(claudeSkill), {
     id: "claude-skill-ui-ux-pro-max-SKILL.md",
@@ -672,6 +869,18 @@ test("renderTargetFiles renders design pack guide and UI/UX skill assets", async
   assert.match(codexDesignSystemSkill, /node \.codex\/skills\/design-system-uupm\/scripts\/generate-tokens\.cjs/);
   assert.match(codexDesignSkill, /ask the user directly/);
   assert.doesNotMatch(codexDesignSkill, /\.claude|AskUserQuestion|OpenBrowser|Claude-native/);
+  assert.doesNotMatch(codexDesignSkill, /\/ckm:|\/ck:|\/ui-ux-pro-max/);
+  assert.doesNotMatch(codexDesignSlidesCreateRef, /\$ARGUMENTS/);
+  assert.doesNotMatch(codexBrandSkill, /\$ARGUMENTS|\/brand update/);
+  assert.doesNotMatch(codexBrandUpdateRef, /\$ARGUMENTS|AskUserQuestion/);
+  assert.doesNotMatch(codexSocialPhotosRef, /\/ckm:|\/ck:|Claude\/OpenBrowser|Claude\/browser automation|OpenBrowser|AskUserQuestion/);
+  assert.match(codexSocialPhotosRef, /`brand-uupm`/);
+  assert.doesNotMatch(codexBrandExtractColors, /Claude\/OpenBrowser|Claude\/browser automation|OpenBrowser/);
+  assert.match(codexBrandExtractColors, /agent\/browser-assisted/);
+  assert.match(codexSlidesSkill, /user-provided presentation topic/);
+  assert.doesNotMatch(codexSlidesSkill, /\$ARGUMENTS/);
+  assert.match(codexSlidesCreateRef, /user-provided presentation topic/);
+  assert.doesNotMatch(codexSlidesCreateRef, /\$ARGUMENTS/);
   assert.match(codexLogoGenerator, /Path\.home\(\) \/ "\.codex" \/ "skills" \/ "\.env"/);
   assert.doesNotMatch(codexLogoGenerator, /\.claude/);
 
@@ -744,7 +953,8 @@ test("renderTargetFiles honors disabled Claude or Codex feature flags", async ()
     path.join(".codex", "guides", "test-driven-development.md"),
     path.join(".codex", "guides", "verification-before-completion.md"),
     path.join(".codex", "guides", "worktree-workflow.md"),
-    ...expectedCoreStaticSkillPaths(["codex"])
+    ...expectedCoreStaticSkillPaths(["codex"]),
+    ...expectedSharedTemplatePaths()
   ]);
   assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "math-genius.md")), false);
   assert.equal(files.some((file) => file.path === path.join(".codex", "agents", "prt-code-reviewer.md")), false);
@@ -776,6 +986,16 @@ function expectedCoreStaticSkillPaths(targets: Array<"claude" | "codex">): strin
     const toolRoot = target === "claude" ? ".claude" : ".codex";
     return files.map((file) => path.join(toolRoot, "skills", skill, file));
   }));
+}
+
+function expectedSharedTemplatePaths(): string[] {
+  return [
+    path.join("docs", "templates", "agent-report-template.md"),
+    path.join("docs", "templates", "design-document-template.md"),
+    path.join("docs", "templates", "qa-report-template.md"),
+    path.join("docs", "templates", "state-template.json"),
+    path.join("docs", "templates", "walkthrough-template.md")
+  ];
 }
 
 function isReferenceSource(filePath: string): boolean {

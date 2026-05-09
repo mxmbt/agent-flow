@@ -4,7 +4,7 @@ provenance_origin: upstream-adapted
 upstream_sync_policy: baseline_only
 provenance_reference: docs/architecture/AI-SKILL-PROVENANCE.md
 provenance_url: attribution-pending
-name: ckm:design-system
+name: design-system-uupm
 description: Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.
 argument-hint: "[component or token]"
 license: MIT

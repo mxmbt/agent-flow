@@ -26,6 +26,40 @@ interface StaticAsset {
   relativePath: string;
 }
 
+interface SharedTemplate {
+  outputPath: string;
+  templatePath: string;
+  id: string;
+}
+
+const SHARED_TEMPLATES: SharedTemplate[] = [
+  {
+    outputPath: path.join("docs", "templates", "agent-report-template.md"),
+    templatePath: path.join("shared", "docs", "templates", "agent-report-template.md.hbs"),
+    id: "shared-doc-template-agent-report"
+  },
+  {
+    outputPath: path.join("docs", "templates", "design-document-template.md"),
+    templatePath: path.join("shared", "docs", "templates", "design-document-template.md.hbs"),
+    id: "shared-doc-template-design-document"
+  },
+  {
+    outputPath: path.join("docs", "templates", "qa-report-template.md"),
+    templatePath: path.join("shared", "docs", "templates", "qa-report-template.md.hbs"),
+    id: "shared-doc-template-qa-report"
+  },
+  {
+    outputPath: path.join("docs", "templates", "state-template.json"),
+    templatePath: path.join("shared", "docs", "templates", "state-template.json.hbs"),
+    id: "shared-doc-template-state"
+  },
+  {
+    outputPath: path.join("docs", "templates", "walkthrough-template.md"),
+    templatePath: path.join("shared", "docs", "templates", "walkthrough-template.md.hbs"),
+    id: "shared-doc-template-walkthrough"
+  }
+];
+
 const CORE_STATIC_SKILLS = [
   "architecture-designer",
   "architecture-patterns",
@@ -43,19 +77,32 @@ const CORE_STATIC_SKILLS = [
   "phase-check",
   "plan-phase",
   "planning-lifecycle",
+  "product-review",
   "quality-gate-phase",
+  "refactor",
+  "refactor-plan",
+  "refactor-method-complexity-reduce",
   "review-phase",
   "work-planning",
   "writing-plans",
   "shadcn-ui",
   "simplify",
   "simplify-phase",
+  "systematic-debugging",
+  "tech-review",
+  "test-driven-development",
   "testing-phase",
+  "ux-copy-review",
+  "verification-before-completion",
   "webapp-testing",
   "frontend-design",
   "design-audit",
-  "accessibility-audit"
+  "accessibility-audit",
+  "brainstorming",
+  "devils-advocate"
 ];
+
+const CORE_STATIC_SKILL_FILES: string[] = [];
 
 const CLAUDE_TARGETS: TargetTemplate[] = [
   {
@@ -469,7 +516,8 @@ export async function renderTargetFiles(
   }));
 
   const renderedSkillAssets = await renderPackSkillAssets(config, packs, options);
-  return [...renderedTemplates, ...renderedSkillAssets];
+  const renderedSharedTemplates = await renderSharedTemplates(config, packs, options);
+  return [...renderedTemplates, ...renderedSkillAssets, ...renderedSharedTemplates];
 }
 
 async function loadCanonicalPartials(templateRoot: string): Promise<TemplatePartials> {
@@ -529,6 +577,7 @@ async function renderPackSkillAssets(
   ];
   const rendered: RenderedFile[] = [];
   const selectedSkills = [...new Set([...CORE_STATIC_SKILLS, ...packs.skills])];
+  const selectedSkillFiles = [...new Set([...CORE_STATIC_SKILL_FILES, ...packs.skillFiles])];
 
   for (const skill of selectedSkills) {
     const sourceRoot = path.join("static", "skills", skill);
@@ -563,7 +612,62 @@ async function renderPackSkillAssets(
     }
   }
 
+  for (const skillFile of selectedSkillFiles) {
+    const sourcePath = path.join("static", "skills", skillFile);
+    const raw = await readFile(path.join(options.templateRoot, sourcePath), "utf8");
+
+    for (const target of targetKinds) {
+      const outputPath = path.join(targetContext(target).toolRoot, "skills", skillFile);
+      const renderedBody = needsStaticTemplate(raw)
+        ? renderTemplate(raw, {
+          ...context,
+          target: targetContext(target)
+        })
+        : raw;
+      const body = applyTargetAdapters(renderedBody, target);
+
+      rendered.push({
+        path: outputPath,
+        content: renderManagedAssetFile(
+          {
+            id: `${target}-skill-file-${skillFile.replaceAll(path.sep, "-")}`,
+            version: options.version ?? 1,
+            source: path.join("templates", sourcePath)
+          },
+          body,
+          outputPath
+        )
+      });
+    }
+  }
+
   return rendered;
+}
+
+async function renderSharedTemplates(
+  config: AgentFlowConfig,
+  packs: ComposedPacks,
+  options: TargetRenderOptions
+): Promise<RenderedFile[]> {
+  const context = buildCanonicalContext(config, packs);
+
+  return Promise.all(SHARED_TEMPLATES.map(async (template) => {
+    const raw = await readFile(path.join(options.templateRoot, template.templatePath), "utf8");
+    const body = renderTemplate(raw, context);
+
+    return {
+      path: template.outputPath,
+      content: renderManagedAssetFile(
+        {
+          id: template.id,
+          version: options.version ?? 1,
+          source: path.join("templates", template.templatePath)
+        },
+        body,
+        template.outputPath
+      )
+    };
+  }));
 }
 
 function needsStaticTemplate(content: string): boolean {
@@ -628,12 +732,17 @@ function applyTargetAdapters(content: string, target: TargetKind): string {
   }
 
   return content
+    .replaceAll("Claude/OpenBrowser", "agent/browser")
     .replaceAll(".claude/guides/", ".codex/guides/")
     .replaceAll(".claude/skills/", ".codex/skills/")
     .replaceAll(".claude", ".codex")
+    .replaceAll("`/ckm:brand`", "`brand-uupm`")
+    .replaceAll("`/ckm:design-system`", "`design-system-uupm`")
+    .replaceAll("`/ck:ui-ux-pro-max`", "`ui-ux-pro-max`")
+    .replaceAll("`/ck:frontend-design`", "`frontend-design`")
+    .replaceAll("`/ui-ux-pro-max`", "`ui-ux-pro-max`")
     .replaceAll("AskUserQuestion", "ask the user directly")
     .replaceAll("OpenBrowser", "browser automation")
     .replaceAll("Claude-native", "runtime-native")
-    .replaceAll("Claude/OpenBrowser", "agent/browser")
     .replaceAll("Claude consumption", "agent consumption");
 }

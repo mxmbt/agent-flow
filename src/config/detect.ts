@@ -12,6 +12,9 @@ export interface DetectionResult {
 interface PackageJson {
   name?: unknown;
   scripts?: unknown;
+  dependencies?: unknown;
+  devDependencies?: unknown;
+  peerDependencies?: unknown;
 }
 
 type ScriptMap = Record<string, string>;
@@ -43,7 +46,13 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   evidence.push("Enabled the code-review-toolkit pack as recommended manual review tooling for code projects.");
 
   const scripts = getScripts(packageJson);
+  const dependencies = getDependencyNames(packageJson);
   const run = packageManager === "yarn" ? "yarn" : `${packageManager ?? "npm"} run`;
+
+  if (dependencies.has("next")) {
+    config.packs.push("nextjs");
+    evidence.push("Detected Next.js dependency; enabled the nextjs pack for App Router best-practice guidance.");
+  }
 
   const defaultChecks = collectCommands([
     scriptCommand(scripts, "test", run),
@@ -146,6 +155,21 @@ function getScripts(packageJson: PackageJson): ScriptMap {
   }
 
   return scripts;
+}
+
+function getDependencyNames(packageJson: PackageJson): Set<string> {
+  const names = new Set<string>();
+  for (const field of [packageJson.dependencies, packageJson.devDependencies, packageJson.peerDependencies]) {
+    if (!field || typeof field !== "object" || Array.isArray(field)) {
+      continue;
+    }
+
+    for (const name of Object.keys(field)) {
+      names.add(name);
+    }
+  }
+
+  return names;
 }
 
 function scriptCommand(scripts: ScriptMap, scriptName: string, run: string): string | null {

@@ -169,6 +169,26 @@ test("detectProjectConfig proposes npm script checks and review markers", async 
   assert.ok(detected.evidence.some((line) => /code-review-toolkit pack as recommended manual review tooling/.test(line)));
 });
 
+test("detectProjectConfig enables nextjs pack for Next.js projects", async () => {
+  const cwd = await tempDir();
+  await writeJson(path.join(cwd, "package.json"), {
+    name: "next-app",
+    scripts: {
+      dev: "next dev",
+      test: "vitest run"
+    },
+    dependencies: {
+      next: "^15.0.0",
+      react: "^19.0.0"
+    }
+  });
+
+  const detected = await detectProjectConfig(cwd);
+
+  assert.deepEqual(detected.config.packs, ["code-review-graph", "code-review-toolkit", "nextjs"]);
+  assert.ok(detected.evidence.some((line) => /enabled the nextjs pack/.test(line)));
+});
+
 async function tempDir(): Promise<string> {
   return mkdtemp(path.join(os.tmpdir(), "agent-flow-config-"));
 }

@@ -4,7 +4,7 @@ provenance_origin: upstream-adapted
 upstream_sync_policy: baseline_only
 provenance_reference: docs/architecture/AI-SKILL-PROVENANCE.md
 provenance_url: attribution-pending
-name: ckm:brand
+name: brand-uupm
 description: Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.
 argument-hint: "[update|review|create] [args]"
 metadata:
@@ -47,7 +47,7 @@ node .claude/skills/brand-uupm/scripts/extract-colors.cjs <image-path>
 ## Brand Sync Workflow
 
 ```bash
-# 1. Edit docs/brand-guidelines.md (or use /brand update)
+# 1. Edit docs/brand-guidelines.md or invoke the brand update flow
 # 2. Sync to design tokens
 node .claude/skills/brand-uupm/scripts/sync-brand-to-tokens.cjs
 # 3. Verify
@@ -97,6 +97,6 @@ node .claude/skills/brand-uupm/scripts/inject-brand-context.cjs --json | head -2
 
 ## Routing
 
-1. Parse subcommand from `$ARGUMENTS` (first word)
+1. Parse subcommand from the user request (first word when explicitly provided)
 2. Load corresponding `references/{subcommand}.md`
 3. Execute with remaining arguments

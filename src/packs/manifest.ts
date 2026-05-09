@@ -11,6 +11,7 @@ export interface PackContribution {
   agents?: string[];
   guides?: string[];
   skills?: string[];
+  skillFiles?: string[];
   skillFragments?: string[];
   validators?: string[];
   mcpServers?: AgentFlowConfig["mcp"]["servers"];
@@ -27,6 +28,7 @@ export interface ComposedPacks {
   agents: string[];
   guides: string[];
   skills: string[];
+  skillFiles: string[];
   skillFragments: string[];
   validators: string[];
   mcpServers: AgentFlowConfig["mcp"]["servers"];
@@ -75,6 +77,7 @@ export function composePacks(available: PackManifest[], selectedNames: string[])
     agents: [],
     guides: [],
     skills: [],
+    skillFiles: [],
     skillFragments: [],
     validators: [],
     mcpServers: {},
@@ -95,6 +98,7 @@ export function composePacks(available: PackManifest[], selectedNames: string[])
     mergeStringList(composed.agents, pack.contributes.agents);
     mergeStringList(composed.guides, pack.contributes.guides);
     mergeStringList(composed.skills, pack.contributes.skills);
+    mergeStringList(composed.skillFiles, pack.contributes.skillFiles);
     mergeStringList(composed.skillFragments, pack.contributes.skillFragments);
     mergeValidators(composed.validators, pack, issues);
     mergeMcpServers(composed.mcpServers, pack);
