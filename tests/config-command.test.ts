@@ -17,6 +17,9 @@ test("config list shows explainable rendered placeholders", async () => {
 
   assert.match(stdout, /agent-flow config/);
   assert.match(stdout, /checks\.defaultShellBlock/);
+  assert.match(stdout, /artifacts\.architectureFile/);
+  assert.match(stdout, /artifacts\.userIsolationArchitectureFile/);
+  assert.match(stdout, /artifacts\.schedulingArchitectureFile/);
   assert.match(stdout, /git\.remoteBranchDeleteCommand/);
 });
 
@@ -29,6 +32,9 @@ test("config explain shows current rendered value, sources, and template usage",
   config.git.releaseBranch = "stable";
   config.checks.default = ["pnpm test", "pnpm typecheck"];
   config.runtime.appRoot = "apps/site";
+  config.artifacts.architectureFile = "docs/architecture/system.md";
+  config.artifacts.userIsolationArchitectureFile = "docs/architecture/data-isolation.md";
+  config.artifacts.schedulingArchitectureFile = "docs/architecture/jobs.md";
   config.packs = ["cloudflare-worker"];
 
   await writeConfig(cwd, config);
@@ -42,6 +48,15 @@ test("config explain shows current rendered value, sources, and template usage",
   const git = await execFileAsync(process.execPath, [cliPath, "config", "explain", "git.remoteBranchDeleteCommand"], { cwd });
   assert.match(git.stdout, /gh api repos\/acme\/example\/git\/refs\/heads\/<branch> -X DELETE/);
   assert.match(git.stdout, /\.agent-flow\/config\.json -> git\.repository/);
+
+  const architecture = await execFileAsync(
+    process.execPath,
+    [cliPath, "config", "explain", "artifacts.userIsolationArchitectureFile"],
+    { cwd }
+  );
+  assert.match(architecture.stdout, /docs\/architecture\/data-isolation\.md/);
+  assert.match(architecture.stdout, /\.agent-flow\/config\.json -> artifacts\.userIsolationArchitectureFile/);
+  assert.match(architecture.stdout, /templates\/canonical\/agents\/architect\.md\.hbs/);
 });
 
 async function tempDir(): Promise<string> {

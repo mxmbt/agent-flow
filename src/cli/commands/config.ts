@@ -42,6 +42,33 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     usedIn: ["templates/canonical/agents/feature-developer.md.hbs"]
   },
   {
+    key: "artifacts.architectureFile",
+    summary: "Primary project architecture reference used by architecture agents.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.architectureFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/architect.md.hbs"
+    ]
+  },
+  {
+    key: "artifacts.userIsolationArchitectureFile",
+    summary: "Project architecture reference for user/data isolation work.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.userIsolationArchitectureFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/architect.md.hbs"
+    ]
+  },
+  {
+    key: "artifacts.schedulingArchitectureFile",
+    summary: "Project architecture reference for scheduling and asynchronous flow work.",
+    renderedFrom: [".agent-flow/config.json -> artifacts.schedulingArchitectureFile"],
+    usedIn: [
+      "templates/canonical/artifact-contracts.md.hbs",
+      "templates/canonical/agents/architect.md.hbs"
+    ]
+  },
+  {
     key: "runtime.migrationsGlob",
     summary: "Migration-file glob derived from the configured runtime app root.",
     renderedFrom: [".agent-flow/config.json -> runtime.appRoot"],

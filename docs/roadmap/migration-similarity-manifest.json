@@ -11,6 +11,48 @@
       "targetSimilarity": 0.99
     },
     {
+      "id": "FINAI-0002",
+      "source": ".claude/agents/analyst.md",
+      "target": "templates/canonical/agents/analyst.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0003",
+      "source": ".claude/agents/architect.md",
+      "target": "templates/canonical/agents/architect.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0004",
+      "source": ".claude/agents/code-simplifier.md",
+      "target": "templates/canonical/agents/code-simplifier.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0005",
+      "source": ".claude/agents/deep-reviewer.md",
+      "target": "templates/canonical/agents/deep-reviewer.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0008",
+      "source": ".claude/agents/findings-arbiter.md",
+      "target": "templates/canonical/agents/findings-arbiter.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0009",
+      "source": ".claude/agents/math-genius.md",
+      "target": "templates/canonical/agents/math-genius.md.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
       "id": "FINAI-0006",
       "source": ".claude/agents/delivery-agent.md",
       "target": "templates/canonical/agents/delivery-agent.md.hbs",

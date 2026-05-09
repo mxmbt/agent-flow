@@ -11,7 +11,8 @@ test("scanUniversality flags project, runtime, command, and domain assumptions",
     "gh api repos/id-bu/AI_Finance_Manager/git/refs/heads/<branch> -X DELETE",
     "release-sync delivery -> `git diff --name-only origin/master...origin/develop`",
     "`docs/design/DESIGN-SYSTEM.md`",
-    "financial correctness and no-look-ahead"
+    "financial correctness and no-look-ahead",
+    "user isolation"
   ].join("\n"));
 
   assert.deepEqual(findings.map((finding) => finding.ruleId), [

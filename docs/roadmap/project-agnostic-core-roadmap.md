@@ -375,6 +375,9 @@ agent-flow/
     "statusFile": "PROJECT_STATUS.md",
     "roadmapFile": "docs/ROADMAP.md",
     "productFile": "docs/PRODUCT.md",
+    "architectureFile": "docs/ARCHITECTURE.md",
+    "userIsolationArchitectureFile": "docs/ARCHITECTURE_MULTI_USER.md",
+    "schedulingArchitectureFile": "docs/ARCHITECTURE_SCHEDULING.md",
     "phaseRoot": "docs/phases",
     "walkthroughRoot": "docs/walkthroughs/agents"
   },
@@ -785,7 +788,10 @@ When users install Agent Flow, I want the strong FinAI-aligned process without F
 
 - 2026-05-08: AF-MIG-0001 migrated `FINAI-0007` feature-developer agent into `templates/canonical/agents/feature-developer.md.hbs` with Claude/Codex target wrappers under `templates/targets/*/agents/`.
 - 2026-05-08: AF-MIG-0002 migrated `FINAI-0006` delivery-agent and `FINAI-0019` qa-expert into canonical agent templates with Claude/Codex target wrappers.
-- 2026-05-08: `src/renderer/target-renderer.ts` now renders `.claude/agents/{feature-developer,delivery-agent,qa-expert}.md` and `.codex/agents/{feature-developer,delivery-agent,qa-expert}.md` from canonical bodies with target-specific guide and skill roots.
+- 2026-05-09: AF-MIG-0003 migrated `FINAI-0002` analyst and `FINAI-0003` architect into canonical agent templates with Claude/Codex target wrappers.
+- 2026-05-09: AF-MIG-0004 migrated `FINAI-0004` code-simplifier and `FINAI-0005` deep-reviewer into canonical agent templates with Claude/Codex target wrappers.
+- 2026-05-09: AF-MIG-0005 migrated `FINAI-0008` findings-arbiter as core and `FINAI-0009` math-genius as a finance pack agent.
+- 2026-05-09: `src/renderer/target-renderer.ts` now renders `.claude/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,delivery-agent,qa-expert}.md` and `.codex/agents/{feature-developer,analyst,architect,code-simplifier,deep-reviewer,findings-arbiter,delivery-agent,qa-expert}.md` from canonical bodies with target-specific guide and skill roots. Pack-contributed agents such as `math-genius` render only when the selected packs contribute them.
 - 2026-05-09: `npm test` passed with 46 tests, including rendered agent metadata, target-specific paths, pack-contributed invariants, configured checks, config explanation, sync diff preview, template comment handling, similarity logic, universality scanner logic, and rendered universalized migrated agents.
 - 2026-05-08: Added `npm run check:migration-similarity` with a 99% baseline target. `FINAI-0006`, `FINAI-0007`, and `FINAI-0019` pass after accepted universalization substitutions; `FINAI-0007` is 99.00% line / 99.85% token similarity and the other two are 100.00% line / 100.00% token similarity.
 - 2026-05-08: Added `npm run check:universality` as an advisory scanner for project/runtime/stack/domain/command assumptions. Internal Agent Flow skill/guide links are accepted package links by MRD-0001, and planning/design artifacts are core by MRD-0006. The three migrated agent templates now pass the universality scan after applying accepted config/pack/source-wording decisions.
@@ -797,7 +803,7 @@ When users install Agent Flow, I want the strong FinAI-aligned process without F
 ### AF-M4-T1
 
 **Title:** Add full mirror parity validation
-**Status:** TODO
+**Status:** IN_PROGRESS
 **Complexity:** Red
 **Dependencies:** AF-M3-T3
 
@@ -915,6 +921,12 @@ When Agent Flow is public, I want installation and maintenance commands, so that
 - `doctor` validates install health.
 - `render` outputs generated files without writing.
 - `validate` runs core and mirror checks.
+
+#### Evidence
+
+- 2026-05-09: `init` creates `.agent-flow/config.json`, generated Claude/Codex target files, and starter docs for configured artifact paths, including architecture, user-isolation architecture, and scheduling architecture references. It supports `--dry-run` and reports unmanaged-file conflicts without overwriting user files.
+- 2026-05-09: `init` reuses common existing project documents for status, roadmap, product, architecture, security/user-isolation, and scheduling/job docs, writing the detected paths into `.agent-flow/config.json` instead of creating duplicate starter docs.
+- 2026-05-09: `npm test` covers bare-project init, existing-document reuse, dry-run behavior, and conflict protection.
 
 #### Verification Focus
 

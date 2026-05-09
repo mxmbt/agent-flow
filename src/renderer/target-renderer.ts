@@ -17,6 +17,7 @@ interface TargetTemplate {
   templatePath: string;
   id: string;
   target: TargetKind;
+  packAgent?: string;
 }
 
 const CLAUDE_TARGETS: TargetTemplate[] = [
@@ -37,6 +38,43 @@ const CLAUDE_TARGETS: TargetTemplate[] = [
     templatePath: path.join("targets", "claude", "agents", "feature-developer.md.hbs"),
     id: "claude-agent-feature-developer",
     target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "agents", "analyst.md"),
+    templatePath: path.join("targets", "claude", "agents", "analyst.md.hbs"),
+    id: "claude-agent-analyst",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "agents", "architect.md"),
+    templatePath: path.join("targets", "claude", "agents", "architect.md.hbs"),
+    id: "claude-agent-architect",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "agents", "code-simplifier.md"),
+    templatePath: path.join("targets", "claude", "agents", "code-simplifier.md.hbs"),
+    id: "claude-agent-code-simplifier",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "agents", "deep-reviewer.md"),
+    templatePath: path.join("targets", "claude", "agents", "deep-reviewer.md.hbs"),
+    id: "claude-agent-deep-reviewer",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "agents", "findings-arbiter.md"),
+    templatePath: path.join("targets", "claude", "agents", "findings-arbiter.md.hbs"),
+    id: "claude-agent-findings-arbiter",
+    target: "claude"
+  },
+  {
+    outputPath: path.join(".claude", "agents", "math-genius.md"),
+    templatePath: path.join("targets", "claude", "agents", "math-genius.md.hbs"),
+    id: "claude-agent-math-genius",
+    target: "claude",
+    packAgent: "math-genius"
   },
   {
     outputPath: path.join(".claude", "agents", "delivery-agent.md"),
@@ -78,6 +116,43 @@ const CODEX_TARGETS: TargetTemplate[] = [
     target: "codex"
   },
   {
+    outputPath: path.join(".codex", "agents", "analyst.md"),
+    templatePath: path.join("targets", "codex", "agents", "analyst.md.hbs"),
+    id: "codex-agent-analyst",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "agents", "architect.md"),
+    templatePath: path.join("targets", "codex", "agents", "architect.md.hbs"),
+    id: "codex-agent-architect",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "agents", "code-simplifier.md"),
+    templatePath: path.join("targets", "codex", "agents", "code-simplifier.md.hbs"),
+    id: "codex-agent-code-simplifier",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "agents", "deep-reviewer.md"),
+    templatePath: path.join("targets", "codex", "agents", "deep-reviewer.md.hbs"),
+    id: "codex-agent-deep-reviewer",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "agents", "findings-arbiter.md"),
+    templatePath: path.join("targets", "codex", "agents", "findings-arbiter.md.hbs"),
+    id: "codex-agent-findings-arbiter",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "agents", "math-genius.md"),
+    templatePath: path.join("targets", "codex", "agents", "math-genius.md.hbs"),
+    id: "codex-agent-math-genius",
+    target: "codex",
+    packAgent: "math-genius"
+  },
+  {
     outputPath: path.join(".codex", "agents", "delivery-agent.md"),
     templatePath: path.join("targets", "codex", "agents", "delivery-agent.md.hbs"),
     id: "codex-agent-delivery-agent",
@@ -103,7 +178,7 @@ export async function renderTargetFiles(
   const targets = [
     ...(config.features.claude ? CLAUDE_TARGETS : []),
     ...(config.features.codex ? CODEX_TARGETS : [])
-  ];
+  ].filter((target) => !target.packAgent || packs.agents.includes(target.packAgent));
 
   return Promise.all(targets.map(async (target) => {
     const template = await readFile(path.join(options.templateRoot, target.templatePath), "utf8");
@@ -137,6 +212,12 @@ async function loadCanonicalPartials(templateRoot: string): Promise<TemplatePart
     "qa-delivery",
     "state-report-contracts",
     path.join("agents", "feature-developer"),
+    path.join("agents", "analyst"),
+    path.join("agents", "architect"),
+    path.join("agents", "code-simplifier"),
+    path.join("agents", "deep-reviewer"),
+    path.join("agents", "findings-arbiter"),
+    path.join("agents", "math-genius"),
     path.join("agents", "delivery-agent"),
     path.join("agents", "qa-expert")
   ];
