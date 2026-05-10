@@ -18,7 +18,8 @@ git diff --check
 
 Publish through the GitHub Actions `Publish` workflow. It requires:
 
-- a repository secret named `NPM_TOKEN`;
+- a repository secret named `NPM_TOKEN` with publish/write access;
+- when npm publish 2FA is enabled, an npm automation token or granular token with bypass 2FA enabled;
 - workflow input `version` matching `package.json`.
 - the workflow file present on the repository default branch.
 
