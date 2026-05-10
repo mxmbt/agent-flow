@@ -55,9 +55,10 @@ test("init --profile webapp writes profile config and rendered pack outputs", as
 
   assert.match(stdout, /Applied webapp profile/);
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
-  assert.deepEqual(config.packs, ["webapp"]);
+  assert.deepEqual(config.packs, ["code-review-graph", "webapp"]);
   assert.deepEqual(config.needsReview, []);
   assert.match(await readFile(path.join(cwd, ".mcp.json"), "utf8"), /playwright/);
+  assert.match(await readFile(path.join(cwd, ".mcp.json"), "utf8"), /codeReviewGraph/);
 });
 
 test("render --profile finai.example includes adapter pack contributions without writing", async () => {

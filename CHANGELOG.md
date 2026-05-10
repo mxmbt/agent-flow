@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Enables the code-review-graph pack as the default planning discovery provider during `agent-flow init`.
+- Renders portable CRG MCP config for fresh installs so `agent-flow doctor` no longer warns about a missing code graph provider after onboarding.
+
 ## 0.1.1
 
 - Creates a starter `package.json` during `agent-flow init` when the project does not already have one.

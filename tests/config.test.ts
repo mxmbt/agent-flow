@@ -220,6 +220,8 @@ test("detectProjectConfig proposes Python checks", async () => {
 
   assert.equal(detected.packageManager, "python");
   assert.equal(detected.hasPackageJson, false);
+  assert.equal(detected.config.discovery.codeGraphProvider, "code-review-graph");
+  assert.deepEqual(detected.config.packs, ["code-review-graph"]);
   assert.deepEqual(detected.config.checks.default, ["python -m pytest"]);
   assert.equal(detected.config.checks.focusedTestCommand, "python -m pytest <test-file>");
   assert.deepEqual(detected.needsReview, []);
@@ -232,6 +234,8 @@ test("detectProjectConfig gives empty repositories starter defaults without revi
 
   assert.equal(detected.packageManager, null);
   assert.equal(detected.hasPackageJson, false);
+  assert.equal(detected.config.discovery.codeGraphProvider, "code-review-graph");
+  assert.deepEqual(detected.config.packs, ["code-review-graph"]);
   assert.deepEqual(detected.config.checks.default, ["npm run test"]);
   assert.equal(detected.config.checks.focusedTestCommand, "npm run test -- <test-file>");
   assert.deepEqual(detected.needsReview, []);
@@ -250,6 +254,8 @@ test("detectProjectConfig ignores npm init placeholder tests", async () => {
   const detected = await detectProjectConfig(cwd);
 
   assert.equal(detected.hasPackageJson, true);
+  assert.equal(detected.config.discovery.codeGraphProvider, "code-review-graph");
+  assert.deepEqual(detected.config.packs, ["code-review-graph", "code-review-toolkit"]);
   assert.deepEqual(detected.config.checks.default, ["node -e \"console.log('No project tests configured yet')\""]);
   assert.equal(detected.config.checks.focusedTestCommand, null);
   assert.deepEqual(detected.needsReview, []);
