@@ -1,45 +1,95 @@
 # Agent Flow
 
-Agent Flow is a project-agnostic orchestration package for installing and maintaining AI agent workflows across Claude Code and Codex.
-
-The target install flow is:
+Agent Flow installs and maintains project-local AI agent workflows for Claude Code and Codex.
 
 ```bash
 npx @mxmbt/agent-flow init
 ```
 
-This repository is being rebuilt from an empty package baseline. FinAI remains a read-only reference implementation; public Agent Flow code, templates, profiles, and packs must stay project-agnostic.
+The install writes:
 
-## Current Status
+- `.agent-flow/config.json`
+- Claude Code targets under `CLAUDE.md` and `.claude/**`
+- Codex targets under `AGENTS.md` and `.codex/**`
+- shared agent artifact templates under `docs/templates/**`
+- helper scripts under `scripts/**`
+- optional MCP config when enabled packs require it
 
-The package scaffold, config schema, renderer, initial packs, migrated core agents, and first working installer paths are in place. Some maintenance commands are still skeletons while migration continues.
-
-Available command groups:
+Generated files are managed by Agent Flow and can be refreshed safely.
 
 ```bash
-agent-flow --help
-agent-flow init --help
-agent-flow update --help
-agent-flow upgrade --help
-agent-flow sync --help
-agent-flow sync --diff
-agent-flow doctor --help
-agent-flow config --help
-agent-flow config list
-agent-flow config explain checks.defaultShellBlock
-agent-flow config explain checks.focusedTestCommand
-agent-flow render --help
-agent-flow validate --help
-agent-flow pack --help
+npx @mxmbt/agent-flow update
+npx @mxmbt/agent-flow validate --strict
+npx @mxmbt/agent-flow doctor
 ```
 
-`agent-flow config explain <key>` is the transparency tool for template placeholders. It shows the current rendered value, where it comes from in `.agent-flow/config.json` or enabled packs, and which agent or guide templates use it.
+## Quick Start
 
-`agent-flow init` creates `.agent-flow/config.json`, generated Claude/Codex targets, and starter project documents for configured artifact paths such as `PROJECT_STATUS.md`, `docs/ROADMAP.md`, `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/ARCHITECTURE_MULTI_USER.md`, `docs/ARCHITECTURE_SCHEDULING.md`, `docs/tasks.md`, `docs/UI-UX-SPECIFICATION.md`, `docs/design/DESIGN-SYSTEM.md`, `docs/design/UX-WRITING-GUIDE.md`, and `docs/testing/QA-SHARED-ACCOUNT.md`. In an existing project, `init` reuses common existing document paths such as `ROADMAP.md`, `docs/product/README.md`, `docs/architecture/README.md`, `docs/SECURITY.md`, `docs/JOBS.md`, `docs/backlog.md`, `docs/UX.md`, `docs/design/README.md`, `docs/content/UX-WRITING-GUIDE.md`, or `docs/qa/shared-account.md` and writes those paths into config instead of creating duplicate docs. Existing unmanaged generated targets are reported as conflicts instead of overwritten.
+```bash
+npx @mxmbt/agent-flow init
+npx @mxmbt/agent-flow doctor
+npx @mxmbt/agent-flow validate --strict
+```
 
-For coding projects, planning needs a code discovery provider for codebase maps, impact analysis, and affected-flow discovery. During onboarding, `agent-flow init` detects a code project from `package.json`; if there is no existing Agent Flow config, it enables the `code-review-graph` pack as the default provider and renders its guide. It also enables the `code-review-toolkit` pack so users can manually invoke auxiliary review agents when useful. Projects with another graph/indexing tool can set `discovery.codeGraphProvider` to `custom`, describe it in `discovery.customProvider`, and remove or replace the graph pack.
+Profiles:
 
-`agent-flow sync --diff` previews generated `.claude/**` and `.codex/**` changes before writing, so users can inspect how config and packs affect the final agent files.
+```bash
+npx @mxmbt/agent-flow init --profile generic
+npx @mxmbt/agent-flow init --profile webapp
+npx @mxmbt/agent-flow init --profile finai.example
+```
+
+Packs:
+
+```bash
+npx @mxmbt/agent-flow pack list
+npx @mxmbt/agent-flow pack add finance
+npx @mxmbt/agent-flow pack add code-review-toolkit
+npx @mxmbt/agent-flow pack remove finance
+```
+
+Inspection:
+
+```bash
+npx @mxmbt/agent-flow config list
+npx @mxmbt/agent-flow config explain checks.defaultShellBlock
+npx @mxmbt/agent-flow render --json
+npx @mxmbt/agent-flow sync --diff
+```
+
+## Concepts
+
+- **Core**: stack-neutral lifecycle, agent contracts, canonical templates, validators, and shared helper scripts.
+- **Targets**: Claude Code and Codex rendered files. They are mirrored from canonical content with explicit target adapters.
+- **Config**: project-local facts such as branches, checks, artifact paths, runtime URLs, MCP choices, and unresolved `needsReview` fields.
+- **Packs**: optional capability modules such as `finance`, `cloudflare-worker`, `telegram`, `webapp`, `code-review-toolkit`, `code-review-graph`, `nextjs`, and `design`.
+- **Profiles**: starter config overlays. `generic` is neutral, `webapp` enables browser QA/accessibility, and `finai.example` proves product-specific assumptions can live outside core.
+
+## Tested Commands
+
+The standard CI command is:
+
+```bash
+npm test
+```
+
+It builds the package, runs temp-repo install tests, validates mirror parity, exercises pack add/remove, and runs the universality scan.
+
+Release-smoke commands before publishing:
+
+```bash
+npm run smoke:package
+```
+
+## Documentation
+
+- [Config](docs/CONFIG.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Packs](docs/PACKS.md)
+- [MCP](docs/MCP.md)
+- [Migration](docs/MIGRATION.md)
+- [Release](docs/RELEASE.md)
+- [Roadmap](docs/roadmap/project-agnostic-core-roadmap.md)
 
 ## Development
 
@@ -47,14 +97,3 @@ For coding projects, planning needs a code discovery provider for codebase maps,
 npm install
 npm test
 ```
-
-## Architecture Direction
-
-Agent Flow is split into:
-
-- `core`: lifecycle mechanics, agent contracts, canonical templates, validators
-- `packs`: optional domain/runtime/toolkit modules such as `finance`, `cloudflare-worker`, `telegram`, `webapp`, `code-review-toolkit`, `code-review-graph`, and `design`
-- `config`: project-local values such as checks, branches, runtime roots, and repository refs
-- `installer`: CLI commands for init, update, upgrade, sync, doctor, config inspection, render, validate, and pack management
-
-See [docs/roadmap/project-agnostic-core-roadmap.md](docs/roadmap/project-agnostic-core-roadmap.md) for the detailed implementation roadmap.

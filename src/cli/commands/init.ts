@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AgentFlowConfig } from "../../config/defaults.js";
 import { detectProjectConfig } from "../../config/detect.js";
+import { applyProfile, isProfileName, profileNames } from "../../config/profiles.js";
 import { builtinPacks } from "../../packs/builtin.js";
 import { composePacks } from "../../packs/manifest.js";
 import {
@@ -30,14 +31,22 @@ export const initCommand: CommandModule = {
     const profile = readFlagValue(context.args, "--profile") ?? "generic";
     const root = process.cwd();
 
-    if (profile !== "generic") {
-      return `Unknown starter profile: ${profile}\nAvailable profiles: generic\n`;
+    if (!isProfileName(profile)) {
+      return `Unknown starter profile: ${profile}\nAvailable profiles: ${profileNames.join(", ")}\n`;
     }
 
     const detected = await detectProjectConfig(root);
+    const profiled = applyProfile(detected.config, profile);
+    detected.config = profiled.config;
+    detected.needsReview = profiled.config.needsReview;
+    detected.evidence.push(...profiled.evidence);
     const detectedConfig = context.config.source === "defaults"
       ? await reuseExistingArtifactPaths(root, detected.config, detected.needsReview, detected.evidence)
       : context.config.config;
+    const needsReview = context.config.source === "defaults"
+      ? detected.needsReview
+      : context.config.config.needsReview ?? [];
+    detectedConfig.needsReview = needsReview;
     const config = detectedConfig;
     const templateRoot = await findTemplateRoot(root);
     const packs = composePacks(builtinPacks, config.packs);
@@ -54,16 +63,16 @@ export const initCommand: CommandModule = {
         return renderInitPlan(
           "Agent Flow init found existing unmanaged files. No files were written.",
           plan,
-          detected.needsReview,
+          needsReview,
           detected.evidence
         );
       }
 
       const written = await writeManagedFiles(root, files);
-      return renderInitPlan("Initialized Agent Flow.", written, detected.needsReview, detected.evidence);
+      return renderInitPlan("Initialized Agent Flow.", written, needsReview, detected.evidence);
     }
 
-    return renderInitPlan("Agent Flow init preview. No files were written.", plan, detected.needsReview, detected.evidence);
+    return renderInitPlan("Agent Flow init preview. No files were written.", plan, needsReview, detected.evidence);
   }
 };
 

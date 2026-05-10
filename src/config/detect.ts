@@ -4,7 +4,7 @@ import { createDefaultConfig, type AgentFlowConfig } from "./defaults.js";
 
 export interface DetectionResult {
   config: AgentFlowConfig;
-  packageManager: "npm" | "pnpm" | "yarn" | null;
+  packageManager: "npm" | "pnpm" | "yarn" | "python" | null;
   needsReview: string[];
   evidence: string[];
 }
@@ -28,9 +28,17 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   const evidence: string[] = [];
 
   if (!packageJson) {
+    if (await hasPythonProject(cwd)) {
+      config.checks.default = ["python -m pytest"];
+      config.checks.focusedTestCommand = "python -m pytest <test-file>";
+      needsReview.push("checks.default");
+      evidence.push("Detected Python project files; defaulted checks to python -m pytest and marked them for review.");
+      return finalizeDetection(config, "python", needsReview, evidence);
+    }
+
     needsReview.push("checks.default");
     evidence.push("No package.json detected; default checks require review.");
-    return { config, packageManager, needsReview, evidence };
+    return finalizeDetection(config, packageManager, needsReview, evidence);
   }
 
   evidence.push("Detected package.json.");
@@ -99,12 +107,12 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   const devCommand = scriptCommand(scripts, "dev", run);
   if (devCommand) {
     config.dev.start.command = devCommand;
-    config.dev.start.url = "http://localhost:3000";
+    config.dev.start.url = inferDevServerUrl(scripts.dev ?? "", dependencies);
     needsReview.push("dev.start.url");
     evidence.push("Detected dev server script; default URL requires confirmation.");
   }
 
-  return { config, packageManager, needsReview: unique(needsReview), evidence };
+  return finalizeDetection(config, packageManager, needsReview, evidence);
 }
 
 async function readPackageJson(cwd: string): Promise<PackageJson | null> {
@@ -132,6 +140,12 @@ async function detectPackageManager(cwd: string): Promise<DetectionResult["packa
   }
 
   return null;
+}
+
+async function hasPythonProject(cwd: string): Promise<boolean> {
+  return (await exists(path.join(cwd, "pyproject.toml")))
+    || (await exists(path.join(cwd, "requirements.txt")))
+    || (await exists(path.join(cwd, "pytest.ini")));
 }
 
 function getProjectName(cwd: string, packageJson: PackageJson | null): string {
@@ -182,6 +196,29 @@ function scriptCommand(scripts: ScriptMap, scriptName: string, run: string): str
 
 function collectCommands(commands: Array<string | null>): string[] {
   return unique(commands.filter((command): command is string => command !== null));
+}
+
+function inferDevServerUrl(devScript: string, dependencies: Set<string>): string {
+  if (dependencies.has("vite") || /\bvite\b/.test(devScript)) {
+    return "http://localhost:5173";
+  }
+
+  if (dependencies.has("next") || /\bnext\s+dev\b/.test(devScript)) {
+    return "http://localhost:3000";
+  }
+
+  return "http://localhost:3000";
+}
+
+function finalizeDetection(
+  config: AgentFlowConfig,
+  packageManager: DetectionResult["packageManager"],
+  needsReview: string[],
+  evidence: string[]
+): DetectionResult {
+  const uniqueNeedsReview = unique(needsReview);
+  config.needsReview = uniqueNeedsReview;
+  return { config, packageManager, needsReview: uniqueNeedsReview, evidence };
 }
 
 function unique(values: string[]): string[] {

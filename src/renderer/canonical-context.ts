@@ -84,6 +84,7 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
       remoteName: config.git.remoteName,
       integrationBranch: config.git.integrationBranch,
       releaseBranch: config.git.releaseBranch ?? "none configured",
+      releaseBranchLabel: config.git.releaseBranch ?? "no release branch configured",
       integrationRef: `${config.git.remoteName}/${config.git.integrationBranch}`,
       releaseRef: config.git.releaseBranch ? `${config.git.remoteName}/${config.git.releaseBranch}` : "none configured",
       defaultDeliveryDiffCommand: `git diff --name-only ${config.git.remoteName}/${config.git.integrationBranch}...HEAD`,
@@ -93,10 +94,31 @@ export function buildCanonicalContext(config: AgentFlowConfig, packs: ComposedPa
       releaseFlow: config.git.releaseBranch
         ? `${config.git.integrationBranch} -> ${config.git.releaseBranch}`
         : "none configured",
+      protectedBranchRule: config.git.releaseBranch
+        ? `Working branch must not be \`${config.git.releaseBranch}\` or \`${config.git.integrationBranch}\`.`
+        : `Working branch must not be \`${config.git.integrationBranch}\`.`,
+      releaseCloseoutRequirement: config.git.releaseBranch
+        ? `the close-out explicitly states whether \`${config.git.releaseBranch}\` is already released or not`
+        : "the close-out explicitly states that no release branch is configured",
+      releaseCloseoutLine: config.git.releaseBranch
+        ? `\`${config.git.releaseBranch}\`: released / not released, release PR number if any`
+        : "Release branch: not configured",
+      releaseSyncAvailability: config.git.releaseBranch
+        ? `Release sync is available as \`${config.git.integrationBranch}\` -> \`${config.git.releaseBranch}\`.`
+        : "Release sync is unavailable until git.releaseBranch is configured.",
+      worktreeParking: config.git.worktreeParking,
+      worktreeParkingMode: config.git.worktreeParking ? "enabled" : "disabled",
+      worktreeParkingAction: config.git.worktreeParking
+        ? "Sync worktrees with `./scripts/park-worktrees.sh`"
+        : "Worktree parking is disabled by config; skip parking and rely on the delivery-state report.",
+      worktreeHygieneSuccessLine: config.git.worktreeParking
+        ? "Local worktree hygiene: pass"
+        : "Local worktree hygiene: skipped",
+      worktreePostcondition: config.git.worktreeParking
+        ? `delivery is not complete until the current worktree is on \`worktree/<dirname>\`, tracks \`${config.git.remoteName}/${config.git.integrationBranch}\`, and its HEAD matches \`${config.git.remoteName}/${config.git.integrationBranch}\``
+        : "delivery may complete without parking because git.worktreeParking is disabled; still run the delivery-state helper so the skipped local hygiene state is explicit",
       prBaseFlag: `--base ${config.git.integrationBranch}`,
-      remoteBranchDeleteCommand: config.git.repository
-        ? `gh api repos/${config.git.repository}/git/refs/heads/<branch> -X DELETE`
-        : "delete the remote branch using the configured repository host",
+      remoteBranchDeleteCommand: `gh api "repos/{owner}/{repo}/git/refs/heads/<branch>" -X DELETE`,
       deliveryStateRef: `<merged-commit-or-${config.git.remoteName}/${config.git.integrationBranch}>`,
       worktreeParkCommand: "./scripts/park-worktrees.sh",
       deliveryStateCommand: "./scripts/report-delivery-state.sh"

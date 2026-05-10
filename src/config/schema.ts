@@ -31,12 +31,19 @@ export function validateAgentFlowConfig(value: unknown): AgentFlowConfig {
   validatePacks(config, issues);
   validateMcp(config, issues);
   validateFeatures(config, issues);
+  validateNeedsReview(config, issues);
 
   if (issues.length > 0) {
     throw new ConfigValidationError(issues);
   }
 
   return value as AgentFlowConfig;
+}
+
+function validateNeedsReview(config: Record<string, unknown>, issues: ConfigIssue[]): void {
+  if (config.needsReview !== undefined) {
+    expectStringArray(config.needsReview, "needsReview", issues);
+  }
 }
 
 function validateProject(config: Record<string, unknown>, issues: ConfigIssue[]): void {

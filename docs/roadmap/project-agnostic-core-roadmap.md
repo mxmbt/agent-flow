@@ -450,16 +450,16 @@ The CLI may also read `.agent-flow/config.yml` for users who prefer YAML, but th
 | [AF-M3-T1](#af-m3-t1) | Build canonical lifecycle templates | Red | AF-M2-T2, AF-M2-T3 | DONE |
 | [AF-M3-T2](#af-m3-t2) | Build Claude and Codex target renderers | Red | AF-M3-T1 | DONE |
 | [AF-M3-T3](#af-m3-t3) | Port agents, skills, guides, and artifact templates | Red | AF-M3-T2 | DONE |
-| [AF-M4-T1](#af-m4-t1) | Add full mirror parity validation | Red | AF-M3-T3 | IN_PROGRESS |
-| [AF-M4-T2](#af-m4-t2) | Generalize git and delivery utilities | Red | AF-M4-T1 | TODO |
-| [AF-M5-T1](#af-m5-t1) | Add MCP configuration rendering and health checks | Red | AF-M2-T1 | TODO |
-| [AF-M5-T2](#af-m5-t2) | Add project command detection and setup prompts | Red | AF-M2-T1 | TODO |
-| [AF-M6-T1](#af-m6-t1) | Implement init/update/upgrade/sync/doctor/render/validate | Red | AF-M2-T2, AF-M4-T1, AF-M5-T1 | TODO |
-| [AF-M6-T2](#af-m6-t2) | Implement pack add/remove/list commands | Red | AF-M2-T3, AF-M6-T1 | TODO |
-| [AF-M7-T1](#af-m7-t1) | Add generic, webapp, and finai-example profiles | Yellow | AF-M6-T1 | TODO |
-| [AF-M7-T2](#af-m7-t2) | Add finance, cloudflare-worker, telegram, and webapp packs | Red | AF-M6-T2 | TODO |
-| [AF-M8-T1](#af-m8-t1) | Add temp-repo install tests and agnostic scans | Red | AF-M7-T2 | TODO |
-| [AF-M9-T1](#af-m9-t1) | Write public docs and migration guide | Yellow | AF-M8-T1 | TODO |
+| [AF-M4-T1](#af-m4-t1) | Add full mirror parity validation | Red | AF-M3-T3 | DONE |
+| [AF-M4-T2](#af-m4-t2) | Generalize git and delivery utilities | Red | AF-M4-T1 | DONE |
+| [AF-M5-T1](#af-m5-t1) | Add MCP configuration rendering and health checks | Red | AF-M2-T1 | DONE |
+| [AF-M5-T2](#af-m5-t2) | Add project command detection and setup prompts | Red | AF-M2-T1 | DONE |
+| [AF-M6-T1](#af-m6-t1) | Implement init/update/upgrade/sync/doctor/render/validate | Red | AF-M2-T2, AF-M4-T1, AF-M5-T1 | DONE |
+| [AF-M6-T2](#af-m6-t2) | Implement pack add/remove/list commands | Red | AF-M2-T3, AF-M6-T1 | DONE |
+| [AF-M7-T1](#af-m7-t1) | Add generic, webapp, and finai-example profiles | Yellow | AF-M6-T1 | DONE |
+| [AF-M7-T2](#af-m7-t2) | Add finance, cloudflare-worker, telegram, and webapp packs | Red | AF-M6-T2 | DONE |
+| [AF-M8-T1](#af-m8-t1) | Add temp-repo install tests and agnostic scans | Red | AF-M7-T2 | DONE |
+| [AF-M9-T1](#af-m9-t1) | Write public docs and migration guide | Yellow | AF-M8-T1 | DONE |
 | [AF-M10-T1](#af-m10-t1) | Publish first release | Yellow | AF-M9-T1 | TODO |
 
 ---
@@ -838,7 +838,7 @@ When users install Agent Flow, I want the strong FinAI-aligned process without F
 ### AF-M4-T1
 
 **Title:** Add full mirror parity validation
-**Status:** IN_PROGRESS
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M3-T3
 
@@ -857,12 +857,18 @@ When Agent Flow renders both tool stacks, I want drift detection, so that Claude
 - Deliberately edit generated Codex lifecycle text and confirm validation fails.
 - Deliberately edit allowed target command block and confirm validation passes.
 
+#### Verification Evidence
+
+- 2026-05-10: Added `src/validation/mirror-parity.ts` and wired `agent-flow validate --strict` to fail on missing, stale, or semantically drifted managed files.
+- 2026-05-10: `tests/mirror-parity.test.ts` checks 200+ rendered Claude/Codex mirror pairs across roots, agents, guides, and skills, ignoring only explicit target-adapter differences.
+- 2026-05-10: Drift test edits installed `AGENTS.md`; validation reports both stale installed output and `CLAUDE.md`/`AGENTS.md` content drift with non-zero strict exit.
+
 ---
 
 ### AF-M4-T2
 
 **Title:** Generalize git and delivery utilities
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M4-T1
 
@@ -883,12 +889,19 @@ When a project uses Agent Flow delivery, I want git helpers to follow that proje
 - Fixture repo with `main` only.
 - Fixture repo with `develop` and `master`.
 
+#### Verification Evidence
+
+- 2026-05-10: Delivery rendering now derives protected-branch wording, release close-out wording, release-sync availability, and worktree parking mode from git config.
+- 2026-05-10: Remote branch deletion renders through GitHub CLI repository metadata: `gh api "repos/{owner}/{repo}/git/refs/heads/<branch>" -X DELETE`.
+- 2026-05-10: Shared delivery helpers support single-branch projects: `report-delivery-state.sh` reports `Release (none configured): not configured`, and worktree hygiene is `skipped` when `git.worktreeParking` is false.
+- 2026-05-10: Added fixture coverage in `tests/delivery-utilities.test.ts` for a `main`-only repo with worktree parking disabled.
+
 ---
 
 ### AF-M5-T1
 
 **Title:** Add MCP configuration rendering and health checks
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M2-T1
 
@@ -909,12 +922,19 @@ When users install Agent Flow, I want required/recommended MCP setup included, s
 - Test required missing MCP fails doctor.
 - Test optional missing MCP warns but passes.
 
+#### Verification Evidence
+
+- 2026-05-10: Added portable MCP catalog/rendering in `src/mcp/catalog.ts`; enabled known servers render into `.mcp.json`, `.claude/settings.json`, and `.codex/mcp.codex.json` from config plus pack recommendations.
+- 2026-05-10: `doctor` now reports MCP mode, missing rendered MCP config, missing commands, required env vars, and unsafe machine-local absolute paths; `doctor --strict` exits non-zero for required/strict issues.
+- 2026-05-10: Added `docs/MCP.md` with generated file list, sync/doctor workflow, strict behavior, and unsafe path rule.
+- 2026-05-10: Added tests for rendered MCP files without `/Users`/`/home` paths, optional MCP warnings, and required missing MCP command failure.
+
 ---
 
 ### AF-M5-T2
 
 **Title:** Add project command detection and setup prompts
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M2-T1
 
@@ -934,12 +954,18 @@ When a user installs Agent Flow, I want as much setup as possible inferred autom
 
 - Fixtures: npm app, pnpm app, Python app, unknown repo.
 
+#### Verification Evidence
+
+- 2026-05-10: `.agent-flow/config.json` now stores `needsReview`, and `doctor` summarizes unresolved setup fields.
+- 2026-05-10: Detection covers npm, pnpm, yarn, Python project files, and unknown repos; JS projects infer default checks, focused test commands, optional lint/build, schema checks, dev command, and likely dev URL.
+- 2026-05-10: Added fixture coverage for npm, pnpm, Python, and unknown projects in `tests/config.test.ts`.
+
 ---
 
 ### AF-M6-T1
 
 **Title:** Implement init/update/upgrade/sync/doctor/render/validate
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M2-T2, AF-M4-T1, AF-M5-T1
 
@@ -962,6 +988,10 @@ When Agent Flow is public, I want installation and maintenance commands, so that
 - 2026-05-09: `init` creates `.agent-flow/config.json`, generated Claude/Codex target files, and starter docs for configured artifact paths, including architecture, user-isolation architecture, and scheduling architecture references. It supports `--dry-run` and reports unmanaged-file conflicts without overwriting user files.
 - 2026-05-09: `init` reuses common existing project documents for status, roadmap, product, architecture, security/user-isolation, and scheduling/job docs, writing the detected paths into `.agent-flow/config.json` instead of creating duplicate starter docs.
 - 2026-05-09: `npm test` covers bare-project init, existing-document reuse, dry-run behavior, and conflict protection.
+- 2026-05-10: `validate` runs installed-file and mirror parity checks, with `--strict` returning non-zero on stale/missing/drifted managed files.
+- 2026-05-10: `doctor` reports planning discovery, unresolved `needsReview` config fields, MCP health, optional warnings, and strict failures.
+- 2026-05-10: `render --json` emits generated files without writing; `update` refreshes managed files; `upgrade --dry-run --from <version>` previews the managed-file upgrade plan.
+- 2026-05-10: `tests/render-update-upgrade-command.test.ts` covers render/update/upgrade behavior; `pack` remains scoped to AF-M6-T2.
 
 #### Verification Focus
 
@@ -972,7 +1002,7 @@ When Agent Flow is public, I want installation and maintenance commands, so that
 ### AF-M6-T2
 
 **Title:** Implement pack add/remove/list commands
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M2-T3, AF-M6-T1
 
@@ -993,12 +1023,19 @@ When a project evolves, I want to add or remove Agent Flow packs safely, so that
 - Add/remove pack e2e test in a temp repo.
 - Snapshot test for rendered output before and after `finance` pack.
 
+#### Verification Evidence
+
+- 2026-05-10: `agent-flow pack list` shows available and installed packs.
+- 2026-05-10: `agent-flow pack add <pack>` updates `.agent-flow/config.json` and renders pack-contributed agents, guides, skills, MCP config, and validators through the normal managed-file policy.
+- 2026-05-10: `agent-flow pack remove <pack>` updates config and deletes obsolete managed files that are no longer contributed by the selected pack set.
+- 2026-05-10: `doctor` reports pack composition errors such as unknown packs; `tests/pack-command.test.ts` covers list/add/remove for the `finance` pack.
+
 ---
 
 ### AF-M7-T1
 
 **Title:** Add generic, webapp, and finai-example profiles
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Yellow
 **Dependencies:** AF-M6-T1
 
@@ -1016,12 +1053,19 @@ When users start with common project types, I want useful profiles, so that one-
 
 - Render snapshots for each profile.
 
+#### Verification Evidence
+
+- 2026-05-10: Added typed profile overlays in `src/config/profiles.ts` for `generic`, `webapp`, and `finai.example`.
+- 2026-05-10: `init --profile <name>` and `render --profile <name>` use the same profile application path.
+- 2026-05-10: `webapp` enables the `webapp` pack and frontend/browser review hints without selecting a framework; `finai.example` composes FinAI-like assumptions through adapter config and packs.
+- 2026-05-10: `tests/profiles.test.ts` covers profile config snapshots and rendered profile output without writing files.
+
 ---
 
 ### AF-M7-T2
 
 **Title:** Add finance, cloudflare-worker, telegram, webapp, and toolkit packs
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M6-T2
 
@@ -1044,12 +1088,19 @@ When users adopt Agent Flow for common domains or runtimes, I want battle-tested
 - Pack render snapshots.
 - FinAI-example fixture proves current FinAI contract is reproducible through profile + packs.
 
+#### Verification Evidence
+
+- 2026-05-10: Built-in packs cover `finance`, `cloudflare-worker`, `telegram`, `webapp`, `code-review-toolkit`, `code-review-graph`, `nextjs`, and `design`.
+- 2026-05-10: `finai.example` profile composes `finance + cloudflare-worker + telegram + webapp + code-review-toolkit + code-review-graph` through config.
+- 2026-05-10: Pack composition tests cover finance, Cloudflare Worker, Telegram, webapp/browser QA, code-review-toolkit, code-review-graph, design, and Next.js contributions.
+- 2026-05-10: Universality scan passes for core files, keeping pack/domain/runtime terms out of core scan targets.
+
 ---
 
 ### AF-M8-T1
 
 **Title:** Add temp-repo install tests and agnostic scans
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M7-T2
 
@@ -1071,12 +1122,18 @@ When publishing Agent Flow, I want proof from clean repos, so that one-click ins
 - CI executes all fixtures.
 - Fixtures include empty repo, JS app, and FinAI profile.
 
+#### Verification Evidence
+
+- 2026-05-10: Added `tests/e2e-install.test.ts` with temp-repo install coverage for empty repo, JS app, unmanaged conflict handling, and `finai.example` profile.
+- 2026-05-10: E2E fixtures run `init`, `validate --strict`, and representative `doctor` checks against generated installs.
+- 2026-05-10: `npm test` now runs the full Node test suite and `scripts/check-universality.mjs --fail-on-errors`, so the agnostic scan is part of the standard CI command.
+
 ---
 
 ### AF-M9-T1
 
 **Title:** Write public docs and migration guide
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Yellow
 **Dependencies:** AF-M8-T1
 
@@ -1096,6 +1153,12 @@ When people open the GitHub repo, I want them to understand the package quickly,
 #### Verification Focus
 
 - README commands are tested or marked as release-smoke commands.
+
+#### Verification Evidence
+
+- 2026-05-10: Rewrote `README.md` as a public quickstart with install, init, validate, doctor, packs, profiles, inspection, and release-smoke command paths.
+- 2026-05-10: Added public docs for configuration, MCP generation, canonical/target architecture, pack composition, and migration from manual `.claude`/`.codex` copy flows.
+- 2026-05-10: `npm test` passes with the public docs in place and continues to run build, the Node test suite, and strict universality scan.
 
 ---
 
@@ -1119,6 +1182,14 @@ When the package is ready, I want a versioned public release, so that users can 
 #### Verification Focus
 
 - Run install from the published artifact, then run `agent-flow doctor`.
+
+#### Release Prep Evidence
+
+- 2026-05-10: Added `npm run smoke:package`, which builds, packs a local tarball, installs it into a clean temp project, then runs `agent-flow init`, `agent-flow validate --strict`, and `agent-flow doctor` through the packaged bin.
+- 2026-05-10: Prepared `0.1.0` package metadata, `CHANGELOG.md` release notes, and `docs/RELEASE.md` publish checklist.
+- 2026-05-10: `npm pack --dry-run --json` confirms the package includes release notes, public docs, runtime `dist/src`, and templates without compiled test files.
+- 2026-05-10: Added GitHub Actions CI and manual publish workflows. CI runs tests, package smoke, and package-content dry run; publish requires an `NPM_TOKEN`, verifies the requested version, reruns the same checks, then runs npm publish with provenance.
+- Publication remains open until an npm package or GitHub release exists and that published artifact passes the same clean-repo smoke path.
 
 ---
 

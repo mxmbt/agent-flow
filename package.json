@@ -1,23 +1,25 @@
 {
   "name": "@mxmbt/agent-flow",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Project-agnostic agent orchestration package and installer for Claude Code and Codex.",
   "type": "module",
   "bin": {
     "agent-flow": "./dist/src/cli/index.js"
   },
   "files": [
-    "dist",
+    "CHANGELOG.md",
+    "dist/src",
     "docs",
     "README.md",
     "templates"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test dist/tests/*.test.js",
+    "test": "npm run build && node --test dist/tests/*.test.js && node scripts/check-universality.mjs --fail-on-errors",
     "type-check": "tsc -p tsconfig.json --noEmit",
     "check:migration-similarity": "npm run build && node scripts/check-migration-similarity.mjs",
-    "check:universality": "npm run build && node scripts/check-universality.mjs"
+    "check:universality": "npm run build && node scripts/check-universality.mjs",
+    "smoke:package": "npm run build && node scripts/smoke-package-install.mjs"
   },
   "engines": {
     "node": ">=20"

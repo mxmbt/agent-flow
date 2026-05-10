@@ -4,6 +4,7 @@ set -euo pipefail
 REMOTE="{{git.remoteName}}"
 INTEGRATION_BRANCH="{{git.integrationBranch}}"
 RELEASE_BRANCH="{{git.releaseBranch}}"
+WORKTREE_PARKING="{{git.worktreeParking}}"
 
 CURRENT_WORKTREE="${PWD}"
 CURRENT_BRANCH="$(git branch --show-current)"
@@ -14,6 +15,11 @@ fail() {
   echo "ERROR: $1" >&2
   exit 1
 }
+
+if [[ "$WORKTREE_PARKING" != "true" ]]; then
+  echo "Worktree parking is disabled by Agent Flow config."
+  exit 0
+fi
 
 is_protected_branch() {
   local branch_name="$1"

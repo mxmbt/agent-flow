@@ -1,4 +1,5 @@
 export interface AgentFlowConfig {
+  needsReview: string[];
   project: {
     name: string;
     taskPrefix: string;
@@ -68,6 +69,7 @@ export interface AgentFlowConfig {
 
 export function createDefaultConfig(projectName = "Example Project"): AgentFlowConfig {
   return {
+    needsReview: [],
     project: {
       name: projectName,
       taskPrefix: "APP",

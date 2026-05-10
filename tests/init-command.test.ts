@@ -52,6 +52,8 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.doesNotMatch(stdout, /\.codex\/guides\/code-review-graph-usage\.md/);
 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
+  assert.ok(config.needsReview.includes("project.taskPrefix"));
+  assert.ok(config.needsReview.includes("git.integrationBranch"));
   assert.equal(config.artifacts.architectureFile, "docs/ARCHITECTURE.md");
   assert.equal(config.artifacts.userIsolationArchitectureFile, "docs/ARCHITECTURE_MULTI_USER.md");
   assert.equal(config.artifacts.schedulingArchitectureFile, "docs/ARCHITECTURE_SCHEDULING.md");
@@ -98,10 +100,10 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.equal(stateTemplate.project, config.project.name);
   assert.equal(stateTemplate.diffBase, "main");
   assert.equal(stateTemplate.reports.delivery.walkthroughFile, "docs/walkthroughs/agents/<taskId>.md");
-  assert.equal(stateTemplate.reports.delivery.releaseAnnouncementInternal, "");
-  assert.equal(stateTemplate.reports.delivery.releaseAnnouncementExternal, "");
-  assert.equal("releaseAnnouncementAdmins" in stateTemplate.reports.delivery, false);
-  assert.equal("releaseAnnouncementUsers" in stateTemplate.reports.delivery, false);
+  assert.equal(stateTemplate.reports.delivery.releaseAnnouncementAdmins, "");
+  assert.equal(stateTemplate.reports.delivery.releaseAnnouncementUsers, "");
+  assert.equal("releaseAnnouncementInternal" in stateTemplate.reports.delivery, false);
+  assert.equal("releaseAnnouncementExternal" in stateTemplate.reports.delivery, false);
 });
 
 test("init enables code-review-graph as default discovery provider for detected code projects", async () => {
