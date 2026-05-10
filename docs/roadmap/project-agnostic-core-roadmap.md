@@ -460,7 +460,7 @@ The CLI may also read `.agent-flow/config.yml` for users who prefer YAML, but th
 | [AF-M7-T2](#af-m7-t2) | Add finance, cloudflare-worker, telegram, and webapp packs | Red | AF-M6-T2 | DONE |
 | [AF-M8-T1](#af-m8-t1) | Add temp-repo install tests and agnostic scans | Red | AF-M7-T2 | DONE |
 | [AF-M9-T1](#af-m9-t1) | Write public docs and migration guide | Yellow | AF-M8-T1 | DONE |
-| [AF-M10-T1](#af-m10-t1) | Publish first release | Yellow | AF-M9-T1 | TODO |
+| [AF-M10-T1](#af-m10-t1) | Publish first release | Yellow | AF-M9-T1 | DONE |
 
 ---
 
@@ -1165,7 +1165,7 @@ When people open the GitHub repo, I want them to understand the package quickly,
 ### AF-M10-T1
 
 **Title:** Publish first release
-**Status:** TODO
+**Status:** DONE
 **Complexity:** Yellow
 **Dependencies:** AF-M9-T1
 
@@ -1192,7 +1192,8 @@ When the package is ready, I want a versioned public release, so that users can 
 - 2026-05-10: Documented the GitHub default-branch requirement for manual `workflow_dispatch` release runs; integration-branch releases must be promoted to the default branch before the publish workflow appears in Actions.
 - 2026-05-10: First publish attempt reached `npm publish` after passing tests, package smoke, and package-content dry run, then failed with npm `E403` because the token did not bypass publish 2FA. Release docs now call out the npm automation/granular bypass-2FA token requirement.
 - 2026-05-10: Second publish attempt passed the 2FA/token gate, signed npm provenance, then failed with npm `E422` because package metadata lacked `repository.url`. Added repository metadata matching the GitHub provenance source.
-- Publication remains open until an npm package or GitHub release exists and that published artifact passes the same clean-repo smoke path.
+- 2026-05-10: Published `@mxmbt/agent-flow@0.1.0` to npm from GitHub Actions with npm provenance.
+- 2026-05-10: Published-artifact smoke passed from a clean temp project: `npm install @mxmbt/agent-flow@0.1.0`, `npx agent-flow init`, `npx agent-flow validate --strict`, and `npx agent-flow doctor`.
 
 ---
 
