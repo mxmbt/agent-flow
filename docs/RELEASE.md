@@ -20,8 +20,11 @@ Publish through the GitHub Actions `Publish` workflow. It requires:
 
 - a repository secret named `NPM_TOKEN`;
 - workflow input `version` matching `package.json`.
+- the workflow file present on the repository default branch.
 
 The workflow runs `npm test`, `npm run smoke:package`, `npm pack --dry-run --json`, then publishes with npm provenance.
+
+If release work lands on an integration branch first, promote that branch to the repository default branch before using the manual workflow. GitHub only exposes `workflow_dispatch` workflows from the default branch.
 
 Manual fallback:
 
