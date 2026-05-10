@@ -1,0 +1,21 @@
+# Agent Flow Canonical Contract
+
+Project: {{ project.name }}
+
+Task ID pattern: `{{ project.taskIdPattern }}`
+
+Installed packs:
+
+{{ packs.installed }}
+
+Planning discovery provider: {{ discovery.planningProviderSummary }}
+
+{{> lifecycle}}
+
+{{> artifact-contracts}}
+
+{{> quality-gates}}
+
+{{> qa-delivery}}
+
+{{> state-report-contracts}}

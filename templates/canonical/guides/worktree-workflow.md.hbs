@@ -1,0 +1,122 @@
+# Worktree Workflow
+
+## Branches
+
+| Branch | Purpose | Direct push |
+|--------|---------|-------------|
+| `{{git.releaseBranchLabel}}` | Release snapshot when a release branch is configured. | Never |
+| `{{git.integrationBranch}}` | Integration branch. Feature PRs target this branch. | Never |
+| `feature/{{project.taskPrefix}}-<taskId>-...` | Task branch. | Allowed with `--force-with-lease` |
+| `bugfix/...`, `hotfix/...`, `infra/...` | Same role as feature branches. | Allowed with `--force-with-lease` |
+| `worktree/<dirname>` | Parking branch for idle worktrees when parking is enabled. | Never |
+
+Do not work directly on protected delivery branches. {{git.protectedBranchRule}} Use a task branch and PR.
+
+## Worktrees
+
+Worktree parking mode: `{{git.worktreeParkingMode}}`.
+
+When parking is enabled, idle worktrees move to local `worktree/<dirname>` branches that track `{{git.integrationRef}}`.
+
+| Worktree | Path | Parking |
+|----------|------|---------|
+| Main | `<main worktree>` | `{{git.integrationBranch}}` |
+| Additional | `<additional worktree>` | `worktree/<dirname>` |
+
+When parking is disabled, skip the parking helper and still run `{{git.deliveryStateCommand}}` so the final report records `{{git.worktreeHygieneSuccessLine}}`.
+
+## Delivery Meaning
+
+These are separate facts. Do not merge them together in close-out wording:
+
+| State | Meaning | Source of truth |
+|-------|---------|-----------------|
+| `delivered to {{git.integrationBranch}}` | Task branch was merged through PR into `{{git.integrationRef}}`. | Merged feature PR and commit reachability from `{{git.integrationRef}}` |
+| `released to {{git.releaseBranchLabel}}` | Integration changes were shipped through the configured release flow. | Merged release PR and release-state evidence |
+| `local cleanup` | Current worktree cleanup/parking state. | `git branch -vv`, upstream, HEAD, and `git status` evidence when parking is enabled |
+
+Rules:
+
+- Default `DELIVERY` closes the task into `{{git.integrationBranch}}`, not into `{{git.releaseBranchLabel}}`.
+- {{git.releaseSyncAvailability}}
+- Local worktree cleanup proves only local hygiene. It does not prove remote delivery or release status.
+- Final reports always separate integration status, release status, and local cleanup status.
+
+## Start A Task
+
+```bash
+git fetch {{git.remoteName}}
+git checkout -b feature/{{project.taskPrefix}}-<taskId>-short-desc {{git.integrationRef}}
+```
+
+## Feature Delivery
+
+```bash
+gh pr create {{git.prBaseFlag}} --title "feat(scope): ..." --body "..."
+gh pr merge <N> --squash
+```
+
+Delivery does not stop at PR creation by default. The agent must complete the flow: squash merge, delete the remote branch, run configured cleanup, and record delivery-state evidence. A PR-only stop is valid only when the user explicitly asks for it.
+
+Feature delivery completes the task in `{{git.integrationBranch}}`. By itself, it does not mean the change was released to `{{git.releaseBranchLabel}}`.
+
+## Cleanup After Merge
+
+```bash
+{{git.remoteBranchDeleteCommand}}
+{{git.worktreeParkCommand}}
+{{git.deliveryStateCommand}} --ref {{git.integrationRef}}
+```
+
+Postcondition: {{git.worktreePostcondition}}.
+
+Cleanup after merge is local hygiene. It does not change release truth for `{{git.releaseBranchLabel}}`.
+
+## Release Sync
+
+Release sync is separate from default task delivery.
+
+Use it only when the project intentionally ships the accumulated integration branch to the configured release branch. If no release branch is configured, release sync is unavailable.
+
+```bash
+gh pr create --base {{git.releaseBranch}} --head {{git.integrationBranch}} --title "release: <milestone>" --body "..."
+gh pr merge <N> --squash
+
+git fetch {{git.remoteName}}
+git -C <main worktree> reset --hard {{git.releaseRef}}
+git -C <main worktree> push --force-with-lease {{git.remoteName}} {{git.integrationBranch}}
+```
+
+After a successful release sync, `git diff {{git.releaseRef}} {{git.integrationRef}}` must be empty. SHA equality is not required when branch protection blocks an integration-branch reset; content equality is the invariant.
+
+## Close-out Wording
+
+Every delivery close-out must explicitly report:
+
+- `{{git.integrationBranch}}:` merged / not merged, PR number, commit
+- {{git.releaseCloseoutLine}}
+- `Local worktree:` parked / skipped / failed, current branch, upstream, `HEAD == {{git.integrationRef}}` yes/no when applicable
+
+Canonical report command:
+
+```bash
+{{git.deliveryStateCommand}} --ref <merge-commit-or-{{git.integrationRef}}>
+```
+
+## Parallel Worktrees
+
+Before opening a PR, rebase on integration:
+
+```bash
+git fetch {{git.remoteName}}
+git rebase {{git.integrationRef}}
+git push --force-with-lease
+```
+
+| Situation | Parallel? |
+|-----------|-----------|
+| Tasks touch different files | Yes, GitHub can merge them independently. |
+| Task B extends files changed by task A | Rebase is required. |
+| Task B depends on task A being complete | Run sequentially. |
+
+Rebase conflicts mean the work was dependent and should not continue in parallel without resolving the dependency.

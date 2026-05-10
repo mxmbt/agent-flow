@@ -1,0 +1,16 @@
+# Canonical Artifact Contracts
+
+Artifact paths come from project config. Generated instructions must not hardcode product-specific roadmap, status, phase, or handoff paths.
+
+{{ artifacts.table }}
+
+## Design Document Contract
+
+- Every task-level design document starts from the configured design template.
+- Downstream phases should reference stable semantic sections, not fragile section numbers.
+- When architecture overrules the design document, update the design document or record the divergence before implementation continues.
+
+## Handoff Contract
+
+- Detailed investigation, repro steps, code snippets, and fix guidance belong in handoff files.
+- Orchestrator-visible reports stay compact and point to handoff artifacts.

@@ -1,0 +1,24 @@
+# Canonical Quality Gates
+
+## Experts
+
+{{ quality.experts }}
+
+## Domain Expert
+
+{{ quality.domainExpert }}
+
+## Invariants
+
+{{ quality.invariants }}
+
+## Pack Validators
+
+{{ packs.validators }}
+
+## Rules
+
+- Security, correctness, performance, and UX must be considered for user-facing or runtime changes.
+- Pack validators extend the gate; they do not replace core review.
+- Every non-blocking finding must be explicitly marked `FIX NOW`, `DEFER`, or `SKIP`.
+- Deferred findings need a route, priority, module, and revisit trigger.

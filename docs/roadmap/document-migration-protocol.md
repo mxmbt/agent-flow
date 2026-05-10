@@ -1,7 +1,7 @@
 # Document Migration Protocol
 
 **Created:** 2026-05-08
-**Applies to:** extracting FinAI reference orchestration docs into Agent Flow core, packs, profiles, and adapters
+**Applies to:** extracting FinAI reference orchestration docs into Agent Flow core, packs, config, and adapters
 **Status:** Draft rule
 
 ---
@@ -69,10 +69,18 @@ docs/roadmap/document-migration-status.md
 
 This is the single source of truth for migration progress. Do not create a separate ledger unless this file becomes too large to use.
 
+Maintain recurring review decisions at:
+
+```text
+docs/roadmap/migration-review-decisions.md
+```
+
+Use the shared decision register for patterns that repeat across files. Once a decision is accepted there, apply it consistently in later migrations unless new evidence requires reopening it.
+
 Each FinAI reference source file must have one row:
 
 ```markdown
-| Source | Target | Classification | Pack/Profile | Decision | Status | Notes |
+| Source | Target | Classification | Pack/Config | Decision | Status | Notes |
 |--------|--------|----------------|--------------|----------|--------|-------|
 | FinAI:.claude/agents/feature-developer.md | templates/canonical/agents/feature-developer.md.hbs | UNCLASSIFIED | — | defer | RAW_SCANNED | full file read required |
 ```
@@ -82,7 +90,6 @@ Allowed decisions:
 - `port-as-core`
 - `port-as-target`
 - `port-as-pack`
-- `port-as-profile`
 - `keep-as-vendor`
 - `replace-with-generated`
 - `out-of-scope`
@@ -91,11 +98,14 @@ Allowed decisions:
 
 Status values:
 
-- `TODO`
-- `IN_PROGRESS`
+- `RAW_SCANNED`
+- `CLASSIFIED`
+- `TASKED`
 - `MIGRATED`
 - `VALIDATED`
 - `SKIPPED`
+
+Legacy task-planning values may appear inside future task descriptions, but the migration register itself uses the status vocabulary above.
 
 ---
 
@@ -107,7 +117,7 @@ Before editing:
 - [ ] Read any direct mirror or sibling variant, if one exists.
 - [ ] Identify whether the file is source, generated mirror, manual policy, vendor asset, or obsolete.
 - [ ] Add or update the migration status register row.
-- [ ] Decide target: core, adapter target, pack, profile, generated, vendor, obsolete.
+- [ ] Decide target: core, adapter target, pack, config-backed generated content, vendor, obsolete.
 
 Project-specific scan:
 
@@ -123,26 +133,35 @@ Project-specific scan:
 
 Extraction rules:
 
-- [ ] Move universal lifecycle/process text into canonical templates.
-- [ ] Move Claude/Codex syntax differences into target adapters.
-- [ ] Move reusable runtime/domain rules into packs.
-- [ ] Move example project values into profiles.
-- [ ] Move project-local values into `.agent-flow/config.json`.
+- [ ] Create a copy-as-is baseline first. Preserve source wording, links, commands, and assumptions before making any universality edits.
+- [ ] Record project-specific assumptions as findings after the baseline exists.
+- [ ] Check `docs/roadmap/migration-review-decisions.md` for accepted decisions that already cover the finding.
+- [ ] Decide manually whether each finding stays temporarily, moves to core, moves to a pack, becomes config, gets neutralized as source-specific wording, or is skipped.
+- [ ] Move Claude/Codex syntax differences into target adapters only after the baseline comparison is understood.
+- [ ] Move reusable runtime/domain rules into packs only after explicit review.
+- [ ] Move project-local values into `.agent-flow/config.json` only after explicit review.
 - [ ] Delete or skip obsolete content instead of preserving it.
 - [ ] Preserve vendor provenance and license metadata.
 
 Universal AI documentation quality:
 
-- [ ] The resulting doc explains what the agent/system must do, not what FinAI happened to do.
-- [ ] Requirements are phrased as configurable contracts.
-- [ ] Examples use neutral placeholders unless intentionally inside a profile or pack.
-- [ ] The doc can be installed into an empty repo without false claims.
+- [ ] First preserve the original agent/skill behavior as close to exactly as possible.
+- [ ] Then review what is too project-specific for a public package.
+- [ ] Cross-links to guides, skills, and docs are allowed in the baseline if they existed in source.
+- [ ] Do not remove cross-links, commands, or assumptions automatically; record them as review findings.
+- [ ] Requirements are phrased as configurable contracts only after the review decision says to generalize them.
+- [ ] Examples use neutral placeholders only after the review decision says to generalize them.
+- [ ] The doc can eventually be installed into an empty repo without false claims, but this can require follow-up pack/config work.
 - [ ] The doc can be rendered for Claude and Codex without semantic drift.
 - [ ] Tool-specific instructions are isolated and explicitly marked.
+- [ ] Any placeholder introduced for universalization has an explainable config or pack source. User-facing onboarding must not require reading template internals to understand where generated values come from.
 
 Validation:
 
-- [ ] Run agnostic literal scan.
+- [ ] Run migration similarity check for prompt/docs migrations. The initial baseline should target near-exact similarity.
+- [ ] Run universality scan as an advisory report of project-specific findings, not as an automatic rewrite instruction.
+- [ ] Complete manual universality review and record recurring decisions in `docs/roadmap/migration-review-decisions.md` before generalizing content.
+- [ ] Run agnostic literal scan for files that are marked ready as public core.
 - [ ] Run mirror parity validation when Claude/Codex targets are affected.
 - [ ] Run pack composition validation when packs are affected.
 - [ ] Run snapshot tests for rendered output.
@@ -159,7 +178,7 @@ Validation:
 **Source:** `<source path>`
 **Target:** `<target path>`
 **Classification:** CORE | ADAPTER_TARGET | PACK | PROFILE | GENERATED | VENDOR | OBSOLETE
-**Pack/Profile:** `<name or —>`
+**Pack/Config:** `<name or —>`
 **Status:** TODO
 
 #### Goal
@@ -179,14 +198,16 @@ Migrate this file into project-agnostic Agent Flow without copying project-speci
 - [ ] Project-specific assumptions identified
 - [ ] Target classification confirmed
 - [ ] Universal content extracted
-- [ ] Project-specific content routed to config/profile/pack or skipped
+- [ ] Project-specific content routed to config/pack, neutralized, or skipped
 - [ ] Rendered output validated
 - [ ] Migration status updated
 
 #### Acceptance Criteria
 
 - The target file is generated or written in the correct layer.
-- Core output has no forbidden project-specific literals.
+- Copy-as-is baseline output is near-exact unless an explicit reviewed exception exists.
+- Project-specific findings are recorded separately from the baseline.
+- Public-core readiness requires manual universality decisions; the advisory scan alone is not sufficient.
 - Claude/Codex parity is preserved when relevant.
 - Tests or snapshots cover the rendered output.
 ```

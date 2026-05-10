@@ -1,0 +1,34 @@
+# Verification Before Completion
+
+## Iron Law
+
+Do not claim success without fresh evidence from the current session.
+
+## Process
+
+1. identify what changed
+2. identify the smallest honest verification set
+3. run the commands or checks
+4. inspect the result, not just the exit code
+5. report exactly what was verified and what was not
+
+## Default Repo Checks
+
+For code changes in the active project:
+
+```bash
+{{checks.defaultShellBlock}}
+```
+
+Extra checks when relevant:
+
+- schema changes -> {{checks.changedSchemaInline}}
+- runtime config changes -> inspect `{{runtime.bindingConfigFile}}` and related bindings/secrets assumptions
+- UI changes -> live or browser-based verification of the changed surface
+
+## Forbidden Claims
+
+- “lint passed” when there is no repo lint contract
+- “build passed” when no build was run
+- “fixed” without reproducing and re-checking the bug
+- “tested” when only reading code happened
