@@ -164,7 +164,7 @@ test("detectProjectConfig proposes npm script checks without review blockers", a
   assert.deepEqual(detected.config.needsReview, detected.needsReview);
   assert.ok(detected.evidence.some((line) => /Detected focused test command: npm run test -- <test-file>/.test(line)));
   assert.ok(detected.evidence.some((line) => /code-review-graph pack as the default planning discovery provider/.test(line)));
-  assert.ok(detected.evidence.some((line) => /code-review-toolkit pack as recommended manual review tooling/.test(line)));
+  assert.ok(detected.evidence.some((line) => /code-review-toolkit pack as core manual review tooling/.test(line)));
 });
 
 test("detectProjectConfig enables nextjs pack for Next.js projects", async () => {
@@ -221,7 +221,7 @@ test("detectProjectConfig proposes Python checks", async () => {
   assert.equal(detected.packageManager, "python");
   assert.equal(detected.hasPackageJson, false);
   assert.equal(detected.config.discovery.codeGraphProvider, "code-review-graph");
-  assert.deepEqual(detected.config.packs, ["code-review-graph"]);
+  assert.deepEqual(detected.config.packs, ["code-review-graph", "code-review-toolkit"]);
   assert.deepEqual(detected.config.checks.default, ["python -m pytest"]);
   assert.equal(detected.config.checks.focusedTestCommand, "python -m pytest <test-file>");
   assert.deepEqual(detected.needsReview, []);
@@ -235,7 +235,7 @@ test("detectProjectConfig gives empty repositories starter defaults without revi
   assert.equal(detected.packageManager, null);
   assert.equal(detected.hasPackageJson, false);
   assert.equal(detected.config.discovery.codeGraphProvider, "code-review-graph");
-  assert.deepEqual(detected.config.packs, ["code-review-graph"]);
+  assert.deepEqual(detected.config.packs, ["code-review-graph", "code-review-toolkit"]);
   assert.deepEqual(detected.config.checks.default, ["npm run test"]);
   assert.equal(detected.config.checks.focusedTestCommand, "npm run test -- <test-file>");
   assert.deepEqual(detected.needsReview, []);

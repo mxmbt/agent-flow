@@ -29,7 +29,7 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   config.project.taskIdPattern = `${config.project.taskPrefix}-[A-Z0-9]+-T[0-9]+`;
   const needsReview: string[] = [];
   const evidence: string[] = [];
-  enableDefaultCodeGraph(config, evidence);
+  enableDefaultCorePacks(config, evidence);
 
   if (!packageJson) {
     if (await hasPythonProject(cwd)) {
@@ -49,10 +49,6 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
 
   evidence.push("Detected package.json.");
   evidence.push(`Defaulted task prefix to ${config.project.taskPrefix} and integration branch to ${config.git.integrationBranch}.`);
-  if (!config.packs.includes("code-review-toolkit")) {
-    config.packs.push("code-review-toolkit");
-  }
-  evidence.push("Enabled the code-review-toolkit pack as recommended manual review tooling for code projects.");
 
   const scripts = getScripts(packageJson);
   const dependencies = getDependencyNames(packageJson);
@@ -172,12 +168,16 @@ function deriveTaskPrefix(projectName: string): string {
   return prefix.length > 0 ? prefix : "APP";
 }
 
-function enableDefaultCodeGraph(config: AgentFlowConfig, evidence: string[]): void {
+function enableDefaultCorePacks(config: AgentFlowConfig, evidence: string[]): void {
   config.discovery.codeGraphProvider = "code-review-graph";
   if (!config.packs.includes("code-review-graph")) {
     config.packs.push("code-review-graph");
   }
+  if (!config.packs.includes("code-review-toolkit")) {
+    config.packs.push("code-review-toolkit");
+  }
   evidence.push("Enabled the code-review-graph pack as the default planning discovery provider. To use another code graph provider later, set discovery.codeGraphProvider to custom and remove or replace the pack.");
+  evidence.push("Enabled the code-review-toolkit pack as core manual review tooling.");
 }
 
 function getScripts(packageJson: PackageJson): ScriptMap {

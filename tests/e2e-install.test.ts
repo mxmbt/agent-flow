@@ -23,7 +23,8 @@ test("e2e empty repo install validates generated mirrors", async () => {
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.deepEqual(config.needsReview, []);
   assert.equal(config.discovery.codeGraphProvider, "code-review-graph");
-  assert.deepEqual(config.packs, ["code-review-graph"]);
+  assert.deepEqual(config.packs, ["code-review-graph", "code-review-toolkit"]);
+  assert.match(init.stdout, /\.codex\/agents\/prt-code-reviewer\.md/);
   const packageJson = JSON.parse(await readFile(path.join(cwd, "package.json"), "utf8"));
   assert.equal(packageJson.scripts.test, "node -e \"console.log('No project tests configured yet')\"");
 
@@ -84,11 +85,11 @@ test("e2e finai example profile installs as adapter config", async () => {
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.deepEqual(config.packs, [
     "code-review-graph",
+    "code-review-toolkit",
     "finance",
     "cloudflare-worker",
     "telegram",
-    "webapp",
-    "code-review-toolkit"
+    "webapp"
   ]);
   assert.equal(config.git.integrationBranch, "develop");
   assert.equal(config.git.releaseBranch, "master");

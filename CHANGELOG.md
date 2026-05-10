@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Enables the code-review-toolkit pack during `agent-flow init` for fresh projects.
+- Installs the six `prt-*` review agents and `pr-review-toolkit` skill as part of the default onboarding bundle.
+
 ## 0.1.2
 
 - Enables the code-review-graph pack as the default planning discovery provider during `agent-flow init`.
