@@ -1682,6 +1682,41 @@
       "target": "templates/shared/docs/templates/walkthrough-template.md.hbs",
       "threshold": 0.99,
       "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0517",
+      "source": "scripts/codex-phase-check.mjs",
+      "target": "templates/shared/scripts/agent-flow-phase-check.mjs.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0518",
+      "source": "scripts/codex-review-gate.mjs",
+      "target": "templates/shared/scripts/agent-flow-review-gate.mjs.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0519",
+      "source": "scripts/codex-validate-phase.mjs",
+      "target": "templates/shared/scripts/agent-flow-validate-phase.mjs.hbs",
+      "threshold": 0.99,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0529",
+      "source": "scripts/park-worktrees.sh",
+      "target": "templates/shared/scripts/park-worktrees.sh.hbs",
+      "threshold": 0.9,
+      "targetSimilarity": 0.99
+    },
+    {
+      "id": "FINAI-0530",
+      "source": "scripts/report-delivery-state.sh",
+      "target": "templates/shared/scripts/report-delivery-state.sh.hbs",
+      "threshold": 0.9,
+      "targetSimilarity": 0.99
     }
   ]
 }

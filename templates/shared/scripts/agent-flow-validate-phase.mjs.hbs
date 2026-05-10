@@ -1,0 +1,153 @@
+#!/usr/bin/env node
+
+import { readFileSync, readdirSync, statSync } from 'fs';
+import { join } from 'path';
+import { validateReviewQuality } from './agent-flow-review-gate.mjs';
+
+const PHASE_ROOT = '{{artifacts.phaseRoot}}';
+const PHASE_ORDER = ['PLAN', 'ARCHITECTURE', 'IMPLEMENTATION', 'SIMPLIFY', 'REVIEW', 'QUALITY_GATE', 'QA', 'DELIVERY'];
+
+const PHASE_STATE_KEYS = {
+  PLAN: 'plan',
+  ARCHITECTURE: 'architecture',
+  IMPLEMENTATION: 'implementation',
+  SIMPLIFY: 'simplify',
+  REVIEW: 'review',
+  QUALITY_GATE: 'qualityGate',
+  QA: 'qa',
+  DELIVERY: 'delivery',
+};
+
+const REPORT_KEYS = {
+  PLAN: 'plan',
+  ARCHITECTURE: 'architecture',
+  IMPLEMENTATION: 'implementation',
+  SIMPLIFY: 'simplify',
+  REVIEW: 'review',
+  QUALITY_GATE: 'qualityGate',
+  QA: 'qa',
+  DELIVERY: 'delivery',
+};
+
+const SKIPPABLE_PHASES = new Set(['ARCHITECTURE', 'QA']);
+const STATE_FILE_SUFFIXES = ['-state.json'];
+
+function isStateFile(fileName) {
+  return STATE_FILE_SUFFIXES.some((suffix) => fileName.endsWith(suffix));
+}
+
+function findLatestAgentState() {
+  const phasesDir = join(process.cwd(), PHASE_ROOT);
+  let best = null;
+
+  try {
+    for (const phaseDir of readdirSync(phasesDir)) {
+      if (!phaseDir.startsWith('phase-')) continue;
+      const statesDir = join(phasesDir, phaseDir, 'states');
+
+      try {
+        for (const file of readdirSync(statesDir)) {
+          if (!isStateFile(file)) continue;
+          const path = join(statesDir, file);
+          const mtime = statSync(path).mtimeMs;
+          if (!best || mtime > best.mtime) best = { path, mtime };
+        }
+      } catch {
+        // ignore missing states dir
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return best?.path || null;
+}
+
+function normalizePhaseName(phaseName) {
+  return typeof phaseName === 'string' ? phaseName.trim().toUpperCase() : '';
+}
+
+function getPhaseState(state, phaseName) {
+  const phaseKey = PHASE_STATE_KEYS[phaseName];
+  return state?.phases?.[phaseKey] || state?.phases?.[phaseName];
+}
+
+function isMeaningfulReport(report) {
+  if (!report || typeof report !== 'object') return false;
+  if (Object.keys(report).length === 0) return false;
+
+  return Object.values(report).some((value) => {
+    if (Array.isArray(value)) return value.length > 0;
+    if (value && typeof value === 'object') return isMeaningfulReport(value);
+    return value !== '' && value !== false && value !== 0 && value !== null;
+  });
+}
+
+function validate() {
+  const statePath = findLatestAgentState();
+  if (!statePath) process.exit(0);
+
+  let state;
+  try {
+    state = JSON.parse(readFileSync(statePath, 'utf-8'));
+  } catch {
+    console.log(`WARNING: Could not read state: ${statePath}`);
+    process.exit(0);
+  }
+
+  const currentPhase = normalizePhaseName(state.currentPhase);
+  const currentIndex = PHASE_ORDER.indexOf(currentPhase);
+  if (currentIndex === -1) process.exit(0);
+
+  const warnings = [];
+  const errors = [];
+
+  for (let i = 0; i < currentIndex; i += 1) {
+    const phase = PHASE_ORDER[i];
+    const phaseState = getPhaseState(state, phase);
+    const status = phaseState?.status;
+    const report = state.reports?.[REPORT_KEYS[phase]];
+
+    if (status === 'skipped') {
+      if (!SKIPPABLE_PHASES.has(phase)) {
+        warnings.push(`${phase}: skipped (unexpected)`);
+      }
+      continue;
+    }
+
+    if (phaseState && status !== 'completed') {
+      warnings.push(`${phase}: status=${String(status)} (expected completed)`);
+      continue;
+    }
+
+    if (phaseState && !isMeaningfulReport(report)) {
+      warnings.push(`${phase}: completed but report seems empty`);
+    }
+  }
+
+  const reviewQuality = validateReviewQuality(state);
+  if (reviewQuality.reviewRequired) {
+    reviewQuality.warnings.forEach((warning) => warnings.push(`REVIEW_GATE: ${warning}`));
+    reviewQuality.errors.forEach((error) => errors.push(`REVIEW_GATE: ${error}`));
+  }
+
+  if (errors.length > 0) {
+    console.log('PHASE VALIDATION ERRORS:');
+    errors.forEach((error) => console.log(`- ${error}`));
+  }
+
+  if (warnings.length > 0) {
+    console.log('PHASE VALIDATION WARNINGS:');
+    warnings.forEach((warning) => console.log(`- ${warning}`));
+    console.log('Run: node scripts/agent-flow-phase-check.mjs');
+  }
+
+  if (errors.length > 0) {
+    console.log('Run: node scripts/agent-flow-review-gate.mjs');
+    process.exit(2);
+  }
+
+  process.exit(0);
+}
+
+validate();

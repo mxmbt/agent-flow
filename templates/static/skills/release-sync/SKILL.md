@@ -75,7 +75,7 @@ In repos with branch protection on `{{git.integrationBranch}}` that blocks force
 {{git.worktreeParkCommand}}
 ```
 
-If running from the main worktree on `{{git.integrationBranch}}`, use the release-sync loop from `.claude/guides/worktree-workflow.md` for all parked worktrees.
+If running from the main worktree on `{{git.integrationBranch}}`, use the release-sync loop from `{{target.toolRoot}}/guides/worktree-workflow.md` for all parked worktrees.
 
 7. Verify content equality:
 

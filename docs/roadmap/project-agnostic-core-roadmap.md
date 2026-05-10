@@ -440,7 +440,7 @@ The CLI may also read `.agent-flow/config.yml` for users who prefer YAML, but th
 | ID | Title | Complexity | Dependencies | Status |
 |----|-------|------------|--------------|--------|
 | [AF-M0-T1](#af-m0-t1) | Preserve FinAI as read-only reference | Green | none | DONE |
-| [AF-M0-T2](#af-m0-t2) | Inventory FinAI reference assets | Yellow | AF-M0-T1 | IN_PROGRESS |
+| [AF-M0-T2](#af-m0-t2) | Inventory FinAI reference assets | Yellow | AF-M0-T1 | DONE |
 | [AF-M0-T3](#af-m0-t3) | Create migration protocol and unified status register | Yellow | AF-M0-T2 | DONE |
 | [AF-M1-T1](#af-m1-t1) | Create package scaffold on empty baseline | Yellow | AF-M0-T3 | DONE |
 | [AF-M1-T2](#af-m1-t2) | Add CLI command skeleton | Yellow | AF-M1-T1 | DONE |
@@ -449,8 +449,8 @@ The CLI may also read `.agent-flow/config.yml` for users who prefer YAML, but th
 | [AF-M2-T3](#af-m2-t3) | Define pack model and pack composition rules | Red | AF-M2-T1 | DONE |
 | [AF-M3-T1](#af-m3-t1) | Build canonical lifecycle templates | Red | AF-M2-T2, AF-M2-T3 | DONE |
 | [AF-M3-T2](#af-m3-t2) | Build Claude and Codex target renderers | Red | AF-M3-T1 | DONE |
-| [AF-M3-T3](#af-m3-t3) | Port agents, skills, guides, and artifact templates | Red | AF-M3-T2 | IN_PROGRESS |
-| [AF-M4-T1](#af-m4-t1) | Add full mirror parity validation | Red | AF-M3-T3 | TODO |
+| [AF-M3-T3](#af-m3-t3) | Port agents, skills, guides, and artifact templates | Red | AF-M3-T2 | DONE |
+| [AF-M4-T1](#af-m4-t1) | Add full mirror parity validation | Red | AF-M3-T3 | IN_PROGRESS |
 | [AF-M4-T2](#af-m4-t2) | Generalize git and delivery utilities | Red | AF-M4-T1 | TODO |
 | [AF-M5-T1](#af-m5-t1) | Add MCP configuration rendering and health checks | Red | AF-M2-T1 | TODO |
 | [AF-M5-T2](#af-m5-t2) | Add project command detection and setup prompts | Red | AF-M2-T1 | TODO |
@@ -490,7 +490,7 @@ When rebuilding Agent Flow, I want FinAI untouched, so that extraction cannot re
 ### AF-M0-T2
 
 **Title:** Inventory FinAI reference assets
-**Status:** IN_PROGRESS
+**Status:** DONE
 **Complexity:** Yellow
 **Dependencies:** AF-M0-T1
 
@@ -511,7 +511,7 @@ When extracting orchestration assets from FinAI, I want every selected candidate
 
 - 2026-05-08: `docs/roadmap/document-migration-status.md` contains 537 raw FinAI reference rows covering `.claude/**`, `.codex/**`, root entrypoints, `scripts/**`, and `docs/templates/**`.
 - 2026-05-08: 4 representative rows were classified after full-file review: root Codex entrypoint, `feature-developer` agent, `architecture-phase` lifecycle skill, and `agent-report-template`.
-- Remaining work: classify the rest of the register before treating AF-M0-T2 as complete.
+- 2026-05-10: Full 537-row FinAI reference register is classified in `docs/roadmap/document-migration-status.md`; no `UNCLASSIFIED` rows remain.
 
 ---
 
@@ -772,7 +772,7 @@ When installing into a repo, I want Claude Code and Codex to receive their nativ
 ### AF-M3-T3
 
 **Title:** Port agents, skills, guides, and artifact templates
-**Status:** IN_PROGRESS
+**Status:** DONE
 **Complexity:** Red
 **Dependencies:** AF-M3-T2
 
@@ -822,6 +822,16 @@ When users install Agent Flow, I want the strong FinAI-aligned process without F
 - 2026-05-09: Added `discovery.codeGraphProvider` onboarding. `init` enables the `code-review-graph` pack by default for detected coding projects without existing Agent Flow config, while `doctor` and `config explain` surface missing or custom planning discovery providers. Core agents now reference the configured discovery provider instead of hardcoded CRG guide links; the CRG guide and MCP recommendation remain pack-owned.
 - 2026-05-09: Detected coding projects also enable the `code-review-toolkit` pack as recommended manual review tooling, without making those agents mandatory in zero-pack installs.
 - 2026-05-09: QA runtime URL and shared test-account docs now render from config via `dev.start.url` and `artifacts.qaSharedAccountFile`; `init` creates a starter QA shared-account doc for bare projects and reuses common existing QA docs.
+- 2026-05-09: AF-MIG-0030 migrated core artifact templates for agent reports, design documents, QA reports, state files, and walkthroughs as shared rendered docs with project/check/branch/domain/runtime values routed through config and packs.
+- 2026-05-10: AF-MIG-0031 migrated the first core validation scripts as shared installed scripts: `agent-flow-phase-check.mjs`, `agent-flow-review-gate.mjs`, and `agent-flow-validate-phase.mjs`. Phase roots render from `artifacts.phaseRoot`; review fields use neutral `primaryReview*` names instead of Codex-specific state fields.
+- 2026-05-10: AF-MIG-0032 migrated the first core delivery helper scripts as shared installed scripts: `park-worktrees.sh` and `report-delivery-state.sh`. Remote, integration branch, and release branch policy render from git config; release branch reporting is optional for projects without one.
+- 2026-05-10: `npm test` passed with 63 tests, `npm run check:universality` passed for 113 files, and `npm run check:migration-similarity -- --source-root /Users/mburtikov/conductor/workspaces/ai_finance_manager/richmond-v1 --max-diff-lines 12` passed for the migrated validation and delivery helper scripts. Validation scripts stayed above the 99% target at 99.48%, 99.71%, and 99.54%; delivery helpers passed their documented 90% minimum at 98.08% and 92.83% because hardcoded branch/release policy was intentionally made config-driven.
+- 2026-05-10: AF-MIG-0033 classified the remaining reviewed script batch. CRG operational scripts are pack-owned, legacy Claude-to-Codex sync scripts are obsolete, Supabase database scripts are out of scope, and delivery/skill-reference tests need renderer-aware redesign before migration.
+- 2026-05-10: AF-MIG-0034 added a generated `.codex/README.md` target and classified the first settings/MCP batch. Source settings and `mcp.codex.json` are not portable enough to copy as core because they contain CRG hooks, source-specific permissions, old hook scripts, and machine-local absolute paths; future settings/MCP output must be rendered from config and packs.
+- 2026-05-10: AF-MIG-0035 classified `.codex/agents/**` and `.codex/guides/**` mirror rows as generated targets. All files in the batch have `@generated from claude:*` provenance, so Agent Flow replaces them with renderer output from canonical agent/guide templates instead of treating source-specific Codex mirrors as independent semantic sources.
+- 2026-05-10: AF-MIG-0036 classified `.codex/skills/**` mirror rows. 209 rows map directly to already migrated `templates/static/skills/**` assets and are generated target output; the remaining manual/stale Codex skill files are either superseded by generated QA/review contracts, future optional tool-pack material, obsolete sync infrastructure, or non-runtime authoring artifacts.
+- 2026-05-10: AF-MIG-0037 classified the final raw inventory rows. Root Claude files are generated adapter targets, hidden template aliases are covered by shared `docs/templates/**`, and the legacy `.codex/sync-manifest.json` is obsolete because Agent Flow renders targets directly. The 537-row FinAI reference register is now fully classified.
+- 2026-05-10: AF-M3-T3 is complete for the FinAI extraction scope: migrated core/pack agents, guides, static skills, shared artifact templates, validation scripts, delivery helper scripts, and generated Claude/Codex target wrappers pass the current renderer, universality, and test checks. Deferred settings/MCP rendering, CRG pack scripts, renderer-aware validators, and pack-management commands continue under AF-M4+ / AF-M5+ / AF-M6+ tasks.
 
 ---
 

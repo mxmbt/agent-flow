@@ -1,0 +1,121 @@
+#!/usr/bin/env node
+
+import { readFileSync, readdirSync, statSync } from 'fs';
+import { join } from 'path';
+import { validateReviewQuality } from './agent-flow-review-gate.mjs';
+
+const PHASE_ROOT = '{{artifacts.phaseRoot}}';
+const PHASE_ORDER = ['PLAN', 'ARCHITECTURE', 'IMPLEMENTATION', 'SIMPLIFY', 'REVIEW', 'QUALITY_GATE', 'QA', 'DELIVERY'];
+
+const PHASE_STATE_KEYS = {
+  PLAN: 'plan',
+  ARCHITECTURE: 'architecture',
+  IMPLEMENTATION: 'implementation',
+  SIMPLIFY: 'simplify',
+  REVIEW: 'review',
+  QUALITY_GATE: 'qualityGate',
+  QA: 'qa',
+  DELIVERY: 'delivery',
+};
+
+const REPORT_KEYS = {
+  PLAN: 'plan',
+  ARCHITECTURE: 'architecture',
+  IMPLEMENTATION: 'implementation',
+  SIMPLIFY: 'simplify',
+  REVIEW: 'review',
+  QUALITY_GATE: 'qualityGate',
+  QA: 'qa',
+  DELIVERY: 'delivery',
+};
+
+const STATE_FILE_SUFFIXES = ['-state.json'];
+
+function isStateFile(fileName) {
+  return STATE_FILE_SUFFIXES.some((suffix) => fileName.endsWith(suffix));
+}
+
+function latestAgentState() {
+  const root = join(process.cwd(), PHASE_ROOT);
+  let best = null;
+
+  try {
+    for (const phaseDir of readdirSync(root)) {
+      if (!phaseDir.startsWith('phase-')) continue;
+
+      const statesDir = join(root, phaseDir, 'states');
+      try {
+        for (const file of readdirSync(statesDir)) {
+          if (!isStateFile(file)) continue;
+          const path = join(statesDir, file);
+          const mtime = statSync(path).mtimeMs;
+          if (!best || mtime > best.mtime) best = { path, mtime };
+        }
+      } catch {
+        // ignore missing states dir
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return best?.path || null;
+}
+
+function getPhaseState(state, phaseName) {
+  const phaseKey = PHASE_STATE_KEYS[phaseName];
+  return state?.phases?.[phaseKey] || state?.phases?.[phaseName];
+}
+
+function reportFilled(value) {
+  if (!value || typeof value !== 'object') return false;
+  if (Object.keys(value).length === 0) return false;
+
+  const hasSignal = (obj) => Object.values(obj).some((entry) => {
+    if (Array.isArray(entry)) return entry.length > 0;
+    if (entry && typeof entry === 'object') return hasSignal(entry);
+    return entry !== '' && entry !== false && entry !== 0 && entry !== null;
+  });
+
+  return hasSignal(value);
+}
+
+const statePath = latestAgentState();
+if (!statePath) {
+  console.log('No agent-state found.');
+  process.exit(0);
+}
+
+const state = JSON.parse(readFileSync(statePath, 'utf-8'));
+
+console.log(`Agent state: ${statePath}`);
+console.log('Lifecycle: phase-centric');
+console.log(`Current phase: ${state.currentPhase}`);
+
+for (const phase of PHASE_ORDER) {
+  const phaseState = getPhaseState(state, phase);
+  const status = phaseState?.status || 'missing';
+  const report = state.reports?.[REPORT_KEYS[phase]];
+  const filled = reportFilled(report);
+
+  let mark = 'open';
+  if (status === 'completed') mark = filled ? 'ok' : 'empty';
+  if (status === 'skipped') mark = 'skipped';
+
+  console.log(`${mark} ${phase}: status=${status}, report=${filled ? 'filled' : 'empty'}`);
+}
+
+const reviewGate = validateReviewQuality(state);
+if (!reviewGate.reviewRequired) {
+  console.log('REVIEW GATE: not required at current phase');
+} else if (reviewGate.errors.length > 0) {
+  console.log('REVIEW GATE: failed');
+  reviewGate.errors.forEach((error) => console.log(`- ${error}`));
+} else if (reviewGate.warnings.length > 0) {
+  console.log('REVIEW GATE: warnings');
+  reviewGate.warnings.forEach((warning) => console.log(`- ${warning}`));
+} else {
+  console.log('REVIEW GATE: passed');
+}
+
+process.exit(0);

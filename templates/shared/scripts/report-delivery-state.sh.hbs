@@ -1,0 +1,184 @@
+#!/bin/bash
+set -euo pipefail
+
+REMOTE="{{git.remoteName}}"
+INTEGRATION_BRANCH="{{git.integrationBranch}}"
+RELEASE_BRANCH="{{git.releaseBranch}}"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./scripts/report-delivery-state.sh [--ref <git-ref>] [--json]
+
+Reports three separate facts for delivery close-out:
+  - whether <ref> is reachable from the configured integration branch
+  - whether <ref> is reachable from the configured release branch, when configured
+  - whether the current worktree satisfies parking hygiene
+
+Options:
+  --ref <git-ref>  Git ref or commit to evaluate. Default: HEAD
+  --json           Emit JSON instead of human-readable text
+  --help           Show this help
+EOF
+}
+
+REF="HEAD"
+FORMAT="text"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --ref|--commit)
+      [[ $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
+      REF="$2"
+      shift 2
+      ;;
+    --json)
+      FORMAT="json"
+      shift
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+  echo "Not inside a git worktree" >&2
+  exit 1
+}
+
+git fetch "$REMOTE" --prune >/dev/null
+
+git rev-parse --verify "$REMOTE/$INTEGRATION_BRANCH" >/dev/null 2>&1 || {
+  echo "Missing $REMOTE/$INTEGRATION_BRANCH" >&2
+  exit 1
+}
+
+RELEASE_CONFIGURED="yes"
+if [[ "$RELEASE_BRANCH" == "none configured" ]]; then
+  RELEASE_CONFIGURED="no"
+else
+  git rev-parse --verify "$REMOTE/$RELEASE_BRANCH" >/dev/null 2>&1 || {
+    echo "Missing $REMOTE/$RELEASE_BRANCH" >&2
+    exit 1
+  }
+fi
+
+TARGET_SHA="$(git rev-parse --verify "$REF")"
+INTEGRATION_SHA="$(git rev-parse --verify "$REMOTE/$INTEGRATION_BRANCH")"
+if [[ "$RELEASE_CONFIGURED" == "yes" ]]; then
+  RELEASE_SHA="$(git rev-parse --verify "$REMOTE/$RELEASE_BRANCH")"
+else
+  RELEASE_SHA=""
+fi
+HEAD_SHA="$(git rev-parse --verify HEAD)"
+CURRENT_BRANCH="$(git branch --show-current)"
+CURRENT_WORKTREE="$(pwd)"
+MAIN_WORKTREE="$(git worktree list --porcelain | awk '/^worktree /{print $2; exit}')"
+
+if [[ "$CURRENT_WORKTREE" == "$MAIN_WORKTREE" ]]; then
+  EXPECTED_BRANCH="$INTEGRATION_BRANCH"
+else
+  EXPECTED_BRANCH="worktree/$(basename "$CURRENT_WORKTREE")"
+fi
+
+if git merge-base --is-ancestor "$TARGET_SHA" "$REMOTE/$INTEGRATION_BRANCH"; then
+  INTEGRATION_STATUS="merged"
+else
+  INTEGRATION_STATUS="not merged"
+fi
+
+if [[ "$RELEASE_CONFIGURED" == "yes" ]]; then
+  if git merge-base --is-ancestor "$TARGET_SHA" "$REMOTE/$RELEASE_BRANCH"; then
+    RELEASE_STATUS="released"
+  else
+    RELEASE_STATUS="not released"
+  fi
+else
+  RELEASE_STATUS="not configured"
+fi
+
+if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+  UPSTREAM_BRANCH="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')"
+else
+  UPSTREAM_BRANCH="(none)"
+fi
+
+if [[ "$CURRENT_BRANCH" == "$EXPECTED_BRANCH" ]]; then
+  BRANCH_OK="yes"
+else
+  BRANCH_OK="no"
+fi
+
+if [[ "$UPSTREAM_BRANCH" == "$REMOTE/$INTEGRATION_BRANCH" ]]; then
+  UPSTREAM_OK="yes"
+else
+  UPSTREAM_OK="no"
+fi
+
+if [[ "$HEAD_SHA" == "$INTEGRATION_SHA" ]]; then
+  HEAD_OK="yes"
+else
+  HEAD_OK="no"
+fi
+
+if [[ -z "$(git status --short)" ]]; then
+  CLEAN_OK="yes"
+else
+  CLEAN_OK="no"
+fi
+
+if [[ "$BRANCH_OK" == "yes" && "$UPSTREAM_OK" == "yes" && "$HEAD_OK" == "yes" && "$CLEAN_OK" == "yes" ]]; then
+  HYGIENE_STATUS="pass"
+else
+  HYGIENE_STATUS="fail"
+fi
+
+short_sha() {
+  git rev-parse --short "$1"
+}
+
+if [[ "$FORMAT" == "json" ]]; then
+  cat <<EOF
+{
+  "ref": "$REF",
+  "targetSha": "$TARGET_SHA",
+  "integration": {
+    "branch": "$INTEGRATION_BRANCH",
+    "status": "$INTEGRATION_STATUS",
+    "remoteSha": "$INTEGRATION_SHA"
+  },
+  "release": {
+    "branch": "$RELEASE_BRANCH",
+    "status": "$RELEASE_STATUS",
+    "remoteSha": "$RELEASE_SHA"
+  },
+  "localWorktree": {
+    "hygiene": "$HYGIENE_STATUS",
+    "expectedBranch": "$EXPECTED_BRANCH",
+    "currentBranch": "$CURRENT_BRANCH",
+    "upstream": "$UPSTREAM_BRANCH",
+    "headMatchesIntegration": "$HEAD_OK",
+    "workingTreeClean": "$CLEAN_OK"
+  }
+}
+EOF
+  exit 0
+fi
+
+cat <<EOF
+Integration ($INTEGRATION_BRANCH): $INTEGRATION_STATUS (ref $(short_sha "$TARGET_SHA") vs $REMOTE/$INTEGRATION_BRANCH $(short_sha "$INTEGRATION_SHA"))
+Release ($RELEASE_BRANCH): $RELEASE_STATUS${RELEASE_SHA:+ (ref $(short_sha "$TARGET_SHA") vs $REMOTE/$RELEASE_BRANCH $(short_sha "$RELEASE_SHA"))}
+Local worktree hygiene: $HYGIENE_STATUS
+- Expected parking branch: $EXPECTED_BRANCH
+- Current branch: $CURRENT_BRANCH
+- Upstream: $UPSTREAM_BRANCH
+- HEAD == $REMOTE/$INTEGRATION_BRANCH: $HEAD_OK
+- Working tree clean: $CLEAN_OK
+EOF
