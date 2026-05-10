@@ -18,9 +18,12 @@ test("e2e empty repo install validates generated mirrors", async () => {
   const init = await execFileAsync(process.execPath, [cliPath, "init"], { cwd, ...execOptions });
   assert.match(init.stdout, /Initialized Agent Flow/);
   assert.match(init.stdout, /package\.json/);
+  assert.match(init.stdout, /code-review-graph pack as the default planning discovery provider/);
 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.deepEqual(config.needsReview, []);
+  assert.equal(config.discovery.codeGraphProvider, "code-review-graph");
+  assert.deepEqual(config.packs, ["code-review-graph"]);
   const packageJson = JSON.parse(await readFile(path.join(cwd, "package.json"), "utf8"));
   assert.equal(packageJson.scripts.test, "node -e \"console.log('No project tests configured yet')\"");
 
@@ -29,6 +32,9 @@ test("e2e empty repo install validates generated mirrors", async () => {
 
   const doctor = await execFileAsync(process.execPath, [cliPath, "doctor"], { cwd, ...execOptions });
   assert.match(doctor.stdout, /Needs review: none/);
+  assert.match(doctor.stdout, /Planning discovery provider: code-review-graph/);
+  assert.match(doctor.stdout, /No doctor warnings/);
+  assert.doesNotMatch(doctor.stdout, /No code graph provider configured/);
 });
 
 test("e2e JS app install enables code project packs and validates", async () => {
@@ -77,12 +83,12 @@ test("e2e finai example profile installs as adapter config", async () => {
 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.deepEqual(config.packs, [
+    "code-review-graph",
     "finance",
     "cloudflare-worker",
     "telegram",
     "webapp",
-    "code-review-toolkit",
-    "code-review-graph"
+    "code-review-toolkit"
   ]);
   assert.equal(config.git.integrationBranch, "develop");
   assert.equal(config.git.releaseBranch, "master");

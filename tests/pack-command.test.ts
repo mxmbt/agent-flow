@@ -18,7 +18,7 @@ test("pack list shows installed and available packs", async () => {
   const { stdout } = await execFileAsync(process.execPath, [cliPath, "pack", "list"], { cwd });
 
   assert.match(stdout, /finance \[available\]/);
-  assert.match(stdout, /code-review-graph \[available\]/);
+  assert.match(stdout, /code-review-graph \[installed\]/);
 });
 
 test("pack add updates config and renders pack files", async () => {
@@ -29,7 +29,7 @@ test("pack add updates config and renders pack files", async () => {
 
   assert.match(stdout, /Agent Flow pack add finance/);
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
-  assert.deepEqual(config.packs, ["finance"]);
+  assert.deepEqual(config.packs, ["code-review-graph", "finance"]);
   assert.match(await readFile(path.join(cwd, ".codex", "agents", "math-genius.md"), "utf8"), /math-genius/);
 });
 
@@ -42,6 +42,6 @@ test("pack remove deletes obsolete managed pack files", async () => {
 
   assert.match(stdout, /Obsolete managed files:/);
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
-  assert.deepEqual(config.packs, []);
+  assert.deepEqual(config.packs, ["code-review-graph"]);
   await assert.rejects(() => readFile(path.join(cwd, ".codex", "agents", "math-genius.md"), "utf8"));
 });
