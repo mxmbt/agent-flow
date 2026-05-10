@@ -17,6 +17,7 @@ test("init creates config, starter docs, and target agent files in a bare projec
   const { stdout } = await execFileAsync(process.execPath, [cliPath, "init"], { cwd });
 
   assert.match(stdout, /Initialized Agent Flow/);
+  assert.match(stdout, /package\.json/);
   assert.match(stdout, /\.agent-flow\/config\.json/);
   assert.match(stdout, /docs\/ARCHITECTURE\.md/);
   assert.match(stdout, /docs\/ARCHITECTURE_MULTI_USER\.md/);
@@ -52,8 +53,9 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.doesNotMatch(stdout, /\.codex\/guides\/code-review-graph-usage\.md/);
 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
-  assert.ok(config.needsReview.includes("project.taskPrefix"));
-  assert.ok(config.needsReview.includes("git.integrationBranch"));
+  assert.deepEqual(config.needsReview, []);
+  assert.match(config.project.taskPrefix, /^[A-Z0-9]+$/);
+  assert.deepEqual(config.checks.default, ["npm run test"]);
   assert.equal(config.artifacts.architectureFile, "docs/ARCHITECTURE.md");
   assert.equal(config.artifacts.userIsolationArchitectureFile, "docs/ARCHITECTURE_MULTI_USER.md");
   assert.equal(config.artifacts.schedulingArchitectureFile, "docs/ARCHITECTURE_SCHEDULING.md");
@@ -66,6 +68,11 @@ test("init creates config, starter docs, and target agent files in a bare projec
   const architecture = await readFile(path.join(cwd, "docs", "ARCHITECTURE.md"), "utf8");
   assert.match(architecture, /# Architecture/);
   assert.match(architecture, /@agent-flow managed/);
+
+  const packageJson = JSON.parse(await readFile(path.join(cwd, "package.json"), "utf8"));
+  assert.equal(packageJson.private, true);
+  assert.equal(packageJson.scripts.test, "node -e \"console.log('No project tests configured yet')\"");
+  assert.equal(packageJson.agentFlow.taskPrefix, config.project.taskPrefix);
 
   const architectAgent = await readFile(path.join(cwd, ".codex", "agents", "architect.md"), "utf8");
   assert.match(architectAgent, /`docs\/ARCHITECTURE\.md`/);
@@ -89,7 +96,7 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.doesNotMatch(codexReadme, /FinAI|semantic source of truth/);
 
   const qaReportTemplate = await readFile(path.join(cwd, "docs", "templates", "qa-report-template.md"), "utf8");
-  assert.match(qaReportTemplate, /npm test/);
+  assert.match(qaReportTemplate, /npm run test/);
   assert.doesNotMatch(qaReportTemplate, /cd cf/);
 
   const designDocumentTemplate = await readFile(path.join(cwd, "docs", "templates", "design-document-template.md"), "utf8");
@@ -125,6 +132,7 @@ test("init enables code-review-graph as default discovery provider for detected 
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.equal(config.discovery.codeGraphProvider, "code-review-graph");
   assert.deepEqual(config.packs, ["code-review-graph", "code-review-toolkit"]);
+  assert.deepEqual(config.needsReview, []);
 
   const guide = await readFile(path.join(cwd, ".codex", "guides", "code-review-graph-usage.md"), "utf8");
   assert.match(guide, /Graph-First/);
@@ -196,6 +204,7 @@ test("init reuses existing project documents instead of creating duplicate artif
   assert.equal(config.artifacts.designSystemFile, "docs/design/README.md");
   assert.equal(config.artifacts.uxWritingGuideFile, "docs/content/UX-WRITING-GUIDE.md");
   assert.equal(config.artifacts.qaSharedAccountFile, "docs/qa/shared-account.md");
+  assert.deepEqual(config.needsReview, []);
 
   const architectAgent = await readFile(path.join(cwd, ".codex", "agents", "architect.md"), "utf8");
   assert.match(architectAgent, /`docs\/architecture\/README\.md`/);

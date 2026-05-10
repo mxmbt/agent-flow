@@ -1,6 +1,6 @@
 {
   "name": "@mxmbt/agent-flow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Project-agnostic agent orchestration package and installer for Claude Code and Codex.",
   "type": "module",
   "repository": {
