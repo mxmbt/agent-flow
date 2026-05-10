@@ -44,12 +44,12 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.match(stdout, /\.codex\/agents\/ux-expert\.md/);
   assert.match(stdout, /\.codex\/guides\/gan-protocol\.md/);
   assert.doesNotMatch(stdout, /\.codex\/agents\/math-genius\.md/);
-  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-code-reviewer\.md/);
-  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-code-simplifier\.md/);
-  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-comment-analyzer\.md/);
-  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-pr-test-analyzer\.md/);
-  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-silent-failure-hunter\.md/);
-  assert.doesNotMatch(stdout, /\.codex\/agents\/prt-type-design-analyzer\.md/);
+  assert.match(stdout, /\.codex\/agents\/prt-code-reviewer\.md/);
+  assert.match(stdout, /\.codex\/agents\/prt-code-simplifier\.md/);
+  assert.match(stdout, /\.codex\/agents\/prt-comment-analyzer\.md/);
+  assert.match(stdout, /\.codex\/agents\/prt-pr-test-analyzer\.md/);
+  assert.match(stdout, /\.codex\/agents\/prt-silent-failure-hunter\.md/);
+  assert.match(stdout, /\.codex\/agents\/prt-type-design-analyzer\.md/);
   assert.match(stdout, /\.codex\/guides\/code-review-graph-usage\.md/);
   assert.match(stdout, /\.mcp\.json/);
 
@@ -57,7 +57,7 @@ test("init creates config, starter docs, and target agent files in a bare projec
   assert.deepEqual(config.needsReview, []);
   assert.match(config.project.taskPrefix, /^[A-Z0-9]+$/);
   assert.equal(config.discovery.codeGraphProvider, "code-review-graph");
-  assert.deepEqual(config.packs, ["code-review-graph"]);
+  assert.deepEqual(config.packs, ["code-review-graph", "code-review-toolkit"]);
   assert.deepEqual(config.checks.default, ["npm run test"]);
   assert.equal(config.artifacts.architectureFile, "docs/ARCHITECTURE.md");
   assert.equal(config.artifacts.userIsolationArchitectureFile, "docs/ARCHITECTURE_MULTI_USER.md");
@@ -79,6 +79,9 @@ test("init creates config, starter docs, and target agent files in a bare projec
 
   const mcp = JSON.parse(await readFile(path.join(cwd, ".mcp.json"), "utf8"));
   assert.deepEqual(Object.keys(mcp.mcpServers), ["codeReviewGraph"]);
+
+  const prtCodeReviewer = await readFile(path.join(cwd, ".codex", "agents", "prt-code-reviewer.md"), "utf8");
+  assert.match(prtCodeReviewer, /prt-code-reviewer/);
 
   const architectAgent = await readFile(path.join(cwd, ".codex", "agents", "architect.md"), "utf8");
   assert.match(architectAgent, /`docs\/ARCHITECTURE\.md`/);
@@ -131,7 +134,7 @@ test("init enables code-review-graph as default discovery provider for detected 
   const { stdout } = await execFileAsync(process.execPath, [cliPath, "init"], { cwd });
 
   assert.match(stdout, /Enabled the code-review-graph pack as the default planning discovery provider/);
-  assert.match(stdout, /Enabled the code-review-toolkit pack as recommended manual review tooling/);
+  assert.match(stdout, /Enabled the code-review-toolkit pack as core manual review tooling/);
   assert.match(stdout, /\.codex\/guides\/code-review-graph-usage\.md/);
   assert.match(stdout, /\.codex\/agents\/prt-code-reviewer\.md/);
 
