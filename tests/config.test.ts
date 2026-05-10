@@ -131,7 +131,7 @@ test("loadProjectConfig requires a custom discovery provider description", async
   );
 });
 
-test("detectProjectConfig proposes npm script checks and review markers", async () => {
+test("detectProjectConfig proposes npm script checks without review blockers", async () => {
   const cwd = await tempDir();
   await writeJson(path.join(cwd, "package.json"), {
     name: "detected-app",
@@ -160,10 +160,7 @@ test("detectProjectConfig proposes npm script checks and review markers", async 
   assert.deepEqual(detected.config.checks.changed.schema, ["npm run generate", "npm run migrate:local"]);
   assert.equal(detected.config.dev.start.command, "npm run dev");
   assert.equal(detected.config.dev.start.url, "http://localhost:5173");
-  assert.ok(detected.needsReview.includes("project.taskPrefix"));
-  assert.ok(detected.needsReview.includes("git.integrationBranch"));
-  assert.ok(detected.needsReview.includes("dev.start.url"));
-  assert.ok(detected.needsReview.includes("discovery.codeGraphProvider"));
+  assert.deepEqual(detected.needsReview, []);
   assert.deepEqual(detected.config.needsReview, detected.needsReview);
   assert.ok(detected.evidence.some((line) => /Detected focused test command: npm run test -- <test-file>/.test(line)));
   assert.ok(detected.evidence.some((line) => /code-review-graph pack as the default planning discovery provider/.test(line)));
@@ -222,19 +219,40 @@ test("detectProjectConfig proposes Python checks", async () => {
   const detected = await detectProjectConfig(cwd);
 
   assert.equal(detected.packageManager, "python");
+  assert.equal(detected.hasPackageJson, false);
   assert.deepEqual(detected.config.checks.default, ["python -m pytest"]);
   assert.equal(detected.config.checks.focusedTestCommand, "python -m pytest <test-file>");
-  assert.ok(detected.needsReview.includes("checks.default"));
+  assert.deepEqual(detected.needsReview, []);
 });
 
-test("detectProjectConfig marks unknown repositories for review", async () => {
+test("detectProjectConfig gives empty repositories starter defaults without review blockers", async () => {
   const cwd = await tempDir();
 
   const detected = await detectProjectConfig(cwd);
 
   assert.equal(detected.packageManager, null);
-  assert.ok(detected.needsReview.includes("checks.default"));
+  assert.equal(detected.hasPackageJson, false);
+  assert.deepEqual(detected.config.checks.default, ["npm run test"]);
+  assert.equal(detected.config.checks.focusedTestCommand, "npm run test -- <test-file>");
+  assert.deepEqual(detected.needsReview, []);
   assert.deepEqual(detected.config.needsReview, detected.needsReview);
+});
+
+test("detectProjectConfig ignores npm init placeholder tests", async () => {
+  const cwd = await tempDir();
+  await writeJson(path.join(cwd, "package.json"), {
+    name: "starter-app",
+    scripts: {
+      test: "echo \"Error: no test specified\" && exit 1"
+    }
+  });
+
+  const detected = await detectProjectConfig(cwd);
+
+  assert.equal(detected.hasPackageJson, true);
+  assert.deepEqual(detected.config.checks.default, ["node -e \"console.log('No project tests configured yet')\""]);
+  assert.equal(detected.config.checks.focusedTestCommand, null);
+  assert.deepEqual(detected.needsReview, []);
 });
 
 async function tempDir(): Promise<string> {

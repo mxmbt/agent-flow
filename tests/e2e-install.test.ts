@@ -17,12 +17,18 @@ test("e2e empty repo install validates generated mirrors", async () => {
 
   const init = await execFileAsync(process.execPath, [cliPath, "init"], { cwd, ...execOptions });
   assert.match(init.stdout, /Initialized Agent Flow/);
+  assert.match(init.stdout, /package\.json/);
+
+  const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
+  assert.deepEqual(config.needsReview, []);
+  const packageJson = JSON.parse(await readFile(path.join(cwd, "package.json"), "utf8"));
+  assert.equal(packageJson.scripts.test, "node -e \"console.log('No project tests configured yet')\"");
 
   const validate = await execFileAsync(process.execPath, [cliPath, "validate", "--strict"], { cwd, ...execOptions });
   assert.match(validate.stdout, /Mirror parity: PASS/);
 
   const doctor = await execFileAsync(process.execPath, [cliPath, "doctor"], { cwd, ...execOptions });
-  assert.match(doctor.stdout, /Needs review:/);
+  assert.match(doctor.stdout, /Needs review: none/);
 });
 
 test("e2e JS app install enables code project packs and validates", async () => {

@@ -41,7 +41,7 @@ export const initCommand: CommandModule = {
     detected.needsReview = profiled.config.needsReview;
     detected.evidence.push(...profiled.evidence);
     const detectedConfig = context.config.source === "defaults"
-      ? await reuseExistingArtifactPaths(root, detected.config, detected.needsReview, detected.evidence)
+      ? await reuseExistingArtifactPaths(root, detected.config, detected.evidence)
       : context.config.config;
     const needsReview = context.config.source === "defaults"
       ? detected.needsReview
@@ -51,6 +51,7 @@ export const initCommand: CommandModule = {
     const templateRoot = await findTemplateRoot(root);
     const packs = composePacks(builtinPacks, config.packs);
     const files = [
+      ...starterPackageJsonFiles(root, detected.hasPackageJson, config),
       configFile(config),
       ...await starterArtifactFiles(root, config),
       ...await renderTargetFiles(config, packs, { templateRoot })
@@ -83,10 +84,44 @@ function configFile(config: unknown): RenderedFile {
   };
 }
 
+function starterPackageJsonFiles(root: string, hasPackageJson: boolean, config: AgentFlowConfig): RenderedFile[] {
+  if (hasPackageJson) {
+    return [];
+  }
+
+  return [
+    {
+      path: "package.json",
+      content: `${JSON.stringify({
+        name: packageName(path.basename(root)),
+        version: "0.1.0",
+        private: true,
+        type: "module",
+        scripts: {
+          test: "node -e \"console.log('No project tests configured yet')\"",
+          "agent-flow:validate": "agent-flow validate --strict",
+          "agent-flow:doctor": "agent-flow doctor"
+        },
+        agentFlow: {
+          taskPrefix: config.project.taskPrefix
+        }
+      }, null, 2)}\n`
+    }
+  ];
+}
+
+function packageName(name: string): string {
+  const normalized = name
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized.length > 0 ? normalized : "agent-flow-project";
+}
+
 async function reuseExistingArtifactPaths(
   root: string,
   config: AgentFlowConfig,
-  needsReview: string[],
   evidence: string[]
 ): Promise<AgentFlowConfig> {
   const next: AgentFlowConfig = {
@@ -99,75 +134,75 @@ async function reuseExistingArtifactPaths(
     "STATUS.md",
     "docs/STATUS.md",
     "docs/PROJECT_STATUS.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "roadmapFile", [
     "docs/ROADMAP.md",
     "ROADMAP.md",
     "docs/roadmap.md",
     "docs/roadmap/index.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "productFile", [
     "docs/PRODUCT.md",
     "PRODUCT.md",
     "docs/PRD.md",
     "docs/product.md",
     "docs/product/README.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "architectureFile", [
     "docs/ARCHITECTURE.md",
     "ARCHITECTURE.md",
     "docs/architecture.md",
     "docs/architecture/README.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "userIsolationArchitectureFile", [
     "docs/ARCHITECTURE_MULTI_USER.md",
     "docs/USER_ISOLATION.md",
     "docs/DATA_ISOLATION.md",
     "docs/SECURITY.md",
     "docs/security.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "schedulingArchitectureFile", [
     "docs/ARCHITECTURE_SCHEDULING.md",
     "docs/SCHEDULING.md",
     "docs/JOBS.md",
     "docs/QUEUES.md",
     "docs/WORKERS.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "backlogFile", [
     "docs/tasks.md",
     "TASKS.md",
     "docs/TASKS.md",
     "docs/backlog.md",
     "docs/BACKLOG.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "uiUxSpecificationFile", [
     "docs/UI-UX-SPECIFICATION.md",
     "docs/UX.md",
     "docs/ui-ux.md",
     "docs/design/UI-UX-SPECIFICATION.md",
     "docs/design/UX.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "designSystemFile", [
     "docs/design/DESIGN-SYSTEM.md",
     "docs/DESIGN-SYSTEM.md",
     "DESIGN-SYSTEM.md",
     "docs/design-system.md",
     "docs/design/README.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "uxWritingGuideFile", [
     "docs/design/UX-WRITING-GUIDE.md",
     "docs/UX-WRITING-GUIDE.md",
     "docs/ux-writing.md",
     "docs/content/UX-WRITING-GUIDE.md",
     "docs/content-style.md"
-  ], needsReview, evidence);
+  ], evidence);
   await reuseExistingPath(root, next, "qaSharedAccountFile", [
     "docs/testing/QA-SHARED-ACCOUNT.md",
     "docs/QA-SHARED-ACCOUNT.md",
     "docs/testing/shared-account.md",
     "docs/qa/shared-account.md",
     "docs/QA.md"
-  ], needsReview, evidence);
+  ], evidence);
 
   return next;
 }
@@ -177,13 +212,11 @@ async function reuseExistingPath(
   config: AgentFlowConfig,
   key: keyof AgentFlowConfig["artifacts"],
   candidates: string[],
-  needsReview: string[],
   evidence: string[]
 ): Promise<void> {
   for (const candidate of candidates) {
     if (await exists(path.join(root, candidate))) {
       config.artifacts[key] = candidate;
-      needsReview.push(`artifacts.${key}`);
       evidence.push(`Detected existing artifact for artifacts.${key}: ${candidate}.`);
       return;
     }

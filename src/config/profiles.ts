@@ -28,10 +28,9 @@ export function applyProfile(config: AgentFlowConfig, profile: ProfileName): Pro
 
     if (!next.dev.start.url) {
       next.dev.start.url = "http://localhost:3000";
-      addNeedsReview(next, "dev.start.url");
     }
 
-    evidence.push("Applied webapp profile: enabled browser QA/accessibility pack and frontend review hints without assuming a framework.");
+    evidence.push("Applied webapp profile: enabled browser QA/accessibility pack and starter frontend defaults without assuming a framework.");
     return { config: next, evidence };
   }
 
@@ -58,8 +57,6 @@ export function applyProfile(config: AgentFlowConfig, profile: ProfileName): Pro
   addQualityInvariant(next, "fixed-point money");
   addQualityInvariant(next, "no look-ahead");
   addQualityInvariant(next, "explicit timezone handling");
-  addNeedsReview(next, "git.repository");
-  addNeedsReview(next, "mcp.servers.codeReviewGraph");
 
   evidence.push("Applied finai.example profile: composed finance, Cloudflare Worker, Telegram, webapp, code-review-toolkit, and code-review-graph assumptions as adapter config.");
   return { config: next, evidence };
@@ -74,12 +71,6 @@ function addPack(config: AgentFlowConfig, pack: string): void {
 function addQualityInvariant(config: AgentFlowConfig, invariant: string): void {
   if (!config.quality.invariants.includes(invariant)) {
     config.quality.invariants.push(invariant);
-  }
-}
-
-function addNeedsReview(config: AgentFlowConfig, item: string): void {
-  if (!config.needsReview.includes(item)) {
-    config.needsReview.push(item);
   }
 }
 

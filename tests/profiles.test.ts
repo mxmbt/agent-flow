@@ -28,7 +28,7 @@ test("webapp profile enables browser QA without a framework assumption", () => {
   assert.deepEqual(profiled.packs, ["webapp"]);
   assert.match(profiled.quality.invariants.join("\n"), /responsive layout and accessibility/);
   assert.equal(profiled.dev.start.url, "http://localhost:3000");
-  assert.ok(profiled.needsReview.includes("dev.start.url"));
+  assert.deepEqual(profiled.needsReview, []);
 });
 
 test("finai example profile keeps project assumptions in adapter config", () => {
@@ -56,7 +56,7 @@ test("init --profile webapp writes profile config and rendered pack outputs", as
   assert.match(stdout, /Applied webapp profile/);
   const config = JSON.parse(await readFile(path.join(cwd, ".agent-flow", "config.json"), "utf8"));
   assert.deepEqual(config.packs, ["webapp"]);
-  assert.ok(config.needsReview.includes("dev.start.url"));
+  assert.deepEqual(config.needsReview, []);
   assert.match(await readFile(path.join(cwd, ".mcp.json"), "utf8"), /playwright/);
 });
 

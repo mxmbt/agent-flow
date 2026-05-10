@@ -5,6 +5,7 @@ import { createDefaultConfig, type AgentFlowConfig } from "./defaults.js";
 export interface DetectionResult {
   config: AgentFlowConfig;
   packageManager: "npm" | "pnpm" | "yarn" | "python" | null;
+  hasPackageJson: boolean;
   needsReview: string[];
   evidence: string[];
 }
@@ -24,24 +25,29 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   const packageManager = await detectPackageManager(cwd);
   const projectName = getProjectName(cwd, packageJson);
   const config = createDefaultConfig(projectName);
-  const needsReview = ["project.taskPrefix", "git.integrationBranch"];
+  config.project.taskPrefix = deriveTaskPrefix(projectName);
+  config.project.taskIdPattern = `${config.project.taskPrefix}-[A-Z0-9]+-T[0-9]+`;
+  const needsReview: string[] = [];
   const evidence: string[] = [];
 
   if (!packageJson) {
     if (await hasPythonProject(cwd)) {
       config.checks.default = ["python -m pytest"];
       config.checks.focusedTestCommand = "python -m pytest <test-file>";
-      needsReview.push("checks.default");
-      evidence.push("Detected Python project files; defaulted checks to python -m pytest and marked them for review.");
-      return finalizeDetection(config, "python", needsReview, evidence);
+      evidence.push("Detected Python project files; defaulted checks to python -m pytest.");
+      evidence.push(`Defaulted task prefix to ${config.project.taskPrefix} and integration branch to ${config.git.integrationBranch}.`);
+      return finalizeDetection(config, "python", false, needsReview, evidence);
     }
 
-    needsReview.push("checks.default");
-    evidence.push("No package.json detected; default checks require review.");
-    return finalizeDetection(config, packageManager, needsReview, evidence);
+    config.checks.default = ["npm run test"];
+    config.checks.focusedTestCommand = "npm run test -- <test-file>";
+    evidence.push("No package.json detected; init will create a starter package.json with a passing test script.");
+    evidence.push(`Defaulted task prefix to ${config.project.taskPrefix} and integration branch to ${config.git.integrationBranch}.`);
+    return finalizeDetection(config, packageManager, false, needsReview, evidence);
   }
 
   evidence.push("Detected package.json.");
+  evidence.push(`Defaulted task prefix to ${config.project.taskPrefix} and integration branch to ${config.git.integrationBranch}.`);
   config.discovery.codeGraphProvider = "code-review-graph";
   if (!config.packs.includes("code-review-graph")) {
     config.packs.push("code-review-graph");
@@ -49,8 +55,7 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   if (!config.packs.includes("code-review-toolkit")) {
     config.packs.push("code-review-toolkit");
   }
-  needsReview.push("discovery.codeGraphProvider");
-  evidence.push("Detected a code project and no existing Agent Flow config; enabled the code-review-graph pack as the default planning discovery provider. If this project uses another code graph provider, set discovery.codeGraphProvider to custom and remove or replace the pack.");
+  evidence.push("Detected a code project and no existing Agent Flow config; enabled the code-review-graph pack as the default planning discovery provider. To use another code graph provider later, set discovery.codeGraphProvider to custom and remove or replace the pack.");
   evidence.push("Enabled the code-review-toolkit pack as recommended manual review tooling for code projects.");
 
   const scripts = getScripts(packageJson);
@@ -63,23 +68,25 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   }
 
   const defaultChecks = collectCommands([
-    scriptCommand(scripts, "test", run),
+    starterSafeTestCommand(scripts, run),
     scriptCommand(scripts, "type-check", run),
     scriptCommand(scripts, "check-types", run)
   ]);
 
   if (defaultChecks.length > 0) {
     config.checks.default = defaultChecks;
-    if (scripts.test) {
+    if (scripts.test && !isNpmInitPlaceholderTest(scripts.test)) {
       config.checks.focusedTestCommand = packageManager === "yarn"
         ? "yarn test <test-file>"
         : `${run} test -- <test-file>`;
       evidence.push(`Detected focused test command: ${config.checks.focusedTestCommand}.`);
+    } else if (isNpmInitPlaceholderTest(scripts.test)) {
+      evidence.push("Detected npm init placeholder test script; using a passing starter validation command until real tests are added.");
     }
     evidence.push(`Detected default checks: ${defaultChecks.join(", ")}.`);
   } else {
-    needsReview.push("checks.default");
-    evidence.push("No test or type-check script detected; checks.default requires review.");
+    config.checks.default = [starterValidationCommand()];
+    evidence.push("No test or type-check script detected; using a passing starter validation command until real checks are added.");
   }
 
   const lint = scriptCommand(scripts, "lint", run);
@@ -108,11 +115,10 @@ export async function detectProjectConfig(cwd: string): Promise<DetectionResult>
   if (devCommand) {
     config.dev.start.command = devCommand;
     config.dev.start.url = inferDevServerUrl(scripts.dev ?? "", dependencies);
-    needsReview.push("dev.start.url");
-    evidence.push("Detected dev server script; default URL requires confirmation.");
+    evidence.push(`Detected dev server script; defaulted local URL to ${config.dev.start.url}.`);
   }
 
-  return finalizeDetection(config, packageManager, needsReview, evidence);
+  return finalizeDetection(config, packageManager, true, needsReview, evidence);
 }
 
 async function readPackageJson(cwd: string): Promise<PackageJson | null> {
@@ -156,6 +162,20 @@ function getProjectName(cwd: string, packageJson: PackageJson | null): string {
   return path.basename(cwd);
 }
 
+function deriveTaskPrefix(projectName: string): string {
+  const words = projectName
+    .split(/[^a-zA-Z0-9]+/)
+    .map((word) => word.replace(/[^a-zA-Z0-9]/g, ""))
+    .filter((word) => word.length > 0);
+
+  const raw = words.length > 1
+    ? words.map((word) => word[0]).join("")
+    : words[0] ?? "APP";
+
+  const prefix = raw.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+  return prefix.length > 0 ? prefix : "APP";
+}
+
 function getScripts(packageJson: PackageJson): ScriptMap {
   if (!packageJson.scripts || typeof packageJson.scripts !== "object" || Array.isArray(packageJson.scripts)) {
     return {};
@@ -194,6 +214,22 @@ function scriptCommand(scripts: ScriptMap, scriptName: string, run: string): str
   return run === "yarn" ? `yarn ${scriptName}` : `${run} ${scriptName}`;
 }
 
+function starterSafeTestCommand(scripts: ScriptMap, run: string): string | null {
+  if (!scripts.test) {
+    return null;
+  }
+
+  return isNpmInitPlaceholderTest(scripts.test) ? starterValidationCommand() : scriptCommand(scripts, "test", run);
+}
+
+function isNpmInitPlaceholderTest(command: string | undefined): boolean {
+  return typeof command === "string" && /Error: no test specified/.test(command);
+}
+
+function starterValidationCommand(): string {
+  return "node -e \"console.log('No project tests configured yet')\"";
+}
+
 function collectCommands(commands: Array<string | null>): string[] {
   return unique(commands.filter((command): command is string => command !== null));
 }
@@ -213,12 +249,13 @@ function inferDevServerUrl(devScript: string, dependencies: Set<string>): string
 function finalizeDetection(
   config: AgentFlowConfig,
   packageManager: DetectionResult["packageManager"],
+  hasPackageJson: boolean,
   needsReview: string[],
   evidence: string[]
 ): DetectionResult {
   const uniqueNeedsReview = unique(needsReview);
   config.needsReview = uniqueNeedsReview;
-  return { config, packageManager, needsReview: uniqueNeedsReview, evidence };
+  return { config, packageManager, hasPackageJson, needsReview: uniqueNeedsReview, evidence };
 }
 
 function unique(values: string[]): string[] {
