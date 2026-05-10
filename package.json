@@ -4,7 +4,7 @@
   "description": "Project-agnostic agent orchestration package and installer for Claude Code and Codex.",
   "type": "module",
   "bin": {
-    "agent-flow": "./dist/src/cli/index.js"
+    "agent-flow": "dist/src/cli/index.js"
   },
   "files": [
     "CHANGELOG.md",
