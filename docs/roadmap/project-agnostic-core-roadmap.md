@@ -1191,6 +1191,7 @@ When the package is ready, I want a versioned public release, so that users can 
 - 2026-05-10: Added GitHub Actions CI and manual publish workflows. CI runs tests, package smoke, and package-content dry run; publish requires an `NPM_TOKEN`, verifies the requested version, reruns the same checks, then runs npm publish with provenance.
 - 2026-05-10: Documented the GitHub default-branch requirement for manual `workflow_dispatch` release runs; integration-branch releases must be promoted to the default branch before the publish workflow appears in Actions.
 - 2026-05-10: First publish attempt reached `npm publish` after passing tests, package smoke, and package-content dry run, then failed with npm `E403` because the token did not bypass publish 2FA. Release docs now call out the npm automation/granular bypass-2FA token requirement.
+- 2026-05-10: Second publish attempt passed the 2FA/token gate, signed npm provenance, then failed with npm `E422` because package metadata lacked `repository.url`. Added repository metadata matching the GitHub provenance source.
 - Publication remains open until an npm package or GitHub release exists and that published artifact passes the same clean-repo smoke path.
 
 ---

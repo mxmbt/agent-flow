@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Project-agnostic agent orchestration package and installer for Claude Code and Codex.",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mxmbt/agent-flow.git"
+  },
   "bin": {
     "agent-flow": "dist/src/cli/index.js"
   },
