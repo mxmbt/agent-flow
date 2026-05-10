@@ -4,6 +4,7 @@ set -euo pipefail
 REMOTE="{{git.remoteName}}"
 INTEGRATION_BRANCH="{{git.integrationBranch}}"
 RELEASE_BRANCH="{{git.releaseBranch}}"
+WORKTREE_PARKING="{{git.worktreeParking}}"
 
 usage() {
   cat <<'EOF'
@@ -77,10 +78,10 @@ if [[ "$RELEASE_CONFIGURED" == "yes" ]]; then
 else
   RELEASE_SHA=""
 fi
-HEAD_SHA="$(git rev-parse --verify HEAD)"
 CURRENT_BRANCH="$(git branch --show-current)"
 CURRENT_WORKTREE="$(pwd)"
 MAIN_WORKTREE="$(git worktree list --porcelain | awk '/^worktree /{print $2; exit}')"
+HEAD_SHA="$(git rev-parse --verify HEAD)"
 
 if [[ "$CURRENT_WORKTREE" == "$MAIN_WORKTREE" ]]; then
   EXPECTED_BRANCH="$INTEGRATION_BRANCH"
@@ -104,40 +105,50 @@ else
   RELEASE_STATUS="not configured"
 fi
 
-if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-  UPSTREAM_BRANCH="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')"
-else
-  UPSTREAM_BRANCH="(none)"
-fi
+if [[ "$WORKTREE_PARKING" == "true" ]]; then
+  if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+    UPSTREAM_BRANCH="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')"
+  else
+    UPSTREAM_BRANCH="(none)"
+  fi
 
-if [[ "$CURRENT_BRANCH" == "$EXPECTED_BRANCH" ]]; then
-  BRANCH_OK="yes"
-else
-  BRANCH_OK="no"
-fi
+  if [[ "$CURRENT_BRANCH" == "$EXPECTED_BRANCH" ]]; then
+    BRANCH_OK="yes"
+  else
+    BRANCH_OK="no"
+  fi
 
-if [[ "$UPSTREAM_BRANCH" == "$REMOTE/$INTEGRATION_BRANCH" ]]; then
-  UPSTREAM_OK="yes"
-else
-  UPSTREAM_OK="no"
-fi
+  if [[ "$UPSTREAM_BRANCH" == "$REMOTE/$INTEGRATION_BRANCH" ]]; then
+    UPSTREAM_OK="yes"
+  else
+    UPSTREAM_OK="no"
+  fi
 
-if [[ "$HEAD_SHA" == "$INTEGRATION_SHA" ]]; then
-  HEAD_OK="yes"
-else
-  HEAD_OK="no"
-fi
+  if [[ "$HEAD_SHA" == "$INTEGRATION_SHA" ]]; then
+    HEAD_OK="yes"
+  else
+    HEAD_OK="no"
+  fi
 
-if [[ -z "$(git status --short)" ]]; then
-  CLEAN_OK="yes"
-else
-  CLEAN_OK="no"
-fi
+  if [[ -z "$(git status --short)" ]]; then
+    CLEAN_OK="yes"
+  else
+    CLEAN_OK="no"
+  fi
 
-if [[ "$BRANCH_OK" == "yes" && "$UPSTREAM_OK" == "yes" && "$HEAD_OK" == "yes" && "$CLEAN_OK" == "yes" ]]; then
-  HYGIENE_STATUS="pass"
+  if [[ "$BRANCH_OK" == "yes" && "$UPSTREAM_OK" == "yes" && "$HEAD_OK" == "yes" && "$CLEAN_OK" == "yes" ]]; then
+    HYGIENE_STATUS="pass"
+  else
+    HYGIENE_STATUS="fail"
+  fi
 else
-  HYGIENE_STATUS="fail"
+  EXPECTED_BRANCH="(disabled)"
+  UPSTREAM_BRANCH="(not checked)"
+  BRANCH_OK="skipped"
+  UPSTREAM_OK="skipped"
+  HEAD_OK="skipped"
+  CLEAN_OK="skipped"
+  HYGIENE_STATUS="skipped"
 fi
 
 short_sha() {

@@ -274,8 +274,8 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
   },
   {
     key: "git.remoteBranchDeleteCommand",
-    summary: "Remote branch deletion command or generic branch-cleanup instruction.",
-    renderedFrom: [".agent-flow/config.json -> git.repository"],
+    summary: "Remote branch deletion command using GitHub CLI repository metadata.",
+    renderedFrom: ["GitHub CLI current repository metadata"],
     usedIn: [
       "templates/canonical/agents/delivery-agent.md.hbs",
       "templates/canonical/guides/worktree-workflow.md.hbs"
@@ -322,6 +322,15 @@ const EXPLAIN_ENTRIES: ExplainEntry[] = [
     summary: "Installed helper command for parking/syncing local worktrees after delivery.",
     renderedFrom: ["Agent Flow installed scripts"],
     usedIn: ["templates/canonical/guides/worktree-workflow.md.hbs"]
+  },
+  {
+    key: "git.worktreeParkingMode",
+    summary: "Whether local worktree parking is enabled for delivery cleanup.",
+    renderedFrom: [".agent-flow/config.json -> git.worktreeParking"],
+    usedIn: [
+      "templates/canonical/guides/worktree-workflow.md.hbs",
+      "templates/static/skills/delivery-phase/SKILL.md"
+    ]
   },
   {
     key: "git.deliveryStateCommand",

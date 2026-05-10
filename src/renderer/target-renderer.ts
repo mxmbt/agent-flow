@@ -1,6 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import type { AgentFlowConfig } from "../config/defaults.js";
+import { renderMcpFiles } from "../mcp/catalog.js";
 import type { ComposedPacks } from "../packs/manifest.js";
 import type { RenderedFile } from "./conflict-policy.js";
 import { buildCanonicalContext } from "./canonical-context.js";
@@ -548,7 +549,8 @@ export async function renderTargetFiles(
 
   const renderedSkillAssets = await renderPackSkillAssets(config, packs, options);
   const renderedSharedTemplates = await renderSharedTemplates(config, packs, options);
-  return [...renderedTemplates, ...renderedSkillAssets, ...renderedSharedTemplates];
+  const renderedMcpFiles = renderMcpFiles(config, packs);
+  return [...renderedTemplates, ...renderedSkillAssets, ...renderedSharedTemplates, ...renderedMcpFiles];
 }
 
 async function loadCanonicalPartials(templateRoot: string): Promise<TemplatePartials> {

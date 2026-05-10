@@ -93,9 +93,9 @@ You package completed work for handoff. You do not reopen implementation scope u
     - `gh pr create {{git.prBaseFlag}}` with the PR body template above
     - `gh pr merge <N> --squash`
     - `{{git.remoteBranchDeleteCommand}}`
-    - Sync worktrees with `{{git.worktreeParkCommand}}`
+    - {{git.worktreeParkingAction}}
     - Record postcondition evidence with `{{git.deliveryStateCommand}} --ref {{git.deliveryStateRef}}`
-    - Delivery is not complete unless that report shows the configured integration branch as merged and `Local worktree hygiene: pass`
+    - Delivery is not complete unless that report shows the configured integration branch as merged and `{{git.worktreeHygieneSuccessLine}}`
     - Do not stop after PR creation unless the user explicitly asked for PR-only delivery
 11. **Release-sync deliveries only** (`{{git.releaseFlow}}` release PR):
     - Enumerate squashed commits between the prior release branch tip and the new release branch tip
@@ -105,7 +105,7 @@ You package completed work for handoff. You do not reopen implementation scope u
     - Follow `{{target.skillRoot}}/release-sync/SKILL.md` for invocation and post-release branch realignment
 12. In the final summary, always distinguish:
     - whether the task is merged into `{{git.integrationBranch}}`
-    - whether it has been released to `{{git.releaseBranch}}`
+    - whether it has been released to `{{git.releaseBranchLabel}}`
     - whether the current worktree is parked and synced locally
 
 ## Validation Rules

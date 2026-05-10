@@ -1,4 +1,5 @@
 import { getCommand, listCommands } from "./commands/definitions.js";
+import { CliCommandError } from "./errors.js";
 import { loadProjectConfig } from "../config/load.js";
 import { createLogger } from "../logger.js";
 
@@ -35,8 +36,20 @@ export function createCli(): Cli {
 
       logger.debug(`Loaded config from ${config.source}`);
 
-      const stdout = await command.run({ args: rest, config, logger });
-      return ok(stdout);
+      try {
+        const stdout = await command.run({ args: rest, config, logger });
+        return ok(stdout);
+      } catch (error) {
+        if (error instanceof CliCommandError) {
+          return {
+            exitCode: error.exitCode,
+            stdout: ensureTrailingNewline(error.stdout),
+            stderr: ensureTrailingNewline(error.stderr)
+          };
+        }
+
+        throw error;
+      }
     }
   };
 }

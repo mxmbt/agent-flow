@@ -25,7 +25,7 @@ DELIVERY packages completed work for human consumption and future maintenance.
 
 `delivery-agent` owns the git flow end-to-end, but must distinguish two modes:
 
-1. **Task delivery** (default): feature branch -> PR -> squash merge into `{{git.integrationBranch}}` -> branch delete -> worktree parking.
+1. **Task delivery** (default): feature branch -> PR -> squash merge into `{{git.integrationBranch}}` -> branch delete -> configured local cleanup.
 2. **Release sync** (explicit): `{{git.integrationBranch}}` -> PR -> squash merge into `{{git.releaseBranch}}` -> hard-reset `{{git.integrationBranch}}` to `{{git.releaseRef}}` -> repoint parking branches.
 
 Rules:
@@ -33,23 +33,24 @@ Rules:
 - Default `DELIVERY` means **task delivered to `{{git.integrationBranch}}`**, not released to `{{git.releaseBranch}}`.
 - Release sync happens only when the user explicitly asks to ship/deploy/release to `{{git.releaseBranch}}`, or when the task itself is a release task.
 - `{{git.integrationBranch}}` ahead of `{{git.releaseBranch}}` is normal between releases.
-- Local worktree parking is required hygiene, but it is never evidence that `{{git.releaseBranch}}` changed.
-- Worktree hygiene is a mandatory part of `DELIVERY`, not optional cleanup after it.
+- {{git.releaseSyncAvailability}}
+- Local cleanup is never evidence that `{{git.releaseBranchLabel}}` changed.
+- Worktree parking mode: `{{git.worktreeParkingMode}}`.
 
 For default task delivery:
 
-1. Working branch must not be `{{git.releaseBranch}}` or `{{git.integrationBranch}}`.
+1. {{git.protectedBranchRule}}
 2. Create PR to `{{git.integrationBranch}}` via `gh pr create {{git.prBaseFlag}}`. PR body must follow the standard template in the next section.
 3. Squash merge: `gh pr merge <N> --squash`.
 4. Delete remote branch: `{{git.remoteBranchDeleteCommand}}`.
-5. Sync worktrees per `{{target.toolRoot}}/guides/worktree-workflow.md` by running `{{git.worktreeParkCommand}}`.
+5. {{git.worktreeParkingAction}}
 6. Prove delivery state by running `{{git.deliveryStateCommand}} --ref {{git.deliveryStateRef}}`.
 
 Delivery is not complete until the report shows:
 
 - `{{git.integrationBranch}}: merged`
-- `Local worktree hygiene: pass`
-- the close-out explicitly states whether `{{git.releaseBranch}}` is already released or not
+- `{{git.worktreeHygieneSuccessLine}}`
+- {{git.releaseCloseoutRequirement}}
 
 PR creation alone is not a valid delivery stop-point unless the user explicitly requests PR-only output.
 
@@ -203,10 +204,10 @@ The `delivery-agent` prompt must require:
 - User-facing change authored by delivery-agent with `productVoiceConfidence` self-assessment; lightweight `product-manager` pass only on `low`
 - Release announcement strings authored per step 6a: `releaseAnnouncementAdmins` always, `releaseAnnouncementUsers` only when user-facing; surfaced in PR body under copy-prefix headings and in the walkthrough Release-notes disposition section
 - release-notes aggregation only on `{{git.releaseFlow}}` release-sync deliveries
-- full git flow: PR → squash merge → branch delete → worktree sync (all mandatory, not optional)
-- explicit worktree postcondition evidence after cleanup: current branch, upstream branch, and `HEAD == {{git.integrationRef}}`
+- full git flow: PR → squash merge → branch delete → configured local cleanup
+- explicit worktree postcondition evidence after cleanup: {{git.worktreePostcondition}}
 - explicit evidence from `{{git.deliveryStateCommand}}`, not hand-written git status paraphrase
-- explicit close-out wording that separates `{{git.integrationBranch}}` delivery, `{{git.releaseBranch}}` release status, and local worktree parking status
+- explicit close-out wording that separates `{{git.integrationBranch}}` delivery, `{{git.releaseBranchLabel}}` release status, and local worktree parking status
 - no PR-only stop unless the user explicitly asks for it
 
 ## Task Source Close-out

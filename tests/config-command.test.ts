@@ -72,8 +72,8 @@ test("config explain shows current rendered value, sources, and template usage",
   assert.match(focusedTest.stdout, /templates\/canonical\/guides\/test-driven-development\.md\.hbs/);
 
   const git = await execFileAsync(process.execPath, [cliPath, "config", "explain", "git.remoteBranchDeleteCommand"], { cwd });
-  assert.match(git.stdout, /gh api repos\/acme\/example\/git\/refs\/heads\/<branch> -X DELETE/);
-  assert.match(git.stdout, /\.agent-flow\/config\.json -> git\.repository/);
+  assert.match(git.stdout, /gh api "repos\/\{owner\}\/\{repo\}\/git\/refs\/heads\/<branch>" -X DELETE/);
+  assert.match(git.stdout, /GitHub CLI current repository metadata/);
 
   const architecture = await execFileAsync(
     process.execPath,

@@ -159,11 +159,12 @@ test("detectProjectConfig proposes npm script checks and review markers", async 
   assert.equal(detected.config.checks.optional.build, "npm run build");
   assert.deepEqual(detected.config.checks.changed.schema, ["npm run generate", "npm run migrate:local"]);
   assert.equal(detected.config.dev.start.command, "npm run dev");
-  assert.equal(detected.config.dev.start.url, "http://localhost:3000");
+  assert.equal(detected.config.dev.start.url, "http://localhost:5173");
   assert.ok(detected.needsReview.includes("project.taskPrefix"));
   assert.ok(detected.needsReview.includes("git.integrationBranch"));
   assert.ok(detected.needsReview.includes("dev.start.url"));
   assert.ok(detected.needsReview.includes("discovery.codeGraphProvider"));
+  assert.deepEqual(detected.config.needsReview, detected.needsReview);
   assert.ok(detected.evidence.some((line) => /Detected focused test command: npm run test -- <test-file>/.test(line)));
   assert.ok(detected.evidence.some((line) => /code-review-graph pack as the default planning discovery provider/.test(line)));
   assert.ok(detected.evidence.some((line) => /code-review-toolkit pack as recommended manual review tooling/.test(line)));
@@ -186,7 +187,54 @@ test("detectProjectConfig enables nextjs pack for Next.js projects", async () =>
   const detected = await detectProjectConfig(cwd);
 
   assert.deepEqual(detected.config.packs, ["code-review-graph", "code-review-toolkit", "nextjs"]);
+  assert.equal(detected.config.dev.start.url, "http://localhost:3000");
   assert.ok(detected.evidence.some((line) => /enabled the nextjs pack/.test(line)));
+});
+
+test("detectProjectConfig proposes pnpm commands", async () => {
+  const cwd = await tempDir();
+  await writeJson(path.join(cwd, "package.json"), {
+    name: "pnpm-app",
+    scripts: {
+      dev: "vite --host 0.0.0.0",
+      test: "vitest run",
+      "check-types": "tsc --noEmit"
+    },
+    devDependencies: {
+      vite: "^6.0.0"
+    }
+  });
+  await writeFile(path.join(cwd, "pnpm-lock.yaml"), "lockfileVersion: '9.0'\n", "utf8");
+
+  const detected = await detectProjectConfig(cwd);
+
+  assert.equal(detected.packageManager, "pnpm");
+  assert.deepEqual(detected.config.checks.default, ["pnpm run test", "pnpm run check-types"]);
+  assert.equal(detected.config.checks.focusedTestCommand, "pnpm run test -- <test-file>");
+  assert.equal(detected.config.dev.start.command, "pnpm run dev");
+  assert.equal(detected.config.dev.start.url, "http://localhost:5173");
+});
+
+test("detectProjectConfig proposes Python checks", async () => {
+  const cwd = await tempDir();
+  await writeFile(path.join(cwd, "pyproject.toml"), "[project]\nname = \"python-app\"\n", "utf8");
+
+  const detected = await detectProjectConfig(cwd);
+
+  assert.equal(detected.packageManager, "python");
+  assert.deepEqual(detected.config.checks.default, ["python -m pytest"]);
+  assert.equal(detected.config.checks.focusedTestCommand, "python -m pytest <test-file>");
+  assert.ok(detected.needsReview.includes("checks.default"));
+});
+
+test("detectProjectConfig marks unknown repositories for review", async () => {
+  const cwd = await tempDir();
+
+  const detected = await detectProjectConfig(cwd);
+
+  assert.equal(detected.packageManager, null);
+  assert.ok(detected.needsReview.includes("checks.default"));
+  assert.deepEqual(detected.config.needsReview, detected.needsReview);
 });
 
 async function tempDir(): Promise<string> {

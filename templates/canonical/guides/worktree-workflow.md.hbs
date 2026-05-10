@@ -1,131 +1,111 @@
 # Worktree Workflow
 
-## Ветки
+## Branches
 
-| Ветка | Назначение | Прямой push |
-|-------|-----------|-------------|
-| `{{git.releaseBranch}}` | Production snapshot. Только через `{{git.integrationBranch}}` -> PR -> squash merge. | ❌ никогда |
-| `{{git.integrationBranch}}` | Integration. Все feature PR идут сюда. | ❌ никогда |
-| `feature/{{project.taskPrefix}}-<taskId>-...` | Рабочая ветка задачи. | ✅ + force-with-lease |
-| `bugfix/...`, `hotfix/...`, `infra/...` | Аналогично feature. | ✅ + force-with-lease |
-| `worktree/<dirname>` | Parking-ветка idle worktree. Всегда указывает на `{{git.integrationRef}}`. | ❌ |
+| Branch | Purpose | Direct push |
+|--------|---------|-------------|
+| `{{git.releaseBranchLabel}}` | Release snapshot when a release branch is configured. | Never |
+| `{{git.integrationBranch}}` | Integration branch. Feature PRs target this branch. | Never |
+| `feature/{{project.taskPrefix}}-<taskId>-...` | Task branch. | Allowed with `--force-with-lease` |
+| `bugfix/...`, `hotfix/...`, `infra/...` | Same role as feature branches. | Allowed with `--force-with-lease` |
+| `worktree/<dirname>` | Parking branch for idle worktrees when parking is enabled. | Never |
 
-**Никогда не работать напрямую в `{{git.releaseBranch}}` или `{{git.integrationBranch}}`.** Любое изменение — через ветку и PR.
+Do not work directly on protected delivery branches. {{git.protectedBranchRule}} Use a task branch and PR.
 
 ## Worktrees
 
-Worktrees паркуются между задачами на своих ветках:
+Worktree parking mode: `{{git.worktreeParkingMode}}`.
 
-| Worktree | Путь | Parking |
-|---------|------|---------|
+When parking is enabled, idle worktrees move to local `worktree/<dirname>` branches that track `{{git.integrationRef}}`.
+
+| Worktree | Path | Parking |
+|----------|------|---------|
 | Main | `<main worktree>` | `{{git.integrationBranch}}` |
-| additional | `<additional worktree>` | `worktree/<dirname>` |
+| Additional | `<additional worktree>` | `worktree/<dirname>` |
 
-Основной worktree всегда паркуется на `{{git.integrationBranch}}`. Дополнительные worktrees — на `worktree/<dirname>`.
+When parking is disabled, skip the parking helper and still run `{{git.deliveryStateCommand}}` so the final report records `{{git.worktreeHygieneSuccessLine}}`.
 
-## Что Считать Доставкой
+## Delivery Meaning
 
-Это три разные операции. Их нельзя смешивать в отчете или в голове:
+These are separate facts. Do not merge them together in close-out wording:
 
-| Состояние | Что означает | Источник правды |
-|-----------|--------------|-----------------|
-| `delivered to {{git.integrationBranch}}` | task-ветка влита через PR в `{{git.integrationRef}}` | merged feature PR + commit reachable from `{{git.integrationRef}}` |
-| `released to {{git.releaseBranch}}` | интеграционный хвост из `{{git.integrationBranch}}` выпущен в `{{git.releaseRef}}` | merged release PR + `{{git.integrationRef}} == {{git.releaseRef}}` после post-release reset |
-| `parked locally` | текущий worktree очищен и стоит на parking-ветке | local `git branch -vv`, upstream, `HEAD`, `git status` |
+| State | Meaning | Source of truth |
+|-------|---------|-----------------|
+| `delivered to {{git.integrationBranch}}` | Task branch was merged through PR into `{{git.integrationRef}}`. | Merged feature PR and commit reachability from `{{git.integrationRef}}` |
+| `released to {{git.releaseBranchLabel}}` | Integration changes were shipped through the configured release flow. | Merged release PR and release-state evidence |
+| `local cleanup` | Current worktree cleanup/parking state. | `git branch -vv`, upstream, HEAD, and `git status` evidence when parking is enabled |
 
-Правила:
+Rules:
 
-- По умолчанию `DELIVERY` закрывает задачу в `{{git.integrationBranch}}`, а не в `{{git.releaseBranch}}`.
-- `{{git.integrationBranch}}` может опережать `{{git.releaseBranch}}` между релизами. Это нормальное состояние, а не drift.
-- `worktree/<dirname>` и чистый local `Changes` tab ничего не доказывают про remote delivery сами по себе.
-- В финальном отчете всегда разделяй: что в `{{git.integrationBranch}}`, что в `{{git.releaseBranch}}`, что только локально очищено.
+- Default `DELIVERY` closes the task into `{{git.integrationBranch}}`, not into `{{git.releaseBranchLabel}}`.
+- {{git.releaseSyncAvailability}}
+- Local worktree cleanup proves only local hygiene. It does not prove remote delivery or release status.
+- Final reports always separate integration status, release status, and local cleanup status.
 
-## Начало задачи
+## Start A Task
 
 ```bash
 git fetch {{git.remoteName}}
 git checkout -b feature/{{project.taskPrefix}}-<taskId>-short-desc {{git.integrationRef}}
 ```
 
-## Feature Delivery: Task -> {{git.integrationBranch}}
+## Feature Delivery
 
 ```bash
-# PR всегда в {{git.integrationBranch}}
 gh pr create {{git.prBaseFlag}} --title "feat(scope): ..." --body "..."
-
-# Squash merge — линейная история
 gh pr merge <N> --squash
 ```
 
-Delivery по умолчанию не останавливается на создании PR. Агент обязан довести git flow до конца: squash merge, delete remote branch, cleanup и parking worktrees. PR-only stop допустим только если пользователь явно попросил остановиться на открытом PR.
+Delivery does not stop at PR creation by default. The agent must complete the flow: squash merge, delete the remote branch, run configured cleanup, and record delivery-state evidence. A PR-only stop is valid only when the user explicitly asks for it.
 
-Feature delivery завершает задачу в `{{git.integrationBranch}}`. Сам по себе этот шаг не означает, что изменение уже выпущено в `{{git.releaseBranch}}`.
+Feature delivery completes the task in `{{git.integrationBranch}}`. By itself, it does not mean the change was released to `{{git.releaseBranchLabel}}`.
 
-## Cleanup после merge
+## Cleanup After Merge
 
 ```bash
-# Удалить remote branch
 {{git.remoteBranchDeleteCommand}}
-
-# Обязательный helper: он сам fetch'ит remote, обновляет integration branch в main worktree,
-# переводит текущий worktree на parking branch, чинит upstream и валидирует постусловия.
 {{git.worktreeParkCommand}}
-
-# Канонический post-delivery отчет
 {{git.deliveryStateCommand}} --ref {{git.integrationRef}}
 ```
 
-**Postcondition is mandatory:** delivery не завершён, пока текущий worktree не стоит на `worktree/<dirname>`, не трекает `{{git.integrationRef}}`, и его `HEAD` не совпадает с `{{git.integrationRef}}`.
+Postcondition: {{git.worktreePostcondition}}.
 
-Cleanup после merge — это только локальная hygiene-операция. Она не меняет правду про `{{git.releaseBranch}}`.
+Cleanup after merge is local hygiene. It does not change release truth for `{{git.releaseBranchLabel}}`.
 
-## Release Sync: {{git.integrationBranch}} -> {{git.releaseBranch}}
+## Release Sync
 
-Это отдельная операция, не часть каждой task-delivery по умолчанию.
+Release sync is separate from default task delivery.
 
-Запускать release-sync только когда нужно реально выпустить накопленный интеграционный хвост в production snapshot.
+Use it only when the project intentionally ships the accumulated integration branch to the configured release branch. If no release branch is configured, release sync is unavailable.
 
 ```bash
-# 1. PR и squash merge
 gh pr create --base {{git.releaseBranch}} --head {{git.integrationBranch}} --title "release: <milestone>" --body "..."
 gh pr merge <N> --squash
 
-# 2. После merge — сбросить {{git.integrationBranch}} на {{git.releaseBranch}} (обязательно после squash-release)
-# Без этого three-dot diff показывает все изменения как "не смёрдженные"
 git fetch {{git.remoteName}}
 git -C <main worktree> reset --hard {{git.releaseRef}}
 git -C <main worktree> push --force-with-lease {{git.remoteName}} {{git.integrationBranch}}
-
-# 3. Синхронизировать все parking worktrees на новый {{git.integrationRef}}
-git worktree list --porcelain \
-  | awk '/^worktree/{wt=$2} /^branch refs\/heads\/worktree\//{print wt}' \
-  | while read wt; do
-      WNAME="$(basename "$wt")"
-      git -C "$wt" checkout -B "worktree/$WNAME" {{git.integrationRef}}
-      git -C "$wt" branch --unset-upstream >/dev/null 2>&1 || true
-      git -C "$wt" branch --set-upstream-to={{git.integrationRef}} "worktree/$WNAME"
-    done
 ```
 
-После успешного release-sync `{{git.integrationRef}}` и `{{git.releaseRef}}` обязаны совпадать. До release-sync их расхождение ожидаемо.
+After a successful release sync, `git diff {{git.releaseRef}} {{git.integrationRef}}` must be empty. SHA equality is not required when branch protection blocks an integration-branch reset; content equality is the invariant.
 
-## Как Отчитываться
+## Close-out Wording
 
-Каждый delivery close-out обязан явно сообщать три статуса:
+Every delivery close-out must explicitly report:
 
 - `{{git.integrationBranch}}:` merged / not merged, PR number, commit
-- `{{git.releaseBranch}}:` released / not released, release PR number if any
-- `Local worktree:` parked / not parked, current branch, upstream, `HEAD == {{git.integrationRef}}` yes/no
+- {{git.releaseCloseoutLine}}
+- `Local worktree:` parked / skipped / failed, current branch, upstream, `HEAD == {{git.integrationRef}}` yes/no when applicable
 
-Канонический способ получить этот блок:
+Canonical report command:
 
 ```bash
 {{git.deliveryStateCommand}} --ref <merge-commit-or-{{git.integrationRef}}>
 ```
 
-## Параллельные worktrees
+## Parallel Worktrees
 
-Перед `gh pr create` — всегда rebase:
+Before opening a PR, rebase on integration:
 
 ```bash
 git fetch {{git.remoteName}}
@@ -133,10 +113,10 @@ git rebase {{git.integrationRef}}
 git push --force-with-lease
 ```
 
-| Ситуация | Параллельно? |
-|----------|-------------|
-| Задачи трогают разные файлы | yes, GitHub мёрджит сам |
-| Задача B дополняет файлы задачи A | rebase обязателен |
-| Задача B требует завершения A | только последовательно |
+| Situation | Parallel? |
+|-----------|-----------|
+| Tasks touch different files | Yes, GitHub can merge them independently. |
+| Task B extends files changed by task A | Rebase is required. |
+| Task B depends on task A being complete | Run sequentially. |
 
-Rebase с конфликтами = задача была зависимой, не должна идти параллельно.
+Rebase conflicts mean the work was dependent and should not continue in parallel without resolving the dependency.

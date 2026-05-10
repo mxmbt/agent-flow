@@ -172,7 +172,10 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
     path.join(".codex", "skills", "refactor-safely.md"),
     path.join(".claude", "skills", "review-changes.md"),
     path.join(".codex", "skills", "review-changes.md"),
-    ...expectedSharedTemplatePaths()
+    ...expectedSharedTemplatePaths(),
+    ".mcp.json",
+    path.join(".claude", "settings.json"),
+    path.join(".codex", "mcp.codex.json")
   ]);
 
   const claude = byPath.get("CLAUDE.md");
@@ -211,6 +214,17 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.match(codex, /# Canonical QA And Delivery/);
   assert.match(codex, /# Canonical State And Report Contracts/);
   assert.doesNotMatch(codex, /FinAI|FINAI|ZNAI|cf &&|organizationId/);
+
+  const sharedMcp = byPath.get(".mcp.json");
+  const claudeSettings = byPath.get(path.join(".claude", "settings.json"));
+  const codexMcp = byPath.get(path.join(".codex", "mcp.codex.json"));
+  assert.ok(sharedMcp);
+  assert.ok(claudeSettings);
+  assert.ok(codexMcp);
+  assert.deepEqual(Object.keys(JSON.parse(sharedMcp).mcpServers), ["codeReviewGraph", "playwright"]);
+  assert.deepEqual(Object.keys(JSON.parse(claudeSettings).mcpServers), ["codeReviewGraph", "playwright"]);
+  assert.deepEqual(Object.keys(JSON.parse(codexMcp).mcpServers), ["codeReviewGraph", "playwright"]);
+  assert.doesNotMatch(`${sharedMcp}\n${claudeSettings}\n${codexMcp}`, /\/Users\/|\/home\/|\/private\//);
 
   const claudeAgent = byPath.get(path.join(".claude", "agents", "feature-developer.md"));
   const codexAgent = byPath.get(path.join(".codex", "agents", "feature-developer.md"));
@@ -717,9 +731,9 @@ test("renderTargetFiles renders native Claude and Codex root targets from the sa
   assert.equal(JSON.parse(stateTemplate).project, "Target Fixture");
   assert.match(stateTemplate, /"diffBase": "develop"/);
   assert.match(stateTemplate, /"walkthroughFile": "docs\/walkthroughs\/agents\/<taskId>\.md"/);
-  assert.match(stateTemplate, /"releaseAnnouncementInternal": ""/);
-  assert.match(stateTemplate, /"releaseAnnouncementExternal": ""/);
-  assert.doesNotMatch(stateTemplate, /releaseAnnouncementAdmins|releaseAnnouncementUsers/);
+  assert.match(stateTemplate, /"releaseAnnouncementAdmins": ""/);
+  assert.match(stateTemplate, /"releaseAnnouncementUsers": ""/);
+  assert.doesNotMatch(stateTemplate, /releaseAnnouncementInternal|releaseAnnouncementExternal/);
   assert.match(qaReportTemplate, /npm test/);
   assert.doesNotMatch(qaReportTemplate, /cd cf/);
   assert.match(designDocumentTemplate, /### Domain Correctness/);
