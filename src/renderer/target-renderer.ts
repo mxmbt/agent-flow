@@ -57,6 +57,31 @@ const SHARED_TEMPLATES: SharedTemplate[] = [
     outputPath: path.join("docs", "templates", "walkthrough-template.md"),
     templatePath: path.join("shared", "docs", "templates", "walkthrough-template.md.hbs"),
     id: "shared-doc-template-walkthrough"
+  },
+  {
+    outputPath: path.join("scripts", "agent-flow-review-gate.mjs"),
+    templatePath: path.join("shared", "scripts", "agent-flow-review-gate.mjs.hbs"),
+    id: "shared-script-review-gate"
+  },
+  {
+    outputPath: path.join("scripts", "agent-flow-phase-check.mjs"),
+    templatePath: path.join("shared", "scripts", "agent-flow-phase-check.mjs.hbs"),
+    id: "shared-script-phase-check"
+  },
+  {
+    outputPath: path.join("scripts", "agent-flow-validate-phase.mjs"),
+    templatePath: path.join("shared", "scripts", "agent-flow-validate-phase.mjs.hbs"),
+    id: "shared-script-validate-phase"
+  },
+  {
+    outputPath: path.join("scripts", "park-worktrees.sh"),
+    templatePath: path.join("shared", "scripts", "park-worktrees.sh.hbs"),
+    id: "shared-script-park-worktrees"
+  },
+  {
+    outputPath: path.join("scripts", "report-delivery-state.sh"),
+    templatePath: path.join("shared", "scripts", "report-delivery-state.sh.hbs"),
+    id: "shared-script-report-delivery-state"
   }
 ];
 
@@ -301,6 +326,12 @@ const CODEX_TARGETS: TargetTemplate[] = [
     outputPath: path.join(".codex", "claude-interop.md"),
     templatePath: path.join("targets", "codex", ".codex", "claude-interop.md.hbs"),
     id: "codex-claude-interop",
+    target: "codex"
+  },
+  {
+    outputPath: path.join(".codex", "README.md"),
+    templatePath: path.join("targets", "codex", ".codex", "README.md.hbs"),
+    id: "codex-readme",
     target: "codex"
   },
   {

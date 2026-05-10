@@ -1,0 +1,226 @@
+#!/usr/bin/env node
+
+import { readFileSync, readdirSync, statSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { join, resolve } from 'path';
+
+const PHASE_ROOT = '{{artifacts.phaseRoot}}';
+
+const PHASE_ORDER = [
+  'PLAN',
+  'ARCHITECTURE',
+  'IMPLEMENTATION',
+  'SIMPLIFY',
+  'REVIEW',
+  'QUALITY_GATE',
+  'QA',
+  'DELIVERY',
+];
+
+const PHASE_STATE_KEYS = {
+  PLAN: 'plan',
+  ARCHITECTURE: 'architecture',
+  IMPLEMENTATION: 'implementation',
+  SIMPLIFY: 'simplify',
+  REVIEW: 'review',
+  QUALITY_GATE: 'qualityGate',
+  QA: 'qa',
+  DELIVERY: 'delivery',
+};
+
+const STATE_FILE_SUFFIXES = ['-state.json'];
+
+function isStateFile(fileName) {
+  return STATE_FILE_SUFFIXES.some((suffix) => fileName.endsWith(suffix));
+}
+
+function latestAgentState() {
+  const root = join(process.cwd(), PHASE_ROOT);
+  let best = null;
+
+  try {
+    for (const phaseDir of readdirSync(root)) {
+      if (!phaseDir.startsWith('phase-')) continue;
+
+      const statesDir = join(root, phaseDir, 'states');
+      try {
+        for (const file of readdirSync(statesDir)) {
+          if (!isStateFile(file)) continue;
+          const path = join(statesDir, file);
+          const mtime = statSync(path).mtimeMs;
+          if (!best || mtime > best.mtime) best = { path, mtime };
+        }
+      } catch {
+        // ignore missing states dir
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return best?.path || null;
+}
+
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function asObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+}
+
+function normalizePhaseName(phaseName) {
+  return typeof phaseName === 'string' ? phaseName.trim().toUpperCase() : '';
+}
+
+function getPhaseState(state, phaseName) {
+  const phaseKey = PHASE_STATE_KEYS[phaseName];
+  return state?.phases?.[phaseKey] || state?.phases?.[phaseName];
+}
+
+function triageHasSignal(value) {
+  if (Array.isArray(value)) return value.length > 0;
+  if (!value || typeof value !== 'object') return false;
+
+  return Object.values(value).some((entry) => {
+    if (Array.isArray(entry)) return entry.length > 0;
+    return entry && typeof entry === 'object' && Object.keys(entry).length > 0;
+  });
+}
+
+function validateDeferredItem(item, index, errors) {
+  const obj = asObject(item);
+  if (Object.keys(obj).length === 0) {
+    errors.push(`reports.review.deferred[${index}] must be an object`);
+    return;
+  }
+
+  const requiredFields = ['kind', 'priority', 'complexity', 'module', 'revisitTrigger', 'deferTarget'];
+  for (const field of requiredFields) {
+    if (typeof obj[field] !== 'string' || obj[field].trim().length === 0) {
+      errors.push(`reports.review.deferred[${index}].${field} must be a non-empty string`);
+    }
+  }
+}
+
+function validateModernReview(review, errors, warnings) {
+  const verdict = review.verdict;
+  const cycles = review.cycles;
+  const approvedVerdicts = new Set(['APPROVED', 'PASS']);
+  const needsChangesVerdicts = new Set(['NEEDS_CHANGES', 'NEEDS_FIX']);
+
+  if (!approvedVerdicts.has(verdict) && !needsChangesVerdicts.has(verdict)) {
+    errors.push(`reports.review.verdict must be APPROVED|PASS|NEEDS_CHANGES|NEEDS_FIX (got: ${String(verdict)})`);
+  }
+
+  if (!Number.isInteger(cycles) || cycles < 0) {
+    errors.push('reports.review.cycles must be a non-negative integer');
+  }
+
+  if (needsChangesVerdicts.has(verdict) && cycles < 1) {
+    errors.push('reports.review.cycles must be >= 1 when verdict requires changes');
+  }
+
+  if (!Array.isArray(review.primaryReviewIssues)) {
+    errors.push('reports.review.primaryReviewIssues must be an array');
+  }
+
+  if (!Array.isArray(review.deepReviewIssues)) {
+    errors.push('reports.review.deepReviewIssues must be an array');
+  }
+
+  if (!Array.isArray(review.deferred)) {
+    errors.push('reports.review.deferred must be an array');
+  }
+
+  const primaryReviewIssues = asArray(review.primaryReviewIssues);
+  const deepReviewIssues = asArray(review.deepReviewIssues);
+  const deferred = asArray(review.deferred);
+  const findingCount = primaryReviewIssues.length + deepReviewIssues.length;
+
+  if (needsChangesVerdicts.has(verdict) && findingCount === 0) {
+    errors.push('reports.review must include primaryReviewIssues or deepReviewIssues when verdict=NEEDS_CHANGES');
+  }
+
+  if (verdict === 'PASS') {
+    warnings.push('reports.review.verdict=PASS is accepted for compatibility with older state files');
+  }
+
+  if (primaryReviewIssues.length > 0 && !triageHasSignal(review.primaryReviewTriage)) {
+    errors.push('reports.review.primaryReviewTriage must record dispositions when primaryReviewIssues are present');
+  }
+
+  if (deepReviewIssues.length > 0 && !triageHasSignal(review.deepReviewTriage)) {
+    errors.push('reports.review.deepReviewTriage must record dispositions when deepReviewIssues are present');
+  }
+
+  if (typeof review.primaryReviewThreadId !== 'string') {
+    errors.push('reports.review.primaryReviewThreadId must be a string');
+  } else if (review.primaryReviewThreadId.trim().length === 0) {
+    warnings.push('reports.review.primaryReviewThreadId is empty; older completed reviews may predate strict thread tracking');
+  }
+
+  deferred.forEach((item, index) => validateDeferredItem(item, index, errors));
+}
+
+export function validateReviewQuality(state) {
+  const errors = [];
+  const warnings = [];
+
+  const currentPhase = normalizePhaseName(state?.currentPhase);
+  const currentIndex = PHASE_ORDER.indexOf(currentPhase);
+  const reviewIndex = PHASE_ORDER.indexOf('REVIEW');
+  const reviewStatus = getPhaseState(state, 'REVIEW')?.status;
+  const reviewRequired = reviewStatus === 'completed' || (currentIndex !== -1 && currentIndex >= reviewIndex);
+
+  if (!reviewRequired) {
+    return { errors, warnings, reviewRequired: false };
+  }
+
+  validateModernReview(asObject(state?.reports?.review), errors, warnings);
+
+  if (reviewStatus !== 'completed') {
+    warnings.push(`phase REVIEW status is ${String(reviewStatus)}; gate usually runs after REVIEW completion`);
+  }
+
+  return { errors, warnings, reviewRequired: true };
+}
+
+function runCli() {
+  const statePath = process.argv[2] || latestAgentState();
+  if (!statePath) {
+    console.log('No agent-state found.');
+    process.exit(0);
+  }
+
+  const state = JSON.parse(readFileSync(statePath, 'utf-8'));
+  const result = validateReviewQuality(state);
+
+  if (!result.reviewRequired) {
+    console.log(`REVIEW GATE SKIPPED: ${statePath}`);
+    process.exit(0);
+  }
+
+  if (result.errors.length > 0) {
+    console.log(`REVIEW GATE FAILED: ${statePath}`);
+    for (const error of result.errors) {
+      console.log(`- ${error}`);
+    }
+    process.exit(2);
+  }
+
+  if (result.warnings.length > 0) {
+    console.log(`REVIEW GATE WARNINGS: ${statePath}`);
+    for (const warning of result.warnings) {
+      console.log(`- ${warning}`);
+    }
+  }
+
+  console.log(`REVIEW GATE PASSED: ${statePath}`);
+  process.exit(0);
+}
+
+const isCliExecution = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isCliExecution) {
+  runCli();
+}

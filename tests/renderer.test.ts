@@ -82,6 +82,22 @@ test("renderManagedAssetFile writes file-type compatible metadata", () => {
   assert.match(csv, /^# @agent-flow managed /);
   assert.deepEqual(parseManagedMetadata(csv), { id: "csv-asset", version: 1, source: undefined });
 
+  const shell = renderManagedAssetFile(
+    { id: "shell-asset", version: 1 },
+    "#!/bin/bash\necho ok\n",
+    "scripts/example.sh"
+  );
+  assert.match(shell, /^#!\/bin\/bash\n# @agent-flow managed /);
+  assert.deepEqual(parseManagedMetadata(shell), { id: "shell-asset", version: 1, source: undefined });
+
+  const mjs = renderManagedAssetFile(
+    { id: "mjs-asset", version: 1 },
+    "#!/usr/bin/env node\nconsole.log('ok')\n",
+    "scripts/example.mjs"
+  );
+  assert.match(mjs, /^#!\/usr\/bin\/env node\n\/\/ @agent-flow managed /);
+  assert.deepEqual(parseManagedMetadata(mjs), { id: "mjs-asset", version: 1, source: undefined });
+
   const skill = renderManagedAssetFile(
     { id: "skill-asset", version: 1 },
     "---\nname: example\n---\n# Example\n",

@@ -31,8 +31,12 @@ export function renderManagedAssetFile(metadata: ManagedMetadata, body: string, 
     return insertPythonManagedHeader(metadata, body);
   }
 
-  if (extension === "cjs" || extension === "js" || extension === "ts") {
-    return `${SLASH_MANAGED_PREFIX}${JSON.stringify(metadata)}\n${ensureTrailingNewline(body)}`;
+  if (extension === "cjs" || extension === "js" || extension === "mjs" || extension === "ts") {
+    return insertSlashManagedHeader(metadata, body);
+  }
+
+  if (extension === "sh") {
+    return insertShellManagedHeader(metadata, body);
   }
 
   if (extension === "csv") {
@@ -106,6 +110,22 @@ function insertPythonManagedHeader(metadata: ManagedMetadata, body: string): str
     insertionIndex += 1;
   }
 
+  lines.splice(insertionIndex, 0, header);
+  return lines.join("\n");
+}
+
+function insertShellManagedHeader(metadata: ManagedMetadata, body: string): string {
+  const lines = ensureTrailingNewline(body).split("\n");
+  const header = `${HASH_MANAGED_PREFIX}${JSON.stringify(metadata)}`;
+  const insertionIndex = lines[0]?.startsWith("#!") ? 1 : 0;
+  lines.splice(insertionIndex, 0, header);
+  return lines.join("\n");
+}
+
+function insertSlashManagedHeader(metadata: ManagedMetadata, body: string): string {
+  const lines = ensureTrailingNewline(body).split("\n");
+  const header = `${SLASH_MANAGED_PREFIX}${JSON.stringify(metadata)}`;
+  const insertionIndex = lines[0]?.startsWith("#!") ? 1 : 0;
   lines.splice(insertionIndex, 0, header);
   return lines.join("\n");
 }

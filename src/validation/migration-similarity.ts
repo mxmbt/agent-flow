@@ -141,7 +141,7 @@ function isTemplateComment(line: string): boolean {
 }
 
 function normalizeAllowedMigrationDifferences(line: string): string {
-  return line
+  const normalized = line
     .replaceAll(".claude/", ".agent-tool/")
     .replaceAll(".codex/", ".agent-tool/")
     .replaceAll("{{target.guideRoot}}/", ".agent-tool/guides/")
@@ -314,6 +314,21 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("primaryReviewIssues", "codexIssues")
     .replaceAll("primaryReviewTriage", "codexTriage")
     .replaceAll("primaryReviewThreadId", "codexThreadId")
+    .replaceAll("import { validateReviewQuality } from './agent-flow-review-gate.mjs';", "import { validateReviewQuality } from './codex-review-gate.mjs';")
+    .replaceAll("const PHASE_ROOT = 'docs/phases';\n", "")
+    .replaceAll("const STATE_FILE_SUFFIXES = ['-state.json'];", "const STATE_FILE_SUFFIXES = ['-state.json', '-state.codex.json'];")
+    .replaceAll("join(process.cwd(), PHASE_ROOT)", "join(process.cwd(), 'docs', 'phases')")
+    .replaceAll("let mark = 'open';", "let mark = '⚪';")
+    .replaceAll("if (status === 'completed') mark = filled ? 'ok' : 'empty';", "if (status === 'completed') mark = filled ? '✅' : '❌';")
+    .replaceAll("if (status === 'skipped') mark = 'skipped';", "if (status === 'skipped') mark = '⏭️';")
+    .replaceAll("console.log('REVIEW GATE: not required at current phase');", "console.log('⚪ REVIEW GATE: not required at current phase');")
+    .replaceAll("console.log('REVIEW GATE: failed');", "console.log('❌ REVIEW GATE: failed');")
+    .replaceAll("console.log('REVIEW GATE: warnings');", "console.log('⚠️ REVIEW GATE: warnings');")
+    .replaceAll("console.log('REVIEW GATE: passed');", "console.log('✅ REVIEW GATE: passed');")
+    .replaceAll("reports.review.verdict=PASS is accepted for compatibility with older state files", "reports.review.verdict=PASS is accepted for compatibility with existing FinAI state files")
+    .replaceAll("WARNING: Could not read state:", "⚠️ Could not read state:")
+    .replaceAll("node scripts/agent-flow-phase-check.mjs", "node scripts/codex-phase-check.mjs")
+    .replaceAll("node scripts/agent-flow-review-gate.mjs", "node scripts/codex-review-gate.mjs")
     .replaceAll("data isolation", "userId isolation")
     .replaceAll("data-isolation", "userId")
     .replaceAll("query/resource bounds", "D1 query bounds")
@@ -551,32 +566,132 @@ function normalizeAllowedMigrationDifferences(line: string): string {
     .replaceAll("\"temporary\"", "“temporary”")
     .replaceAll("Preferred path:", "Preferred path in FinAI:")
     .replaceAll("commit work, open PR to the configured integration branch with the standard body template, squash merge, delete branch, sync worktrees", "commit work, open PR to `develop` with the standard body template, squash merge, delete branch, sync worktrees")
-    .replaceAll("on configured release-sync deliveries, prepend a new block to `RELEASES.md` from per-PR user-facing lines", "on `develop -> master` release-sync deliveries, prepend a new block to `RELEASES.md` from per-PR user-facing lines")
+    .replaceAll("on configured release-sync deliveries, prepend a new block to `RELEASES.md` from per-PR user-facing lines", "on `develop → master` release-sync deliveries, prepend a new block to `RELEASES.md` from per-PR user-facing lines")
     .replaceAll("report configured integration-branch delivery, configured release-branch status, and local worktree parking as separate facts", "report `develop` delivery, `master` release status, and local worktree parking as separate facts")
     .replaceAll("Runtime bindings (`cf/wrangler.toml` configured binding changes)", "Bindings (`cf/wrangler.toml` D1/R2/KV changes)")
     .replaceAll("Secrets (new configured secret references without existing secret provisioning history)", "Secrets (new `env.<NAME>` references without existing `wrangler secret put` history)")
     .replaceAll("Cron (configured scheduled triggers and handlers)", "Cron (`[triggers]` in wrangler.toml; `scheduled()` handlers)")
     .replaceAll("scheduled-task or cron handlers", "`scheduled()` / cron handlers")
+    .replaceAll("Operator notes (release workflows, manual backfills)", "Operator notes (`.github/workflows/**`, manual backfills)")
     .replaceAll("configured release-notes aggregation", "`RELEASES.md` aggregation")
     .replaceAll("Release-notes aggregation skips these entries.", "`RELEASES.md` aggregation skips these entries.")
+    .replaceAll("6a. **Release announcement authoring**:", "6a. **Release announcement authoring** (OBSERVE-T0 contract — mandatory from this point forward):")
+    .replaceAll("After authoring `userFacingChange`, author two announcement strings for the operator to paste into the configured release announcement destinations:", "After authoring `userFacingChange`, author two announcement strings for the operator to paste into the deploy workflow inputs:")
     .replaceAll("configured operator/admin release-announcement destination", "`release_notes_admins` workflow input")
     .replaceAll("configured user-facing release-announcement destination", "`release_notes_users` workflow input")
+    .replaceAll("the `release_notes_admins` workflow input", "`release_notes_admins` workflow input")
+    .replaceAll("the `release_notes_users` workflow input", "`release_notes_users` workflow input")
     .replaceAll("for the `release_notes_admins` workflow input", "for `release_notes_admins` workflow input")
     .replaceAll("## Copy into configured admin release announcement destination", "## ⤵ Copy into deploy.yml release_notes_admins input")
     .replaceAll("## Copy into configured user release announcement destination", "## ⤵ Copy into deploy.yml release_notes_users input")
+    .replaceAll("Blank values are a contract bug; omitting `releaseAnnouncementUsers` when it is not applicable is correct.", "These are mandatory fields after OBSERVE-T0 PR-A lands. Leaving them blank is a contract bug.")
     .replaceAll("write directly to the configured release-notes artifact", "write to `RELEASES.md` directly")
     .replaceAll("new configured release-notes block", "new `RELEASES.md` block")
     .replaceAll("to the configured release-notes artifact", "to `RELEASES.md`")
+    .replaceAll("on configured release-sync deliveries, prepend a new block to `RELEASES.md` from per-PR user-facing lines", "on `develop → master` release-sync deliveries, prepend a new block to `RELEASES.md` from per-PR user-facing lines")
     .replaceAll("release-notes aggregation only", "`RELEASES.md` aggregation only")
     .replaceAll("updated the configured release-notes artifact", "updated `RELEASES.md`")
+    .replaceAll("suitable for `release_notes_users` workflow input", "suitable for pasting into `release_notes_users`")
     .replaceAll("diff touches configured high-risk prompt or agent assembly surfaces, configured messaging copy changed, or approval/registration flow semantics changed", "diff touches `cf/src/agents/*/SOUL.md`|`RULES.md`|tier-1 prompt assembly, Telegram copy changed (including the `pending` command, notifier fan-out), or approval/registration flow semantics changed")
-    .replaceAll("📢 Deploy <YYYY-MM-DD>", "📢 FinAI deploy <YYYY-MM-DD>")
+    .replaceAll("Deploy <YYYY-MM-DD>", "📢 FinAI deploy <YYYY-MM-DD>")
+    .replaceAll("configured integration branch as merged", "`Develop: merged`")
+    .replaceAll("the `Develop: merged`", "`Develop: merged`")
     .replaceAll("Reference the current Design Document or ADD/ADR for full architectural rationale when the release-announcement contract changed.", "Reference: `docs/phases/phase-observe/design/FINAI-PLAN-OBSERVE-T0-ADR.md` (delivery-agent Contract Delta section) for full architectural rationale.")
     .replaceAll("Enumerate squashed commits between the prior release branch tip and the new release branch tip", "Enumerate squashed commits between prior master tip and new master tip");
+
+  return normalized;
+}
+
+function normalizeScriptMigrationDifferences(value: string): string {
+  return value
+    .replaceAll([
+      'REMOTE="origin"',
+      'INTEGRATION_BRANCH="develop"',
+      'RELEASE_BRANCH="master"',
+      ''
+    ].join("\n"), "")
+    .replaceAll([
+      "is_protected_branch() {",
+      "  local branch_name=\"$1\"",
+      "  [[ \"$branch_name\" == \"$INTEGRATION_BRANCH\" ]] && return 0",
+      "  [[ \"$RELEASE_BRANCH\" != \"none configured\" && \"$branch_name\" == \"$RELEASE_BRANCH\" ]] && return 0",
+      "  return 1",
+      "}",
+      ""
+    ].join("\n"), "")
+    .replaceAll("\"$REMOTE/$INTEGRATION_BRANCH\"", "origin/develop")
+    .replaceAll("$REMOTE/$INTEGRATION_BRANCH", "origin/develop")
+    .replaceAll("\"$REMOTE/$RELEASE_BRANCH\"", "origin/master")
+    .replaceAll("$REMOTE/$RELEASE_BRANCH", "origin/master")
+    .replaceAll("\"$REMOTE\"", "origin")
+    .replaceAll("\"$INTEGRATION_BRANCH\"", "develop")
+    .replaceAll("$INTEGRATION_BRANCH", "develop")
+    .replaceAll("\"$RELEASE_BRANCH\"", "master")
+    .replaceAll("$RELEASE_BRANCH", "master")
+    .replaceAll("integration_head", "develop_head")
+    .replaceAll("INTEGRATION_SHA", "DEVELOP_SHA")
+    .replaceAll("INTEGRATION_STATUS", "DEVELOP_STATUS")
+    .replaceAll("RELEASE_SHA", "MASTER_SHA")
+    .replaceAll("RELEASE_STATUS", "MASTER_STATUS")
+    .replaceAll("headMatchesIntegration", "headMatchesOriginDevelop")
+    .replaceAll("if is_protected_branch \"$CURRENT_BRANCH\"; then", "if [[ \"$CURRENT_BRANCH\" == \"develop\" || \"$CURRENT_BRANCH\" == \"master\" ]]; then")
+    .replaceAll(
+      'MAIN_WORKTREE="$(git worktree list --porcelain | awk -v branch="refs/heads/develop" \'/^worktree /{wt=$2} $0 == "branch " branch {print wt; exit}\')"',
+      'MAIN_WORKTREE="$(git worktree list --porcelain | awk \'/^worktree /{wt=$2} /^branch refs\\/heads\\/develop$/{print wt; exit}\')"'
+    )
+    .replaceAll("the configured integration branch", "origin/develop")
+    .replaceAll("the configured release branch, when configured", "origin/master")
+    .replaceAll([
+      "RELEASE_CONFIGURED=\"yes\"",
+      "if [[ \"master\" == \"none configured\" ]]; then",
+      "  RELEASE_CONFIGURED=\"no\"",
+      "else",
+      "  git rev-parse --verify origin/master >/dev/null 2>&1 || {",
+      "    echo \"Missing origin/master\" >&2",
+      "    exit 1",
+      "  }",
+      "fi"
+    ].join("\n"), [
+      "git rev-parse --verify origin/master >/dev/null 2>&1 || {",
+      "  echo \"Missing origin/master\" >&2",
+      "  exit 1",
+      "}"
+    ].join("\n"))
+    .replaceAll([
+      "if [[ \"$RELEASE_CONFIGURED\" == \"yes\" ]]; then",
+      "  MASTER_SHA=\"$(git rev-parse --verify origin/master)\"",
+      "else",
+      "  MASTER_SHA=\"\"",
+      "fi"
+    ].join("\n"), "MASTER_SHA=\"$(git rev-parse --verify origin/master)\"")
+    .replaceAll([
+      "if [[ \"$RELEASE_CONFIGURED\" == \"yes\" ]]; then",
+      "  if git merge-base --is-ancestor \"$TARGET_SHA\" origin/master; then",
+      "    MASTER_STATUS=\"released\"",
+      "  else",
+      "    MASTER_STATUS=\"not released\"",
+      "  fi",
+      "else",
+      "  MASTER_STATUS=\"not configured\"",
+      "fi"
+    ].join("\n"), [
+      "if git merge-base --is-ancestor \"$TARGET_SHA\" origin/master; then",
+      "  MASTER_STATUS=\"released\"",
+      "else",
+      "  MASTER_STATUS=\"not released\"",
+      "fi"
+    ].join("\n"))
+    .replaceAll("  \"integration\": {", "  \"develop\": {")
+    .replaceAll("  \"release\": {", "  \"master\": {")
+    .replaceAll("    \"branch\": \"develop\",\n", "")
+    .replaceAll("    \"branch\": \"master\",\n", "")
+    .replaceAll("    \"remoteSha\":", "    \"originSha\":")
+    .replaceAll("Integration (develop):", "Develop:")
+    .replaceAll("Release (master):", "Master:");
 }
 
 function normalizeAllowedMigrationText(value: string): string {
-  return value
+  const normalized = value
     .replaceAll(
       [
         "type LaceEventType = string;",
@@ -775,6 +890,8 @@ function normalizeAllowedMigrationText(value: string): string {
       /Run the configured validation checks:\s+```bash\s+cd cf && npm test\s+cd cf && npm run type-check\s+```\s+Other checks:/g,
       "- `cd cf && npm test`:\n- `cd cf && npm run type-check`:\n- Other checks:"
     );
+
+  return normalizeScriptMigrationDifferences(normalized);
 }
 
 function tokenize(value: string): string[] {
