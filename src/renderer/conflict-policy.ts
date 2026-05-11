@@ -1,10 +1,11 @@
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, chmod, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { isManagedFile } from "./managed-blocks.js";
 
 export interface RenderedFile {
   path: string;
   content: string;
+  mode?: number;
 }
 
 export type ConflictMode = "error" | "force" | "backup";
@@ -80,6 +81,9 @@ export async function writeManagedFiles(
     }
 
     await writeFile(targetPath, file.content, "utf8");
+    if (file.mode !== undefined) {
+      await chmod(targetPath, file.mode);
+    }
   }
 
   return plan;
@@ -105,6 +109,15 @@ async function planManagedFile(
   const existing = await readFile(targetPath, "utf8");
 
   if (existing === file.content) {
+    if (file.mode !== undefined && await hasDifferentMode(targetPath, file.mode)) {
+      return {
+        path: file.path,
+        action: "update",
+        reason: "target file mode differs from rendered output",
+        managed: isManagedFile(existing)
+      };
+    }
+
     return {
       path: file.path,
       action: "noop",
@@ -147,6 +160,11 @@ async function planManagedFile(
     reason: "target file exists and is not managed by Agent Flow",
     managed: false
   };
+}
+
+async function hasDifferentMode(filePath: string, expectedMode: number): Promise<boolean> {
+  const current = (await stat(filePath)).mode & 0o777;
+  return current !== expectedMode;
 }
 
 function resolveManagedPath(root: string, filePath: string): string {

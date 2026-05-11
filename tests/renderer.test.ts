@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -149,6 +149,31 @@ test("writeManagedFiles backs up unmanaged files before overwrite", async () => 
   assert.equal(plan[0]?.action, "overwrite");
   assert.equal(await readFile(path.join(root, "AGENTS.md"), "utf8"), rendered);
   assert.equal(await readFile(path.join(root, "AGENTS.md.agent-flow-backup"), "utf8"), "manual instructions\n");
+});
+
+test("writeManagedFiles applies executable mode and repairs mode-only drift", async () => {
+  const root = await tempDir();
+  const content = renderManagedAssetFile(
+    { id: "script", version: 1 },
+    "#!/bin/bash\necho ok\n",
+    "scripts/example.sh"
+  );
+
+  let plan = await writeManagedFiles(root, [
+    { path: "scripts/example.sh", content, mode: 0o755 }
+  ]);
+
+  assert.equal(plan[0]?.action, "create");
+  assert.equal((await stat(path.join(root, "scripts", "example.sh"))).mode & 0o777, 0o755);
+
+  await chmod(path.join(root, "scripts", "example.sh"), 0o644);
+  plan = await writeManagedFiles(root, [
+    { path: "scripts/example.sh", content, mode: 0o755 }
+  ]);
+
+  assert.equal(plan[0]?.action, "update");
+  assert.equal(plan[0]?.reason, "target file mode differs from rendered output");
+  assert.equal((await stat(path.join(root, "scripts", "example.sh"))).mode & 0o777, 0o755);
 });
 
 test("writeManagedFiles aborts all writes when unmanaged conflicts exist", async () => {

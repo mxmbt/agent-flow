@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -79,6 +79,16 @@ test("init creates config, starter docs, and target agent files in a bare projec
 
   const mcp = JSON.parse(await readFile(path.join(cwd, ".mcp.json"), "utf8"));
   assert.deepEqual(Object.keys(mcp.mcpServers), ["codeReviewGraph"]);
+
+  for (const scriptPath of [
+    path.join("scripts", "agent-flow-review-gate.mjs"),
+    path.join("scripts", "agent-flow-phase-check.mjs"),
+    path.join("scripts", "agent-flow-validate-phase.mjs"),
+    path.join("scripts", "park-worktrees.sh"),
+    path.join("scripts", "report-delivery-state.sh")
+  ]) {
+    assert.equal((await stat(path.join(cwd, scriptPath))).mode & 0o777, 0o755);
+  }
 
   const prtCodeReviewer = await readFile(path.join(cwd, ".codex", "agents", "prt-code-reviewer.md"), "utf8");
   assert.match(prtCodeReviewer, /prt-code-reviewer/);
