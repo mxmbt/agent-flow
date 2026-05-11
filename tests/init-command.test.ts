@@ -85,7 +85,13 @@ test("init creates config, starter docs, and target agent files in a bare projec
     path.join("scripts", "agent-flow-phase-check.mjs"),
     path.join("scripts", "agent-flow-validate-phase.mjs"),
     path.join("scripts", "park-worktrees.sh"),
-    path.join("scripts", "report-delivery-state.sh")
+    path.join("scripts", "report-delivery-state.sh"),
+    path.join(".codex", "skills", "systematic-debugging", "find-polluter.sh"),
+    path.join(".codex", "skills", "brainstorming", "scripts", "start-server.sh"),
+    path.join(".codex", "skills", "brainstorming", "scripts", "stop-server.sh"),
+    path.join(".claude", "skills", "systematic-debugging", "find-polluter.sh"),
+    path.join(".claude", "skills", "brainstorming", "scripts", "start-server.sh"),
+    path.join(".claude", "skills", "brainstorming", "scripts", "stop-server.sh")
   ]) {
     assert.equal((await stat(path.join(cwd, scriptPath))).mode & 0o777, 0o755);
   }

@@ -988,6 +988,21 @@ test("design pack static skill assets do not contain dangling local references",
   assert.deepEqual(missing, []);
 });
 
+test("renderTargetFiles marks every shebang asset executable", async () => {
+  const config = createDefaultConfig("Executable Fixture");
+  config.discovery.codeGraphProvider = "code-review-graph";
+  config.packs = ["code-review-graph", "code-review-toolkit", "design"];
+  const packs = composePacks(builtinPacks, config.packs);
+
+  const files = await renderTargetFiles(config, packs, { templateRoot });
+  const shebangFiles = files.filter((file) => file.content.startsWith("#!"));
+
+  assert.ok(shebangFiles.length > 20);
+  for (const file of shebangFiles) {
+    assert.equal(file.mode, 0o755, file.path);
+  }
+});
+
 test("renderTargetFiles honors disabled Claude or Codex feature flags", async () => {
   const config = createDefaultConfig("Codex Only");
   config.features.claude = false;

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Extends executable mode handling to all rendered shebang assets, including static skill scripts.
+- Adds a renderer invariant that every generated file beginning with `#!` is written with mode `0755`.
+
 ## 0.1.4
 
 - Writes generated helper scripts with executable mode `0755` so they can be invoked as `./scripts/...`.
