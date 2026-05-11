@@ -637,6 +637,7 @@ async function renderPackSkillAssets(
 
         rendered.push({
           path: outputPath,
+          mode: executableModeForContent(body),
           content: renderManagedAssetFile(
             {
               id: `${target}-skill-${skill}-${asset.relativePath.replaceAll(path.sep, "-")}`,
@@ -667,6 +668,7 @@ async function renderPackSkillAssets(
 
       rendered.push({
         path: outputPath,
+        mode: executableModeForContent(body),
         content: renderManagedAssetFile(
           {
             id: `${target}-skill-file-${skillFile.replaceAll(path.sep, "-")}`,
@@ -696,7 +698,7 @@ async function renderSharedTemplates(
 
     return {
       path: template.outputPath,
-      mode: template.mode,
+      mode: template.mode ?? executableModeForContent(body),
       content: renderManagedAssetFile(
         {
           id: template.id,
@@ -708,6 +710,10 @@ async function renderSharedTemplates(
       )
     };
   }));
+}
+
+function executableModeForContent(content: string): number | undefined {
+  return content.startsWith("#!") ? 0o755 : undefined;
 }
 
 function needsStaticTemplate(content: string): boolean {
