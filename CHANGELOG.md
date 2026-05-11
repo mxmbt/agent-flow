@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Writes generated helper scripts with executable mode `0755` so they can be invoked as `./scripts/...`.
+- Repairs mode-only drift during `agent-flow update`/`sync` when managed scripts already match rendered content but are not executable.
+
 ## 0.1.3
 
 - Enables the code-review-toolkit pack during `agent-flow init` for fresh projects.

@@ -31,6 +31,7 @@ interface SharedTemplate {
   outputPath: string;
   templatePath: string;
   id: string;
+  mode?: number;
 }
 
 const SHARED_TEMPLATES: SharedTemplate[] = [
@@ -62,27 +63,32 @@ const SHARED_TEMPLATES: SharedTemplate[] = [
   {
     outputPath: path.join("scripts", "agent-flow-review-gate.mjs"),
     templatePath: path.join("shared", "scripts", "agent-flow-review-gate.mjs.hbs"),
-    id: "shared-script-review-gate"
+    id: "shared-script-review-gate",
+    mode: 0o755
   },
   {
     outputPath: path.join("scripts", "agent-flow-phase-check.mjs"),
     templatePath: path.join("shared", "scripts", "agent-flow-phase-check.mjs.hbs"),
-    id: "shared-script-phase-check"
+    id: "shared-script-phase-check",
+    mode: 0o755
   },
   {
     outputPath: path.join("scripts", "agent-flow-validate-phase.mjs"),
     templatePath: path.join("shared", "scripts", "agent-flow-validate-phase.mjs.hbs"),
-    id: "shared-script-validate-phase"
+    id: "shared-script-validate-phase",
+    mode: 0o755
   },
   {
     outputPath: path.join("scripts", "park-worktrees.sh"),
     templatePath: path.join("shared", "scripts", "park-worktrees.sh.hbs"),
-    id: "shared-script-park-worktrees"
+    id: "shared-script-park-worktrees",
+    mode: 0o755
   },
   {
     outputPath: path.join("scripts", "report-delivery-state.sh"),
     templatePath: path.join("shared", "scripts", "report-delivery-state.sh.hbs"),
-    id: "shared-script-report-delivery-state"
+    id: "shared-script-report-delivery-state",
+    mode: 0o755
   }
 ];
 
@@ -690,6 +696,7 @@ async function renderSharedTemplates(
 
     return {
       path: template.outputPath,
+      mode: template.mode,
       content: renderManagedAssetFile(
         {
           id: template.id,
