@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -1000,6 +1000,26 @@ test("renderTargetFiles marks every shebang asset executable", async () => {
   assert.ok(shebangFiles.length > 20);
   for (const file of shebangFiles) {
     assert.equal(file.mode, 0o755, file.path);
+  }
+});
+
+test("source shebang scripts are executable", async () => {
+  const files = [
+    ...await listFiles(path.join(templateRoot, "static", "skills")),
+    ...await listFiles(path.join(repoRoot, "scripts"))
+  ];
+  const shebangFiles: string[] = [];
+
+  for (const file of files) {
+    const content = await readFile(file, "utf8");
+    if (content.startsWith("#!")) {
+      shebangFiles.push(file);
+    }
+  }
+
+  assert.ok(shebangFiles.length > 20);
+  for (const file of shebangFiles) {
+    assert.equal((await stat(file)).mode & 0o777, 0o755, path.relative(repoRoot, file));
   }
 });
 
