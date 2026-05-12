@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6
+
+- Marks all source shebang scripts in static skills and repo helper scripts as executable in git.
+- Adds a source-tree invariant that shebang scripts stay `0755`.
+
 ## 0.1.5
 
 - Extends executable mode handling to all rendered shebang assets, including static skill scripts.
